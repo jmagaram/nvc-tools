@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import DateDisplayDemo from './DateDisplayDemo.tsx'
-import NumberDisplayDemo from './NumberDisplayDemo.tsx'
+import EmotionCategoryCardDemo from './EmotionCategoryCardDemo.tsx'
+import FeelingCardDemo from './FeelingCardDemo.tsx'
 
 export type Demo = {
   slug: string
@@ -9,6 +9,10 @@ export type Demo = {
 }
 
 export const demos: Demo[] = [
-  { slug: 'date-display', title: 'Date Display', Component: DateDisplayDemo },
-  { slug: 'number-display', title: 'Number Display', Component: NumberDisplayDemo },
+  {
+    slug: 'emotion-category-card',
+    title: 'Emotion Category Card',
+    Component: EmotionCategoryCardDemo,
+  },
+  { slug: 'feeling-card', title: 'Feeling Card', Component: FeelingCardDemo },
 ]
