@@ -1,4 +1,5 @@
 import type { Feeling, FeelingCategory } from '../data/feelings.ts'
+import { shuffle } from './shuffle.ts'
 
 /** A feeling the walk has already asked about. */
 type Answered = {
@@ -29,16 +30,6 @@ export type FeelingPickerState = {
 }
 
 export type FeelingPickerAction = { type: 'accept' } | { type: 'reject' }
-
-/** Fisher-Yates, on a copy. `rng` is a parameter so a walk can be repeatable. */
-function shuffle(feelings: readonly Feeling[], rng: () => number): Feeling[] {
-  const result = [...feelings]
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[result[i], result[j]] = [result[j], result[i]]
-  }
-  return result
-}
 
 /**
  * Start a walk through `category`. Feelings named in `alreadyPicked` are asked
@@ -90,6 +81,11 @@ export function reduce(
       ? { status: 'asking', answered: next, current: head, upcoming: rest }
       : { status: 'done', answered: next },
   }
+}
+
+/** Whether every feeling in the category has been asked about. */
+export function isDone(state: FeelingPickerState): boolean {
+  return state.walk.status === 'done'
 }
 
 /**

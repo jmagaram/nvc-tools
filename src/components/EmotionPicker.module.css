@@ -1,0 +1,59 @@
+.picker {
+  display: grid;
+  gap: 1rem;
+}
+
+/* The rule under the tabs runs the full width; the selected tab's own bottom
+   border sits on top of it, so the panel reads as hanging off that tab. */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid;
+}
+
+.tab {
+  margin-bottom: -1px;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* The chosen side is told by the border alone — no colour, the same way met
+   and unmet are told apart everywhere else. */
+.tab[aria-pressed='true'] {
+  border-color: currentColor;
+  border-bottom-color: transparent;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Cards size themselves to the text; auto-fill lets a row hold as many as fit
+   rather than stretching two cards across the page. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.actions button {
+  padding: 0.5rem 1rem;
+}
+
