@@ -44,8 +44,43 @@ Obsidian plugin all depend on the word list.
   translate them. Find out whether the official inventory includes them, and
   whether anything in the data should mark them.
 
+## Research: the official NVC needs list
+
+`src/data/needs.ts` has the same problem as the feelings file — 7 categories and
+about 75 needs, transcribed without a cited source. Settle where it comes from
+before anything depends on it.
+
+### Questions
+
+- **Which list is canonical?** CNVC publishes a "Needs Inventory" handout; the
+  appendix of Rosenberg's *Nonviolent Communication: A Language of Life* has its
+  own, and NVC Academy and individual trainers circulate variants. Find out
+  which one people mean by "the official list," and whether it is the same
+  authority as whatever settles the feelings list.
+- **Does our transcription match it?** Diff our categories and words against the
+  source. Check for missing needs and for categories that don't exist upstream.
+- **Are the category headings official?** We group under `Autonomy`,
+  `Connection`, `Honesty`, `Meaning`, `Peace`, `Physical Wellbeing`, and `Play`.
+  Confirm the source groups at all — some versions are flat — and that these are
+  its group names. `Meaning` and `Physical Wellbeing` in particular are worth
+  checking; other versions use headings like "Physical Nurturance" or split
+  meaning across several groups.
+- **Licensing.** Same question as feelings: check the specific terms and whether
+  attribution is required when shipping the list in an app or plugin.
+
+### Known wrinkles to resolve against the source
+
+- Some entries are phrases rather than single words: `to know and be known`,
+  `to see and be seen`, `to understand and be understood`,
+  `respect/self-respect`. Verify they appear this way upstream, and decide
+  whether the slash form should be one entry or two.
+- Our `Play` category has only two entries (`joy`, `humor`), which looks thin
+  next to the others. Check whether the source's play group is larger.
+- Words that appear under more than one category — check for duplicates the way
+  the feelings list has them, and confirm any we find exist upstream.
+
 ### Then
 
-Needs has no data file yet. Once the feelings source is settled, transcribe the
-needs inventory the same way, reusing the `FeelingCategory` shape if the
-structure matches.
+Once both sources are settled, decide whether needs should carry definitions the
+way feelings do (`Feeling` has a `definition`; `NeedCategory` holds bare
+strings), and whether the two files should share a category shape.
