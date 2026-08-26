@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
-import EmotionCategoryCardDemo from './EmotionCategoryCardDemo.tsx'
-import EmotionCategoryPillDemo from './EmotionCategoryPillDemo.tsx'
-import EmotionPickerDemo from './EmotionPickerDemo.tsx'
+import CategoryWalkDemo from './CategoryWalkDemo.tsx'
 import FeelingCardDemo from './FeelingCardDemo.tsx'
+import FeelingCategoryCardDemo from './FeelingCategoryCardDemo.tsx'
+import FeelingCategoryPillDemo from './FeelingCategoryPillDemo.tsx'
 import FeelingPickerDemo from './FeelingPickerDemo.tsx'
 import FeelingPromptDemo from './FeelingPromptDemo.tsx'
-import NeedsCategoryCardDemo from './NeedsCategoryCardDemo.tsx'
+import NeedCategoryCardDemo from './NeedCategoryCardDemo.tsx'
 import StepProgressDemo from './StepProgressDemo.tsx'
 
 export type Demo = {
@@ -16,19 +16,19 @@ export type Demo = {
 
 export const demos: Demo[] = [
   {
-    slug: 'emotion-picker',
-    title: 'Emotion Picker',
-    Component: EmotionPickerDemo,
+    slug: 'feeling-picker',
+    title: 'Feeling Picker',
+    Component: FeelingPickerDemo,
   },
   {
-    slug: 'emotion-category-card',
-    title: 'Emotion Category Card',
-    Component: EmotionCategoryCardDemo,
+    slug: 'feeling-category-card',
+    title: 'Feeling Category Card',
+    Component: FeelingCategoryCardDemo,
   },
   {
-    slug: 'emotion-category-pill',
-    title: 'Emotion Category Pill',
-    Component: EmotionCategoryPillDemo,
+    slug: 'feeling-category-pill',
+    title: 'Feeling Category Pill',
+    Component: FeelingCategoryPillDemo,
   },
   { slug: 'feeling-card', title: 'Feeling Card', Component: FeelingCardDemo },
   {
@@ -37,9 +37,9 @@ export const demos: Demo[] = [
     Component: StepProgressDemo,
   },
   {
-    slug: 'needs-category-card',
-    title: 'Needs Category Card',
-    Component: NeedsCategoryCardDemo,
+    slug: 'need-category-card',
+    title: 'Need Category Card',
+    Component: NeedCategoryCardDemo,
   },
   {
     slug: 'feeling-prompt',
@@ -47,8 +47,8 @@ export const demos: Demo[] = [
     Component: FeelingPromptDemo,
   },
   {
-    slug: 'feeling-picker',
-    title: 'Feeling Picker',
-    Component: FeelingPickerDemo,
+    slug: 'category-walk',
+    title: 'Category Walk',
+    Component: CategoryWalkDemo,
   },
 ]

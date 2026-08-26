@@ -9,7 +9,7 @@
 }
 
 /* Met and unmet are told apart by the border alone, the same way
-   EmotionCategoryCard does it, plus the spelled-out label. */
+   FeelingCategoryCard does it, plus the spelled-out label. */
 .met {
   border-style: solid;
 }

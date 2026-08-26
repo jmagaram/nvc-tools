@@ -13,8 +13,8 @@ answering anything, and everything previously picked in that category is lost.
 Reproduced in August 2026: `Angry` holding `incensed · indignant · outraged`,
 re-opened, backed straight out — the card came back reading *none of these*.
 
-The cause is `close` in `src/machines/emotionPicker.ts`, which writes
-`feelingPicker.picked(walk)`. That reports only the walk just performed, so a
+The cause is `close` in `src/machines/feelingPicker.ts`, which writes
+`categoryWalk.picked(walk)`. That reports only the walk just performed, so a
 walk bailed out of has picked nothing and overwrites the earlier answers with an
 empty list. Answering two words and then backing out loses the rest the same
 way, so this is not only about untouched walks.
@@ -28,7 +28,7 @@ Left as is deliberately. The fix carries a semantic choice:
   that was not revisited, while still honouring a "not this" that removes a
   word. This is the better of the two.
 
-Worth weighing against the intended model: `feelingPicker.init` deliberately
+Worth weighing against the intended model: `categoryWalk.init` deliberately
 asks previously-picked words first, so re-walking a category is meant to be a
 quick pass of "yes, still applies". Backing out of that pass currently reads as
 re-deciding everything, which is not what the person did.

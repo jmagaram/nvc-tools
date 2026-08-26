@@ -1,4 +1,4 @@
-import styles from './EmotionCategoryPill.module.css'
+import styles from './FeelingCategoryPill.module.css'
 
 type Props = {
   /** The feeling category, e.g. 'Engaged'. */
@@ -12,9 +12,9 @@ type Props = {
 /**
  * A category with nothing picked from it yet, small enough that every category
  * fits on screen at once. Once someone has picked feelings from a category, it
- * has words to show, and `EmotionCategoryCard` is the shape for that.
+ * has words to show, and `FeelingCategoryCard` is the shape for that.
  */
-export default function EmotionCategoryPill({
+export default function FeelingCategoryPill({
   category,
   kind,
   onClick,

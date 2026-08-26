@@ -1,4 +1,4 @@
-import styles from './EmotionCategoryCard.module.css'
+import styles from './FeelingCategoryCard.module.css'
 
 type Props = {
   /** The feeling category, e.g. 'Engaged'. */
@@ -6,17 +6,17 @@ type Props = {
   /** Which side of the NVC split this category sits on. */
   kind: 'met' | 'unmet'
   /** The specific feelings picked within this category. May be empty. */
-  emotions: string[]
-  /** Shown in place of the feelings when `emotions` is empty. */
+  feelings: string[]
+  /** Shown in place of the feelings when `feelings` is empty. */
   emptyText: string
   /** Called when the card is activated, to reopen this category. */
   onClick: () => void
 }
 
-export default function EmotionCategoryCard({
+export default function FeelingCategoryCard({
   category,
   kind,
-  emotions,
+  feelings,
   emptyText,
   onClick,
 }: Props) {
@@ -27,10 +27,10 @@ export default function EmotionCategoryCard({
           {category}
         </button>
       </h3>
-      {emotions.length > 0 ? (
-        <ul className={styles.emotions}>
-          {emotions.map((emotion) => (
-            <li key={emotion}>{emotion}</li>
+      {feelings.length > 0 ? (
+        <ul className={styles.feelings}>
+          {feelings.map((feeling) => (
+            <li key={feeling}>{feeling}</li>
           ))}
         </ul>
       ) : (

@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import EmotionCategoryPill from '../components/EmotionCategoryPill.tsx'
+import FeelingCategoryPill from '../components/FeelingCategoryPill.tsx'
 import { categories } from '../data/feelings.ts'
-import styles from './EmotionCategoryPillDemo.module.css'
+import styles from './FeelingCategoryPillDemo.module.css'
 
 const KINDS: ('met' | 'unmet')[] = ['met', 'unmet']
 
-export default function EmotionCategoryPillDemo() {
+export default function FeelingCategoryPillDemo() {
   const [category, setCategory] = useState('Engaged')
   const [kind, setKind] = useState<'met' | 'unmet'>('met')
   const [clicks, setClicks] = useState(0)
@@ -31,7 +31,7 @@ export default function EmotionCategoryPillDemo() {
         </select>
       </label>
       <hr />
-      <EmotionCategoryPill
+      <FeelingCategoryPill
         category={category}
         kind={kind}
         onClick={() => setClicks(clicks + 1)}
@@ -42,7 +42,7 @@ export default function EmotionCategoryPillDemo() {
       <p>{opened ? `Opened ${opened}` : 'No category opened yet'}</p>
       <div className={styles.row}>
         {categories.map((sample) => (
-          <EmotionCategoryPill
+          <FeelingCategoryPill
             key={sample.name}
             category={sample.name}
             kind={sample.kind}

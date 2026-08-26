@@ -1,4 +1,4 @@
-import styles from './NeedsCategoryCard.module.css'
+import styles from './NeedCategoryCard.module.css'
 
 type Props = {
   /** The need category, e.g. 'Autonomy'. */
@@ -11,7 +11,7 @@ type Props = {
   onClick: () => void
 }
 
-export default function NeedsCategoryCard({
+export default function NeedCategoryCard({
   category,
   needs,
   emptyText,

@@ -22,8 +22,15 @@ Obsidian plugin — for now the gallery is the only surface.
   type, an action type, `init`, `reduce`, and selectors, with no React import.
   The component takes `state` and `onAction` props; the demo page (later the
   app or an Obsidian modal) owns the `useState` that drives it. See
-  `src/machines/feelingPicker.ts` and `src/components/FeelingPicker.tsx`.
+  `src/machines/categoryWalk.ts` and `src/components/CategoryWalk.tsx`.
 - Type props with an explicit `type Props = { ... }`.
+- **Terminology.** The domain noun is **feeling**, never *emotion* — that is what
+  `src/data/feelings.ts` and the CNVC source call it. A **category** is a named
+  group of feelings with a `kind` of `'met' | 'unmet'`; needs have categories
+  too, but no `kind`. Name a component for the scope it covers: `*Picker` walks
+  every category, `*Walk` walks one, `*Prompt` asks about one word, `*Card`
+  just displays one thing. Prefer the singular (`NeedCategoryCard`, not
+  `Needs…`) to match the data types.
 - **Make impossible states unrepresentable.** Prefer a shape that cannot express
   a contradiction: a discriminated union over parallel optional fields, a
   required prop over an optional one with a silent fallback. Two caveats —

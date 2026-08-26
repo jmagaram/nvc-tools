@@ -32,7 +32,7 @@ export default function FeelingPrompt({
   onReject,
 }: Props) {
   return (
-    <div className={styles.picker}>
+    <div className={styles.prompt}>
       <StepProgress
         total={total}
         current={index}

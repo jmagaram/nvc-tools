@@ -47,18 +47,18 @@
   outline-offset: 2px;
 }
 
-.emotions {
+.feelings {
   margin: 0;
   padding: 0;
   list-style: none;
   font-size: 0.85em;
 }
 
-.emotions li {
+.feelings li {
   display: inline;
 }
 
-.emotions li:not(:last-child)::after {
+.feelings li:not(:last-child)::after {
   content: ' · ';
 }
 

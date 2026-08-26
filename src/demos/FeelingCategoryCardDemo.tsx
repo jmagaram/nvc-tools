@@ -1,17 +1,17 @@
 import { useState } from 'react'
-import EmotionCategoryCard from '../components/EmotionCategoryCard.tsx'
+import FeelingCategoryCard from '../components/FeelingCategoryCard.tsx'
 
 type Sample = {
   category: string
   kind: 'met' | 'unmet'
-  emotions: string[]
+  feelings: string[]
 }
 
 const CATEGORIES: Sample[] = [
   {
     category: 'Engaged',
     kind: 'met',
-    emotions: [
+    feelings: [
       'curious',
       'absorbed',
       'alert',
@@ -29,7 +29,7 @@ const CATEGORIES: Sample[] = [
   {
     category: 'Angry',
     kind: 'unmet',
-    emotions: [
+    feelings: [
       'enraged',
       'furious',
       'incensed',
@@ -48,7 +48,7 @@ const CATEGORIES: Sample[] = [
 
 const COUNTS = [12, 3, 0]
 
-export default function EmotionCategoryCardDemo() {
+export default function FeelingCategoryCardDemo() {
   const [counts, setCounts] = useState([12, 3])
   const [clicks, setClicks] = useState([0, 0])
 
@@ -80,10 +80,10 @@ export default function EmotionCategoryCardDemo() {
       <hr />
       {CATEGORIES.map((sample, index) => (
         <div key={sample.category}>
-          <EmotionCategoryCard
+          <FeelingCategoryCard
             category={sample.category}
             kind={sample.kind}
-            emotions={sample.emotions.slice(0, counts[index])}
+            feelings={sample.feelings.slice(0, counts[index])}
             emptyText="no specific feelings chosen"
             onClick={() => setClicks(setAt(clicks, index, clicks[index] + 1))}
           />

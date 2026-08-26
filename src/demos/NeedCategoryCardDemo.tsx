@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import NeedsCategoryCard from '../components/NeedsCategoryCard.tsx'
+import NeedCategoryCard from '../components/NeedCategoryCard.tsx'
 import { categories } from '../data/needs.ts'
 
 /** How many of the category's needs to hand the card. */
@@ -14,7 +14,7 @@ function setAt<T>(values: T[], slot: number, value: T): T[] {
   return values.map((v, i) => (i === slot ? value : v))
 }
 
-export default function NeedsCategoryCardDemo() {
+export default function NeedCategoryCardDemo() {
   const [picked, setPicked] = useState(INITIAL)
   const [countIndexes, setCountIndexes] = useState([0, 0])
   const [clicks, setClicks] = useState([0, 0])
@@ -64,7 +64,7 @@ export default function NeedsCategoryCardDemo() {
         const count = COUNTS[countIndexes[slot]]
         return (
           <div key={slot}>
-            <NeedsCategoryCard
+            <NeedCategoryCard
               category={category.name}
               needs={count === 'all' ? words : words.slice(0, count)}
               emptyText="no specific needs chosen"
