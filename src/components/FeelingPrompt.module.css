@@ -3,6 +3,12 @@
   gap: 1rem;
 }
 
+/* The prompt takes focus so the arrow keys have somewhere to land; push the
+   ring out so it reads as a frame around the whole thing. */
+.prompt:focus-visible {
+  outline-offset: 0.5rem;
+}
+
 .stage {
   position: relative;
   min-height: 8rem;

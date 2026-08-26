@@ -55,6 +55,10 @@ export default function FeelingPromptDemo() {
       <p>
         Accepted {accepted} times, rejected {rejected} times
       </p>
+      <p>
+        Click the prompt or Tab into it, then answer with → and ←. A host that
+        opens this in a modal would give it focus itself.
+      </p>
     </>
   )
 }

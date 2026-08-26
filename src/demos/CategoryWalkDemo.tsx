@@ -69,7 +69,8 @@ export default function CategoryWalkDemo() {
       )}
       <p>
         Walk through a category, pick a few, then switch away and back: the ones
-        you picked are asked about first.
+        you picked are asked about first. Once the prompt has focus you can run
+        the whole walk on → and ←.
       </p>
     </>
   )
