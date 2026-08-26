@@ -1,8 +1,63 @@
 # TODO
 
-## Source: the CNVC Feelings and Needs Inventory
+Open questions first, then the decisions already made and the research behind
+them. Before "fixing" anything in `src/data/`, check the settled half — most
+oddities in there are faithful to the source.
 
-Settled. `src/data/feelings.ts` and `src/data/needs.ts` reproduce the Center for
+## Open
+
+### Re-opening a category and backing out erases what it held
+
+Re-open a category from its card and press **Back to categories** before
+answering anything, and everything previously picked in that category is lost.
+Reproduced in August 2026: `Angry` holding `incensed · indignant · outraged`,
+re-opened, backed straight out — the card came back reading *none of these*.
+
+The cause is `close` in `src/machines/emotionPicker.ts`, which writes
+`feelingPicker.picked(walk)`. That reports only the walk just performed, so a
+walk bailed out of has picked nothing and overwrites the earlier answers with an
+empty list. Answering two words and then backing out loses the rest the same
+way, so this is not only about untouched walks.
+
+Left as is deliberately. The fix carries a semantic choice:
+
+- Treat an untouched walk as a pure cancel and restore the previous words.
+  Simplest, but still loses data on a partly-answered walk.
+- On close, keep the words accepted this walk **plus** any previously-picked
+  words this walk never got around to asking about. Never discards a decision
+  that was not revisited, while still honouring a "not this" that removes a
+  word. This is the better of the two.
+
+Worth weighing against the intended model: `feelingPicker.init` deliberately
+asks previously-picked words first, so re-walking a category is meant to be a
+quick pass of "yes, still applies". Backing out of that pass currently reads as
+re-deciding everything, which is not what the person did.
+
+### Whether the data should mark the words NVC treats as thoughts
+
+The evaluation-flavoured `Aversion` words — `hate`, `dislike`, `contempt`,
+`animosity` — and `resentful` in `Angry`. NVC treats these as thoughts about
+another person rather than feelings, yet the inventory lists them. They are
+faithful to the source and must stay (see *Confirmed upstream* below); what is
+open is whether anything in the data should flag them, and whether a tool built
+on this should say something when one is picked.
+
+### Whether to ship our own definitions of doctrinal words
+
+Background in *The definitions are ours* below — every gloss in `feelings.ts`
+and `needs.ts` was written for this project, because the source defines nothing.
+To settle:
+
+- Whether to ship our own glosses of doctrinal words at all, or show bare words
+  and leave the meaning to the reader.
+- If we keep them, whether someone with NVC training should review the wording
+  before an app or plugin depends on it.
+
+## Settled
+
+### Source: the CNVC Feelings and Needs Inventory
+
+`src/data/feelings.ts` and `src/data/needs.ts` reproduce the Center for
 Nonviolent Communication's four-page **Feelings and Needs Inventory**, © 2023
 Center for Nonviolent Communication, www.cnvc.org. Both files were verified
 against it word-for-word in August 2026 and match exactly, including the
@@ -22,7 +77,7 @@ credited as follows: The Center for Nonviolent Communication © 2023 /
 www.CNVC.org / cnvc@cnvc.org." Shipping the list in an app or plugin is fine;
 crediting CNVC is expected. The gallery does so in `src/App.tsx`.
 
-### Variants, and why they are not this
+#### Variants, and why they are not this
 
 - *Nonviolent Communication: A Language of Life* (Rosenberg, PuddleDancer Press)
   carries an older list — "Some Basic Needs We All Have", grouped as Autonomy,
@@ -40,7 +95,7 @@ If someone reports a "missing" word or an odd grouping, check it against the
 CNVC inventory before changing the data — they are probably thinking of one of
 the variants above.
 
-### Confirmed upstream, not transcription noise
+#### Confirmed upstream, not transcription noise
 
 Everything below was once suspected to be an error in our data. All of it is
 faithful to the source, so do not "fix" it:
@@ -56,20 +111,20 @@ faithful to the source, so do not "fix" it:
   `dread`.
 - The evaluation-flavoured `Aversion` words — `hate`, `dislike`, `contempt`,
   `animosity` — and `resentful` in `Angry`. NVC treats these as thoughts about
-  another person rather than feelings, yet the inventory lists them. Whether
-  anything in the data should mark them is still open.
+  another person rather than feelings, yet the inventory lists them. Whether the
+  data should mark them is open, above.
 
-## Review: the definitions are ours, not the source's
+### The definitions are ours, not the source's
 
-Settled: needs carry definitions, and `Need` is structurally identical to
-`Feeling` (`{ word, definition }`), so one component can render either dataset.
+Needs carry definitions, and `Need` is structurally identical to `Feeling`
+(`{ word, definition }`), so one component can render either dataset.
 
-What that decision created is a separate problem. The CNVC inventory defines
-nothing — it is a bare word list, confirmed by the research above, and no other
-NVC handout we found glosses its words either. Every definition in both
-`feelings.ts` and `needs.ts` was written for this project. They are
-interpretations of doctrinal vocabulary, and some are deliberate judgement
-calls:
+What that decision created is a separate problem, still open above. The CNVC
+inventory defines nothing — it is a bare word list, confirmed by the research
+above, and no other NVC handout we found glosses its words either. Every
+definition in both `feelings.ts` and `needs.ts` was written for this project.
+They are interpretations of doctrinal vocabulary, and some are deliberate
+judgement calls:
 
 - `to matter`, `contribution`, and `efficacy` are worded to pull apart, as are
   `competence` / `effectiveness` and `security` / `stability` / `consistency`.
@@ -79,10 +134,3 @@ calls:
   `Physical Wellbeing`. That reading is ours.
 - Needs definitions are phrased as what the met need looks like, feelings
   definitions as an experience from the inside. Two registers in one app.
-
-To settle:
-
-- Whether to ship our own glosses of doctrinal words at all, or show bare words
-  and leave the meaning to the reader.
-- If we keep them, whether someone with NVC training should review the wording
-  before an app or plugin depends on it.
