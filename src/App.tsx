@@ -15,6 +15,13 @@ export default function App() {
             </li>
           ))}
         </ul>
+        <footer>
+          <p>
+            Feelings and needs vocabulary from the Feelings and Needs Inventory,
+            © 2023 Center for Nonviolent Communication,{' '}
+            <a href="https://www.cnvc.org">cnvc.org</a>.
+          </p>
+        </footer>
       </>
     )
   }

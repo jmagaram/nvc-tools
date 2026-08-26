@@ -1,92 +1,72 @@
 # TODO
 
-## Research: the official NVC feelings list
+## Source: the CNVC Feelings and Needs Inventory
 
-`src/data/feelings.ts` was transcribed from a feelings inventory pasted into a
-chat, not from a cited source. Before building anything on top of it, confirm
-what the authoritative list actually is and where it comes from.
+Settled. `src/data/feelings.ts` and `src/data/needs.ts` reproduce the Center for
+Nonviolent Communication's four-page **Feelings and Needs Inventory**, © 2023
+Center for Nonviolent Communication, www.cnvc.org. Both files were verified
+against it word-for-word in August 2026 and match exactly, including the
+category headings.
 
-The wording of these lists is doctrinal in NVC circles, and the app will be
-judged against whichever version a user already knows. Getting this wrong is
-cheap to fix now and expensive to fix once components, saved user data, and an
-Obsidian plugin all depend on the word list.
+CNVC is the authority here — the nonprofit Marshall Rosenberg founded, and the
+copyright holder. It publishes both lists in one document, given away at
+<https://www.cnvc.org/store/feelings-and-needs-inventory> behind a name/email
+form, so there is no stable file URL to link. The older standalone
+`cnvc.org/training/resource/needs-inventory` and `/feelings-inventory` pages
+(© 2005) now 404 after a site redesign; their wording is identical apart from
+`PHYSICAL WELL-BEING` respelled `PHYSICAL WELLBEING`.
 
-### Questions
+**Licence.** Not Creative Commons — a permission grant in the document's own
+footer: "you are free to share or copy this document; we request CNVC is
+credited as follows: The Center for Nonviolent Communication © 2023 /
+www.CNVC.org / cnvc@cnvc.org." Shipping the list in an app or plugin is fine;
+crediting CNVC is expected. The gallery does so in `src/App.tsx`.
 
-- **Which list is canonical?** CNVC (cnvc.org) publishes one; the Center for
-  Nonviolent Communication's "Feelings Inventory" and "Needs Inventory" handouts
-  are the usual reference. Marshall Rosenberg's *Nonviolent Communication: A
-  Language of Life* has its own lists in the appendix, and they differ. NVC
-  Academy, PuddleDancer Press, and various trainers circulate further variants.
-  Find out which one people actually mean by "the official list."
-- **Does our transcription match it?** Diff the 231 words and 25 categories in
-  `src/data/feelings.ts` against the source. Check for words we're missing and
-  categories that don't exist upstream.
-- **Are the category headings official?** Our data treats `Affectionate`,
-  `Yearning`, and the other 23 as group labels only. Confirm the real list
-  groups words this way at all — some versions are a flat alphabetical list with
-  no categories, which would make our whole grouping an invention.
-- **Licensing.** CNVC materials are generally CC-licensed but check the specific
-  terms, and whether attribution is required if we ship the list in an app or
-  plugin.
+### Variants, and why they are not this
 
-### Known wrinkles to resolve against the source
+- *Nonviolent Communication: A Language of Life* (Rosenberg, PuddleDancer Press)
+  carries an older list — "Some Basic Needs We All Have", grouped as Autonomy,
+  Celebration, Integrity, Interdependence, Play, Spiritual Communion, Physical
+  Nurturance. The ancestor of the CNVC handout, not a competing edition.
+- PuddleDancer Press (nonviolentcommunication.com), the official NVC publisher,
+  reprints that book-era list as "Feelings and Needs We All Have".
+- BayNVC / the Kashtans' "Universal Human Needs" (<https://baynvc.org/list-of-needs/>)
+  is widely circulated and adds Max-Neef-derived categories. Respected, but not
+  CNVC's.
+- NVC Academy and individual trainers circulate further reshuffles. None carry
+  CNVC's copyright.
 
-- Three words appear in two categories: `amazed`, `surprised` (which spans both
-  polarities), and `restless`. Verify these duplicates exist upstream and aren't
-  transcription noise.
-- Several entries are nouns, not adjectives, so they don't fit "I feel ___":
-  `grief`, `turmoil`, `wonder`, `agony`, `dread`. Check whether the source has
-  them this way or whether we should normalize.
-- Several entries in `Aversion` — `hate`, `dislike`, `contempt`, `animosity` —
-  and `resentful` in `Angry` read as evaluations of another person rather than
-  felt states. NVC elsewhere calls these "faux feelings" and teaches people to
-  translate them. Find out whether the official inventory includes them, and
-  whether anything in the data should mark them.
+If someone reports a "missing" word or an odd grouping, check it against the
+CNVC inventory before changing the data — they are probably thinking of one of
+the variants above.
 
-## Research: the official NVC needs list
+### Confirmed upstream, not transcription noise
 
-`src/data/needs.ts` has the same problem as the feelings file — 7 categories and
-75 needs, transcribed without a cited source. Settle where it comes from before
-anything depends on it.
+Everything below was once suspected to be an error in our data. All of it is
+faithful to the source, so do not "fix" it:
 
-### Questions
-
-- **Which list is canonical?** CNVC publishes a "Needs Inventory" handout; the
-  appendix of Rosenberg's *Nonviolent Communication: A Language of Life* has its
-  own, and NVC Academy and individual trainers circulate variants. Find out
-  which one people mean by "the official list," and whether it is the same
-  authority as whatever settles the feelings list.
-- **Does our transcription match it?** Diff our categories and words against the
-  source. Check for missing needs and for categories that don't exist upstream.
-- **Are the category headings official?** We group under `Autonomy`,
-  `Connection`, `Honesty`, `Meaning`, `Peace`, `Physical Wellbeing`, and `Play`.
-  Confirm the source groups at all — some versions are flat — and that these are
-  its group names. `Meaning` and `Physical Wellbeing` in particular are worth
-  checking; other versions use headings like "Physical Nurturance" or split
-  meaning across several groups.
-- **Licensing.** Same question as feelings: check the specific terms and whether
-  attribution is required when shipping the list in an app or plugin.
-
-### Known wrinkles to resolve against the source
-
-- Some entries are phrases rather than single words: `to know and be known`,
-  `to see and be seen`, `to understand and be understood`,
-  `respect/self-respect`. Verify they appear this way upstream, and decide
-  whether the slash form should be one entry or two.
-- Our `Play` category has only two entries (`joy`, `humor`), which looks thin
-  next to the others. Check whether the source's play group is larger.
-- `safety` appears under both `Connection` and `Physical Wellbeing`, the way
-  three words do in the feelings list. Confirm the duplicate exists upstream and
-  is not transcription noise.
+- `safety` under both `Connection` and `Physical Wellbeing`.
+- `amazed` (Excited, Inspired), `restless` (Disquiet, Tense), and `surprised`
+  (Excited, Disquiet — spanning both polarities).
+- `Play` containing only `joy` and `humor`.
+- Phrase entries: `to know and be known`, `to see and be seen`,
+  `to understand and be understood`. `respect/self-respect` is one entry
+  upstream, not two.
+- Nouns that do not fit "I feel ___": `grief`, `turmoil`, `wonder`, `agony`,
+  `dread`.
+- The evaluation-flavoured `Aversion` words — `hate`, `dislike`, `contempt`,
+  `animosity` — and `resentful` in `Angry`. NVC treats these as thoughts about
+  another person rather than feelings, yet the inventory lists them. Whether
+  anything in the data should mark them is still open.
 
 ## Review: the definitions are ours, not the source's
 
 Settled: needs carry definitions, and `Need` is structurally identical to
 `Feeling` (`{ word, definition }`), so one component can render either dataset.
 
-What that decision created is a separate problem. No NVC inventory we know of
-defines its words — the handouts are word lists. Every definition in both
+What that decision created is a separate problem. The CNVC inventory defines
+nothing — it is a bare word list, confirmed by the research above, and no other
+NVC handout we found glosses its words either. Every definition in both
 `feelings.ts` and `needs.ts` was written for this project. They are
 interpretations of doctrinal vocabulary, and some are deliberate judgement
 calls:

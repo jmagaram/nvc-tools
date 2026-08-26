@@ -1,3 +1,16 @@
+// The needs and their category headings come from the Center for Nonviolent
+// Communication's four-page Feelings and Needs Inventory, © 2023 Center for
+// Nonviolent Communication, www.cnvc.org. CNVC gives permission to copy and
+// share it and asks to be credited; see README.md.
+//
+// The word list is reproduced unchanged — verified against the source
+// word-for-word in August 2026. Two things here look like transcription errors
+// and are not: `safety` is listed under both Connection and Physical Wellbeing,
+// and several entries are phrases rather than single words. Both are upstream.
+//
+// The definitions are not. The source is a bare word list with no glosses, so
+// every definition below was written for this project. See TODO.md.
+
 export type Need = {
   word: string
   definition: string

@@ -1,3 +1,18 @@
+// The feelings and their category headings come from the Center for Nonviolent
+// Communication's four-page Feelings and Needs Inventory, © 2023 Center for
+// Nonviolent Communication, www.cnvc.org. CNVC gives permission to copy and
+// share it and asks to be credited; see README.md.
+//
+// The word list is reproduced unchanged — verified against the source
+// word-for-word in August 2026. `kind` records the source's own split between
+// "feelings when needs are satisfied" and "feelings when needs are not
+// satisfied". Three words look like transcription errors and are not: `amazed`,
+// `surprised`, and `restless` each appear in two categories upstream, and
+// `surprised` spans both polarities.
+//
+// The definitions are not. The source is a bare word list with no glosses, so
+// every definition below was written for this project. See TODO.md.
+
 export type Feeling = {
   word: string
   definition: string
