@@ -1,0 +1,60 @@
+import { useState } from 'react'
+import FeelingPrompt from '../components/FeelingPrompt.tsx'
+import { categories } from '../data/feelings.ts'
+
+export default function FeelingPromptDemo() {
+  const [categoryIndex, setCategoryIndex] = useState(2)
+  const [index, setIndex] = useState(0)
+  const [accepted, setAccepted] = useState(0)
+  const [rejected, setRejected] = useState(0)
+
+  const category = categories[categoryIndex]
+  // Keep the feeling in range when a shorter category is chosen.
+  const clamped = Math.min(index, category.feelings.length - 1)
+  const feeling = category.feelings[clamped]
+
+  return (
+    <>
+      <label>
+        Category{' '}
+        <select
+          value={categoryIndex}
+          onChange={(e) => setCategoryIndex(Number(e.target.value))}
+        >
+          {categories.map((option, optionIndex) => (
+            <option key={option.name} value={optionIndex}>
+              {option.name} ({option.kind})
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Feeling{' '}
+        <select
+          value={clamped}
+          onChange={(e) => setIndex(Number(e.target.value))}
+        >
+          {category.feelings.map((option, optionIndex) => (
+            <option key={option.word} value={optionIndex}>
+              {option.word}
+            </option>
+          ))}
+        </select>
+      </label>
+      <hr />
+      <FeelingPrompt
+        word={feeling.word}
+        category={category.name}
+        definition={feeling.definition}
+        kind={category.kind}
+        index={clamped}
+        total={category.feelings.length}
+        onAccept={() => setAccepted(accepted + 1)}
+        onReject={() => setRejected(rejected + 1)}
+      />
+      <p>
+        Accepted {accepted} times, rejected {rejected} times
+      </p>
+    </>
+  )
+}

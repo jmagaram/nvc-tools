@@ -1,0 +1,21 @@
+.picker {
+  display: grid;
+  gap: 1rem;
+}
+
+.stage {
+  position: relative;
+  min-height: 8rem;
+  display: grid;
+  align-content: start;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.actions button {
+  padding: 0.5rem 1rem;
+}
