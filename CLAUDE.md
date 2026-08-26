@@ -34,6 +34,7 @@ src/
   router.ts          useHashRoute() — hand-rolled, no router dependency
   index.css          the entire stylesheet
   components/        presentational components
+  data/              NVC reference data (feelings, needs)
   demos/             one demo page per component, plus index.ts registry
 ```
 
