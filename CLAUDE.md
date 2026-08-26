@@ -17,6 +17,12 @@ Obsidian plugin — for now the gallery is the only surface.
 - Components are **presentational only**: props in, JSX out. No state, no
   effects, no fetching, no globals, no awareness of routing. State belongs in
   the demo page (and later, in the app).
+- **Flow state lives in a machine.** When a component walks someone through
+  several steps, put the state in `src/machines/` as a pure module — a state
+  type, an action type, `init`, `reduce`, and selectors, with no React import.
+  The component takes `state` and `onAction` props; the demo page (later the
+  app or an Obsidian modal) owns the `useState` that drives it. See
+  `src/machines/feelingPicker.ts` and `src/components/FeelingPicker.tsx`.
 - Type props with an explicit `type Props = { ... }`.
 - **Make impossible states unrepresentable.** Prefer a shape that cannot express
   a contradiction: a discriminated union over parallel optional fields, a
@@ -46,6 +52,7 @@ src/
   components/        presentational components
   data/              NVC reference data (feelings, needs)
   demos/             one demo page per component, plus index.ts registry
+  machines/          pure state machines (state + action + reduce, no React)
 ```
 
 ## Commands
