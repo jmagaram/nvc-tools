@@ -1,6 +1,6 @@
 # TODO
 
-## Research: the official NVC feelings and needs lists
+## Research: the official NVC feelings list
 
 `src/data/feelings.ts` was transcribed from a feelings inventory pasted into a
 chat, not from a cited source. Before building anything on top of it, confirm
@@ -47,8 +47,8 @@ Obsidian plugin all depend on the word list.
 ## Research: the official NVC needs list
 
 `src/data/needs.ts` has the same problem as the feelings file — 7 categories and
-about 75 needs, transcribed without a cited source. Settle where it comes from
-before anything depends on it.
+75 needs, transcribed without a cited source. Settle where it comes from before
+anything depends on it.
 
 ### Questions
 
@@ -76,11 +76,33 @@ before anything depends on it.
   whether the slash form should be one entry or two.
 - Our `Play` category has only two entries (`joy`, `humor`), which looks thin
   next to the others. Check whether the source's play group is larger.
-- Words that appear under more than one category — check for duplicates the way
-  the feelings list has them, and confirm any we find exist upstream.
+- `safety` appears under both `Connection` and `Physical Wellbeing`, the way
+  three words do in the feelings list. Confirm the duplicate exists upstream and
+  is not transcription noise.
 
-### Then
+## Review: the definitions are ours, not the source's
 
-Once both sources are settled, decide whether needs should carry definitions the
-way feelings do (`Feeling` has a `definition`; `NeedCategory` holds bare
-strings), and whether the two files should share a category shape.
+Settled: needs carry definitions, and `Need` is structurally identical to
+`Feeling` (`{ word, definition }`), so one component can render either dataset.
+
+What that decision created is a separate problem. No NVC inventory we know of
+defines its words — the handouts are word lists. Every definition in both
+`feelings.ts` and `needs.ts` was written for this project. They are
+interpretations of doctrinal vocabulary, and some are deliberate judgement
+calls:
+
+- `to matter`, `contribution`, and `efficacy` are worded to pull apart, as are
+  `competence` / `effectiveness` and `security` / `stability` / `consistency`.
+  The source simply lists them side by side with no such distinction.
+- `safety` is defined differently in each of its two categories — "being able to
+  lower your guard" under `Connection`, "being out of harm's way" under
+  `Physical Wellbeing`. That reading is ours.
+- Needs definitions are phrased as what the met need looks like, feelings
+  definitions as an experience from the inside. Two registers in one app.
+
+To settle:
+
+- Whether to ship our own glosses of doctrinal words at all, or show bare words
+  and leave the meaning to the reader.
+- If we keep them, whether someone with NVC training should review the wording
+  before an app or plugin depends on it.
