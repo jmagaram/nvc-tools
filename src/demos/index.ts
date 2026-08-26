@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import EmotionCategoryCardDemo from './EmotionCategoryCardDemo.tsx'
+import EmotionCategoryPillDemo from './EmotionCategoryPillDemo.tsx'
 import FeelingCardDemo from './FeelingCardDemo.tsx'
 import FeelingPickerDemo from './FeelingPickerDemo.tsx'
 import FeelingPromptDemo from './FeelingPromptDemo.tsx'
@@ -17,6 +18,11 @@ export const demos: Demo[] = [
     slug: 'emotion-category-card',
     title: 'Emotion Category Card',
     Component: EmotionCategoryCardDemo,
+  },
+  {
+    slug: 'emotion-category-pill',
+    title: 'Emotion Category Pill',
+    Component: EmotionCategoryPillDemo,
   },
   { slug: 'feeling-card', title: 'Feeling Card', Component: FeelingCardDemo },
   {
