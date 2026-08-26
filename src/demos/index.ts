@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import EmotionCategoryCardDemo from './EmotionCategoryCardDemo.tsx'
 import FeelingCardDemo from './FeelingCardDemo.tsx'
+import StepProgressDemo from './StepProgressDemo.tsx'
 
 export type Demo = {
   slug: string
@@ -15,4 +16,9 @@ export const demos: Demo[] = [
     Component: EmotionCategoryCardDemo,
   },
   { slug: 'feeling-card', title: 'Feeling Card', Component: FeelingCardDemo },
+  {
+    slug: 'step-progress',
+    title: 'Step Progress',
+    Component: StepProgressDemo,
+  },
 ]
