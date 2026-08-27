@@ -111,7 +111,7 @@ export default function NeedPrompt({
             />
             <div className={styles.wash} />
             <p className={styles.stamp}>
-              {leaving.toward === 'accept' ? '✓ Yes' : '✕ Not this'}
+              {leaving.toward === 'accept' ? '✓' : '✕'}
             </p>
           </div>
         )}

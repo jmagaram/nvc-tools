@@ -19,8 +19,8 @@
   align-content: start;
   /* A card on its way out flies past the sides. Clip it there so it slides
      under the edge of the stage rather than widening the page or spilling out
-     of a narrow modal. Vertically it stays visible: the tilt lifts a corner
-     above the stage, and that is where the stamp sits. */
+     of a narrow modal. Vertically it stays visible, so the tilt can lift a
+     corner above the stage without it being sliced off. */
   overflow-x: clip;
   overflow-y: visible;
 }
@@ -60,8 +60,8 @@
 
 /* Two cues, borrowed from the dating apps, so the answer registers before the
    card is gone: the whole card takes a wash of the verdict colour, and a stamp
-   lands in the corner. Both are on the leaving card only — there is no drag
-   here to preview an answer, so they mark a decision already made. */
+   lands over it. Both are on the leaving card only — there is no drag here to
+   preview an answer, so they mark a decision already made. */
 .wash {
   position: absolute;
   inset: 0;
@@ -71,38 +71,28 @@
   animation: wash 400ms forwards;
 }
 
-/* Solid rather than outlined so it reads on any theme the host drops this
-   into — the card underneath sets no background of its own. */
+/* One glyph in a solid disc, dead centre over the card: 400ms is not long
+   enough to read a word, and the tick or the cross says it on its own. Solid
+   rather than outlined so it reads on any theme the host drops this into — the
+   card underneath sets no background of its own. Centred by `inset` and
+   `margin: auto` rather than a translate, which leaves `scale` free for the
+   keyframes to animate. */
 .stamp {
   position: absolute;
-  top: 0.75rem;
-  margin: 0;
-  padding: 0.15em 0.5em;
-  border-radius: 0.25rem;
+  inset: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   background: var(--verdict);
   color: white;
-  font-size: 1.25rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
+  font-size: 2rem;
+  line-height: 1;
   opacity: 0;
-  /* Rotated with the standalone property, not `transform`, so the keyframes
-     can animate scale without having to restate the tilt. */
   scale: 1.25;
   animation: stamp 400ms forwards;
-}
-
-/* The stamp sits on the side the card is turning away from, where the corner
-   lifts — the same place a swipe puts it. */
-.accept .stamp {
-  left: 0.75rem;
-  rotate: -12deg;
-}
-
-.reject .stamp {
-  right: 0.75rem;
-  rotate: 12deg;
 }
 
 /* The next card rises into the gap the old one left, like the deck dealing.
