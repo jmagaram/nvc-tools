@@ -22,7 +22,7 @@ type FeelingCategoryWalkState = CategoryWalkState<
 export default function FeelingCategoryWalkDemo() {
   const [categoryIndex, setCategoryIndex] = useState(2)
   const [state, setState] = useState<FeelingCategoryWalkState>(() =>
-    init(
+    init<Feeling, { kind: 'met' | 'unmet' }>(
       { name: categories[2].name, kind: categories[2].kind },
       categories[2].feelings,
       (feeling) => feeling.word,
@@ -48,7 +48,7 @@ export default function FeelingCategoryWalkDemo() {
     setPicksByCategory(remembered)
     setCategoryIndex(index)
     setState(
-      init(
+      init<Feeling, { kind: 'met' | 'unmet' }>(
         { name: category.name, kind: category.kind },
         category.feelings,
         (feeling) => feeling.word,

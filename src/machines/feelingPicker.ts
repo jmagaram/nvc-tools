@@ -110,7 +110,7 @@ export function reduce(
       const category = state.categories.find((c) => c.name === action.category)
       if (!category) return state
       const opened = { ...state, tab: category.kind }
-      const walk = categoryWalk.init(
+      const walk = categoryWalk.init<Feeling, { kind: 'met' | 'unmet' }>(
         { name: category.name, kind: category.kind },
         category.feelings,
         (feeling) => feeling.word,

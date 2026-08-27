@@ -19,7 +19,11 @@ type NeedCategoryWalkState = CategoryWalkState<Need>
 export default function NeedCategoryWalkDemo() {
   const [categoryIndex, setCategoryIndex] = useState(1)
   const [state, setState] = useState<NeedCategoryWalkState>(() =>
-    init({ name: categories[1].name }, categories[1].needs, (need) => need.word),
+    init<Need>(
+      { name: categories[1].name },
+      categories[1].needs,
+      (need) => need.word,
+    ),
   )
   // Standing in for whatever the app stores between sessions, so that
   // re-opening a category shows the previously picked needs first.
@@ -41,7 +45,7 @@ export default function NeedCategoryWalkDemo() {
     setPicksByCategory(remembered)
     setCategoryIndex(index)
     setState(
-      init(
+      init<Need>(
         { name: category.name },
         category.needs,
         (need) => need.word,

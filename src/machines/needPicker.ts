@@ -101,7 +101,7 @@ export function reduce(
       if (state.walk) return state
       const category = state.categories.find((c) => c.name === action.category)
       if (!category) return state
-      const walk = categoryWalk.init(
+      const walk = categoryWalk.init<Need>(
         { name: category.name },
         category.needs,
         (need) => need.word,
