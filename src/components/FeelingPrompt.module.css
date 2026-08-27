@@ -9,9 +9,13 @@
   outline-offset: 0.5rem;
 }
 
+/* Tall enough for the longest definition to wrap without moving the buttons
+   below it. A walk is twenty of these in a row, so the answer buttons have to
+   stay under the cursor — measured against the two-line case, which is where
+   about a fifth of the feelings land once the modal is narrow. */
 .stage {
   position: relative;
-  min-height: 8rem;
+  min-height: 10rem;
   display: grid;
   align-content: start;
 }

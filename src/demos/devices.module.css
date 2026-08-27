@@ -1,0 +1,18 @@
+/* The screen the modal sits in. The demo sets the width and height from the
+   chosen device; the dashed border is where the screen ends. A phone modal
+   fills it, a desktop one is a card centred in it. */
+.screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  border: 1px dashed;
+  padding: 0;
+}
+
+/* Only vertical breathing room. The gallery column is barely wider than a
+   desktop modal, so there is none to spare at the sides — the gap above and
+   below is enough to read the modal as floating in a window. */
+.screen.desktop {
+  padding: 1rem 0;
+}

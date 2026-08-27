@@ -33,20 +33,16 @@ const TABS: { kind: 'unmet' | 'met'; label: string }[] = [
  */
 export default function FeelingPicker({ state, onAction }: Props) {
   if (state.walk) {
+    // The machine closes the walk on the last answer, so this only ever shows a
+    // feeling waiting to be answered. Leaving part way through is a 'close'
+    // action the host raises from its own chrome — a modal puts it in the title
+    // bar and the button row, where the rest of the ways out already live.
     return (
       <div className={styles.picker}>
-        {/* The machine closes the walk on the last answer, so this only ever
-            shows a feeling waiting to be answered. The button is the way out
-            part way through, not a step at the end. */}
         <CategoryWalk
           state={state.walk}
           onAction={(answer) => onAction({ type: 'answer', answer })}
         />
-        <div className={styles.actions}>
-          <button type="button" onClick={() => onAction({ type: 'close' })}>
-            Back to categories
-          </button>
-        </div>
       </div>
     )
   }

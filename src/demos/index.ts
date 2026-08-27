@@ -5,6 +5,7 @@ import FeelingCategoryCardDemo from './FeelingCategoryCardDemo.tsx'
 import FeelingCategoryPillDemo from './FeelingCategoryPillDemo.tsx'
 import FeelingPickerDemo from './FeelingPickerDemo.tsx'
 import FeelingPromptDemo from './FeelingPromptDemo.tsx'
+import ModalFrameDemo from './ModalFrameDemo.tsx'
 import NeedCategoryCardDemo from './NeedCategoryCardDemo.tsx'
 import StepProgressDemo from './StepProgressDemo.tsx'
 
@@ -20,6 +21,7 @@ export const demos: Demo[] = [
     title: 'Feeling Picker',
     Component: FeelingPickerDemo,
   },
+  { slug: 'modal-frame', title: 'Modal Frame', Component: ModalFrameDemo },
   {
     slug: 'feeling-category-card',
     title: 'Feeling Category Card',

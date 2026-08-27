@@ -3,7 +3,7 @@ import * as categoryWalk from './categoryWalk.ts'
 import { shuffle } from './shuffle.ts'
 
 /** A category that has been walked through, and what was picked in it. */
-type Visited = {
+export type Visited = {
   category: string
   kind: 'met' | 'unmet'
   /** May be empty: the walk happened but nothing in it applied. */
