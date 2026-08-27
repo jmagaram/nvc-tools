@@ -12,6 +12,7 @@ import NeedCategoryPillDemo from './NeedCategoryPillDemo.tsx'
 import NeedCategoryWalkDemo from './NeedCategoryWalkDemo.tsx'
 import NeedPickerDemo from './NeedPickerDemo.tsx'
 import NeedPromptDemo from './NeedPromptDemo.tsx'
+import PickedEntriesDemo from './PickedEntriesDemo.tsx'
 import StepProgressDemo from './StepProgressDemo.tsx'
 
 /**
@@ -115,6 +116,12 @@ export const demos: Demo[] = [
     title: 'Modal Frame',
     group: 'Shared',
     Component: ModalFrameDemo,
+  },
+  {
+    slug: 'picked-entries',
+    title: 'Picked Entries',
+    group: 'Shared',
+    Component: PickedEntriesDemo,
   },
   {
     slug: 'step-progress',

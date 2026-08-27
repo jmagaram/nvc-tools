@@ -1,20 +1,21 @@
 import { Plugin } from 'obsidian'
 import type { Editor } from 'obsidian'
+import type { Picked } from '../src/components/PickedEntries.tsx'
+import { registerBlocks } from './block.tsx'
 import FeelingPickerModal from './FeelingPickerModal.tsx'
 import NeedPickerModal from './NeedPickerModal.tsx'
-import { toMarkdown } from './insert.ts'
-// The modal's own three rules. Everything else in the shipped styles.css comes
-// from the components' CSS modules, which the build folds into the same file.
+import { toBlock } from './insert.ts'
+// The plugin's own chrome, for the modal and for a block in a note. Everything
+// else in the shipped styles.css comes from the components' CSS modules, which
+// the build folds into the same file.
 import './styles.css'
-
-/** A category and what was picked in it, as either picker reports it. */
-type Picked = {
-  category: string
-  words: readonly string[]
-}
 
 export default class NvcPlugin extends Plugin {
   onload() {
+    // Blocks first: a note open at load time is drawn before either command
+    // can be reached.
+    registerBlocks(this)
+
     /* `editorCallback` rather than `callback`, so neither command offers itself
        when there is no note open — there would be nowhere to put the answer. */
     this.addCommand({
@@ -40,10 +41,16 @@ export default class NvcPlugin extends Plugin {
 }
 
 /**
- * Put what was picked where the cursor is. Pressing OK having picked nothing
- * writes nothing — an empty line would be a worse answer than none.
+ * Put what was picked where the cursor is, as a block the plugin can redraw.
+ * Pressing OK having picked nothing writes nothing — an empty line would be a
+ * worse answer than none.
+ *
+ * It always goes in as a list, the shape it had before there was a choice. Which
+ * layout you want is a question about the note you are looking at, and it is
+ * one right-click away once the words are actually on the page — so it is not
+ * worth stopping the walk to ask.
  */
 function insert(editor: Editor, entries: readonly Picked[]) {
-  const text = toMarkdown(entries)
+  const text = toBlock(entries)
   if (text) editor.replaceSelection(`${text}\n`)
 }

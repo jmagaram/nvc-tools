@@ -1,7 +1,8 @@
 /*
  * Everything the components need is in their own CSS modules, which the build
- * bundles into this file. What is written by hand here is only what belongs to
- * the modal rather than to a component, and no colour of its own: the component
+ * bundles into this file. What is written by hand here is only the plugin's own
+ * chrome — the modal, and a block sitting in a note — rather than anything that
+ * belongs to a component, and it has no colour of its own: the component
  * styles use `currentColor` and `inherit` throughout, so an Obsidian theme
  * reaches them without help.
  *
@@ -35,4 +36,36 @@
   color: var(--text-normal);
   font: inherit;
   cursor: pointer;
+}
+
+/* An `nvc-*` block in a note. The layouts themselves come from the component's
+   CSS module, bundled into this file; what is here is the chrome around them. */
+.nvc-block {
+  position: relative;
+}
+
+/* Out of the way until it is wanted, but never gone for keyboard or touch:
+   right-click is a desktop gesture, so on mobile this button is the only way
+   to reach the menu. */
+.nvc-block-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  padding: var(--size-2-2);
+  border: none;
+  box-shadow: none;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.nvc-block:hover .nvc-block-menu,
+.nvc-block-menu:focus-visible {
+  opacity: 1;
+}
+
+.nvc-block-menu:hover {
+  color: var(--text-normal);
 }

@@ -1,0 +1,27 @@
+/* All three layouts sit inside someone else's prose — a note, a demo page — so
+   they set spacing and structure only and take colour and type from around
+   them. */
+
+.list {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.category {
+  font-weight: bolder;
+}
+
+.table {
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.15rem 0.75rem 0.15rem 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.inline {
+  margin: 0;
+}

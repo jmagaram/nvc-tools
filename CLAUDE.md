@@ -73,8 +73,8 @@ scripts/             deploy-plugin.mjs
 
 `obsidian/` is the second surface: two commands, `NVC: Insert feelings…` and
 `NVC: Insert needs…`, each opening a picker over the active note and inserting
-grouped bullets at the cursor. It imports straight from `src/` and adds nothing
-to it.
+grouped bullets at the cursor, fenced as an `nvc-list` block. It imports
+straight from `src/` and adds nothing to it.
 
 - **The modal is the host.** `FeelingPickerHost` / `NeedPickerHost` are their
   demo pages with the controls taken off — same `useState`, same `reduce`, same
@@ -85,12 +85,24 @@ to it.
   heading and the button row through portals, because that modifier only works
   when `.modal-button-container` is a *sibling* of `.modal-content`, not inside
   it.
+- **The block is the note's copy.** What goes in is a fence whose body is the
+  same bullets as before, so the note still reads with the plugin off. The
+  plugin redraws it as a list, a table, or one comma-separated line
+  (`PickedEntries`), and the layout is switched from a right-click menu or the
+  block's corner button. `registerBlocks` in `obsidian/block.tsx` registers one
+  processor per language — `nvc`, `nvc-list`, `nvc-table`, `nvc-inline` —
+  because a code block processor is handed the body and never the info string,
+  so a ```` ```nvc table ```` argument could not be read without going back to
+  the file. Switching rewrites the fence line through `vault.process`, so the
+  choice lives in the note and each block keeps its own. A block whose body does
+  not parse is shown verbatim rather than half-swallowed.
 - **Closing cancels.** The corner `x` and Escape both land in `onClose` and
   insert nothing, on the walk screen as well as the browse screen. **Back** and
   **Skip Rest** are what keep your picks.
 - **Styles.** Component CSS modules use only `currentColor` and `inherit`, so an
   Obsidian theme reaches them untouched and they ship as they are.
-  `obsidian/styles.css` holds only what belongs to the modal. `src/index.css` is
+  `obsidian/styles.css` holds only the plugin's own chrome, for the modal and
+  for a block in a note. `src/index.css` is
   gallery-only — every rule in it targets `body` or a bare element and would
   restyle the whole app.
 
