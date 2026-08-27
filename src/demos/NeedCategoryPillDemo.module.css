@@ -3,3 +3,13 @@
   flex-wrap: wrap;
   gap: 0.4rem;
 }
+
+/* The pill and the card the picker swaps it for, side by side, so the step from
+   one to the other is a glance rather than a scroll. Top-aligned: the card is
+   the taller of the two and the pill belongs level with its heading. */
+.pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 1rem;
+}

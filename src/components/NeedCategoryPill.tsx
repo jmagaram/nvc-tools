@@ -1,4 +1,4 @@
-import styles from './NeedCategoryPill.module.css'
+import styles from './pill.module.css'
 
 type Props = {
   /** The need category, e.g. 'Autonomy'. */

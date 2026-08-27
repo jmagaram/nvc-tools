@@ -1,4 +1,4 @@
-import styles from './FeelingCategoryPill.module.css'
+import styles from './pill.module.css'
 
 type Props = {
   /** The feeling category, e.g. 'Engaged'. */

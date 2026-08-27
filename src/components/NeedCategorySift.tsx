@@ -3,6 +3,7 @@ import type {
   NeedCategorySiftAction,
   NeedCategorySiftState,
 } from '../machines/needCategorySift.ts'
+import NeedPill from './NeedPill.tsx'
 import styles from './NeedCategorySift.module.css'
 
 type Props = {
@@ -41,24 +42,18 @@ export default function NeedCategorySift({ state, onAction }: Props) {
         </span>
       </h3>
 
+      {/* On a touch screen there is no hover and the tap does both showing and
+          marking, which is why the definition goes in a strip below rather
+          than in a tooltip. */}
       <div className={styles.words}>
         {state.words.map((need) => (
-          /* A pressed button rather than a checkbox: the whole word is the
-             target, which is what makes marking a run of them quick. */
-          <button
+          <NeedPill
             key={need.word}
-            type="button"
-            className={styles.word}
-            aria-pressed={isMarked(state, need.word)}
+            word={need.word}
+            marked={isMarked(state, need.word)}
             onClick={() => onAction({ type: 'toggle', word: need.word })}
-            /* Reading a definition must not cost a mark, so hovering and
-               tabbing show one too. On a touch screen there is no hover and
-               the tap does both, which is why the strip and not a tooltip. */
-            onPointerEnter={() => onAction({ type: 'show', word: need.word })}
-            onFocus={() => onAction({ type: 'show', word: need.word })}
-          >
-            {need.word}
-          </button>
+            onShow={() => onAction({ type: 'show', word: need.word })}
+          />
         ))}
       </div>
 

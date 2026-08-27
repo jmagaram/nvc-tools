@@ -1,15 +1,18 @@
 import { useState } from 'react'
+import FeelingCategoryCard from '../components/FeelingCategoryCard.tsx'
 import FeelingCategoryPill from '../components/FeelingCategoryPill.tsx'
 import { categories } from '../data/feelings.ts'
 import styles from './FeelingCategoryPillDemo.module.css'
 
 const KINDS: ('met' | 'unmet')[] = ['met', 'unmet']
 
+/** Enough for the card to have something to list. */
+const PICKED = ['fascinated', 'absorbed']
+
 export default function FeelingCategoryPillDemo() {
   const [category, setCategory] = useState('Engaged')
   const [kind, setKind] = useState<'met' | 'unmet'>('met')
   const [clicks, setClicks] = useState(0)
-  const [opened, setOpened] = useState<string | null>(null)
 
   return (
     <>
@@ -31,22 +34,40 @@ export default function FeelingCategoryPillDemo() {
         </select>
       </label>
       <hr />
-      <FeelingCategoryPill
-        category={category}
-        kind={kind}
-        onClick={() => setClicks(clicks + 1)}
-      />
-      <p>Clicked {clicks} times</p>
+      {/* The pill has no picked state of its own to put beside the plain one:
+          picking something in a category is what turns it into a card. So the
+          two shapes the picker swaps between are what go side by side. */}
+      <div className={styles.pair}>
+        <FeelingCategoryPill
+          category={category}
+          kind={kind}
+          onClick={() => setClicks(clicks + 1)}
+        />
+        <FeelingCategoryCard
+          category={category}
+          kind={kind}
+          feelings={PICKED}
+          emptyText="Nothing picked yet"
+          resume={false}
+          onClick={() => setClicks(clicks + 1)}
+        />
+      </div>
+      <p>
+        A category with nothing picked in it, and the same one once something
+        is. Clicked {clicks} times.
+      </p>
       <hr />
-      {/* The reason the pill exists: every category on screen at once. */}
-      <p>{opened ? `Opened ${opened}` : 'No category opened yet'}</p>
+
+      {/* The reason the pill exists: every category on screen at once. Display
+          only — opening one is what the Feeling Picker page is for. */}
+      <p>Every category at once, which is what the pill is small enough for.</p>
       <div className={styles.row}>
         {categories.map((sample) => (
           <FeelingCategoryPill
             key={sample.name}
             category={sample.name}
             kind={sample.kind}
-            onClick={() => setOpened(sample.name)}
+            onClick={() => {}}
           />
         ))}
       </div>

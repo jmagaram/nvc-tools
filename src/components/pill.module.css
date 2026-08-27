@@ -1,0 +1,74 @@
+/* The pill shape, shared by the four components that draw one: a feeling, a
+   need, a feeling category, a need category. It is one shape doing one job —
+   a word you can tap — and the only reason there are four components is that
+   the domain has four nouns. Kept in one file so the shape cannot drift
+   between them; a module next to each would be four copies of this.
+
+   A real button, so the focus ring lands on the whole pill and none of the
+   card's overlay machinery is needed. The class is doubled to out-specify a
+   host's own button chrome — see the comment on `.tabs .tab` in
+   FeelingPicker.module.css. */
+.pill.pill {
+  display: inline-block;
+  height: auto;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid;
+  border-radius: 999px;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Marked is drawn with a wash of the ink and a heavier border, never a colour
+   of its own: `color-mix` against `transparent` composites the text colour onto
+   whatever the host's background happens to be, so it lands right in a light
+   theme and a dark one without either being named — the same trick the focus
+   ring below uses. A third of the way is where it landed: 15% reads on a light
+   theme but all but vanishes on a dark one, where the eye has a harder time
+   with a faint light wash than with a faint dark one.
+
+   Nothing about a mark changes the pill's width. The border grows into padding
+   given back, and the wash is paint. A tick could not say it without either
+   reserving room for itself in every unmarked pill — which cost the grid three
+   rows of the 28-word categories at the width the modal opens at — or shuffling
+   the row under the finger that just tapped it. A heavier *word* would shuffle
+   it too, which is why the weight is left alone.
+
+   Only the two that can be marked ever carry `aria-pressed`. A category pill
+   has no marked state: once something is picked in a category it is drawn as a
+   card instead. */
+.pill.pill[aria-pressed='true'] {
+  background: color-mix(in srgb, currentColor 32%, transparent);
+  border-width: 2px;
+  padding: calc(0.1rem - 1px) calc(0.6rem - 1px);
+}
+
+/* Spelled out because the reset above took the host's own ring away with it:
+   Obsidian draws focus with a box-shadow, and `box-shadow: none` at 0,2,0
+   out-specifies its `button:focus-visible`. Offset clear of the pill's border.
+
+   `--nvc-ring` is how a host puts its own focus colour back — the plugin points
+   it at Obsidian's. Failing that, the text colour softened towards the
+   background: undiluted `currentColor` is the strongest ink on the page and
+   reads as a hard black box beside the quieter rings an app draws itself. */
+.pill.pill:focus-visible {
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline-offset: 2px;
+}
+
+/* The source's own split between feelings that signal needs met and needs
+   unmet, drawn the same way on a feeling and on the category holding it so the
+   two read as the same thing. Needs take neither class: they are one undivided
+   list, so there is nothing for the border to say. Doubled up to match
+   `.pill.pill` above, whose `border` shorthand would otherwise out-specify
+   these. */
+.pill.met {
+  border-style: solid;
+}
+
+.pill.unmet {
+  border-style: dashed;
+}

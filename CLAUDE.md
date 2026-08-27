@@ -13,7 +13,11 @@ Obsidian plugin — for now the gallery is the only surface.
 - **No UI library**, no CSS framework, no CSS-in-JS. Plain semantic HTML.
 - Styles live in a **CSS Module** next to the component
   (`src/components/Foo.module.css`, imported as `styles`). Put a rule in
-  `src/index.css` only when it is genuinely global across components.
+  `src/index.css` only when it is genuinely global across components — today
+  that is one line, `color-scheme: light dark`, which is what gives the gallery
+  a dark mode: the components name no colour, so they follow the browser's own
+  ink and canvas the way they follow an Obsidian theme. The one shared module is
+  `src/components/pill.module.css` — see **The pill** below.
 - Components are **presentational only**: props in, JSX out. No state, no
   effects, no fetching, no globals, no awareness of routing. State belongs in
   the demo page (and later, in the app). The one exception is **transient
@@ -35,8 +39,9 @@ Obsidian plugin — for now the gallery is the only surface.
   too, but no `kind`. Name a component for the scope it covers: `*Picker` covers
   every category, `*Sift` shows one category's words all at once, `*Walk` goes
   through one category a word at a time, `*Prompt` asks about one word, `*Card`
-  just displays one thing. Prefer the singular (`NeedCategoryCard`, not
-  `Needs…`) to match the data types.
+  just displays one thing, and `*Pill` is one thing small enough to sit in a row
+  of them. Prefer the singular (`NeedCategoryCard`, not `Needs…`) to match the
+  data types.
 - **Make impossible states unrepresentable.** Prefer a shape that cannot express
   a contradiction: a discriminated union over parallel optional fields, a
   required prop over an optional one with a silent fallback. Two caveats —
@@ -44,6 +49,34 @@ Obsidian plugin — for now the gallery is the only surface.
   nothing when the invalid case is a runtime property the type cannot see (an
   empty array, a blank string). Reach for it when the branches genuinely differ;
   otherwise just make the prop required.
+
+## The pill
+
+The pill shape is drawn in four places — a feeling, a need, a feeling category,
+a need category — so there are four components (`FeelingPill`, `NeedPill`,
+`FeelingCategoryPill`, `NeedCategoryPill`) and **one** stylesheet,
+`src/components/pill.module.css`, which all four import. It is the one shared
+CSS module in the project. Four copies of the shape would drift, and the point
+of the shape is that a word you can tap looks the same wherever it is.
+
+The four split two ways. A **word** pill (`FeelingPill`, `NeedPill`) can be
+marked and carries `aria-pressed`; marked is a wash of the ink, `color-mix`ed
+against `transparent` so it composites onto whatever the host's background is
+and needs no colour named. A **category** pill cannot be marked at all: once
+something is picked in a category, the picker draws it as a `*CategoryCard`
+instead, so an outline pill always means *nothing chosen here*. The feeling
+pills carry the source's met/unmet split as a solid or dashed border; the need
+pills take neither, needs being one undivided list.
+
+Nothing about a mark may change a pill's width. The heavier border grows into
+padding given back and the wash is paint, so a row cannot reflow under the
+finger that just tapped it. This is why marked is not a tick: a tick either
+reserves room in every unmarked pill — three rows of a 28-word category at the
+width the modal opens at — or shuffles the row when it appears.
+
+Both word pills take one `onShow` rather than an `onPointerEnter` and an
+`onFocus`, because to a host the two events mean the same thing: show what this
+word means. Reading a definition must not cost a mark.
 
 ## Adding a component
 

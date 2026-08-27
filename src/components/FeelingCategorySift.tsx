@@ -3,6 +3,7 @@ import type {
   FeelingCategorySiftAction,
   FeelingCategorySiftState,
 } from '../machines/feelingCategorySift.ts'
+import FeelingPill from './FeelingPill.tsx'
 import styles from './FeelingCategorySift.module.css'
 
 type Props = {
@@ -42,26 +43,19 @@ export default function FeelingCategorySift({ state, onAction }: Props) {
         </span>
       </h3>
 
+      {/* On a touch screen there is no hover and the tap does both showing and
+          marking, which is why the definition goes in a strip below rather
+          than in a tooltip. */}
       <div className={styles.words}>
         {state.words.map((feeling) => (
-          /* A pressed button rather than a checkbox: the whole word is the
-             target, which is what makes marking a run of them quick. */
-          <button
+          <FeelingPill
             key={feeling.word}
-            type="button"
-            className={`${styles.word} ${styles[state.kind]}`}
-            aria-pressed={isMarked(state, feeling.word)}
+            word={feeling.word}
+            kind={state.kind}
+            marked={isMarked(state, feeling.word)}
             onClick={() => onAction({ type: 'toggle', word: feeling.word })}
-            /* Reading a definition must not cost a mark, so hovering and
-               tabbing show one too. On a touch screen there is no hover and
-               the tap does both, which is why the strip and not a tooltip. */
-            onPointerEnter={() =>
-              onAction({ type: 'show', word: feeling.word })
-            }
-            onFocus={() => onAction({ type: 'show', word: feeling.word })}
-          >
-            {feeling.word}
-          </button>
+            onShow={() => onAction({ type: 'show', word: feeling.word })}
+          />
         ))}
       </div>
 

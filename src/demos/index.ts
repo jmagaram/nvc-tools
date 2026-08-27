@@ -5,6 +5,7 @@ import FeelingCategoryPillDemo from './FeelingCategoryPillDemo.tsx'
 import FeelingCategorySiftDemo from './FeelingCategorySiftDemo.tsx'
 import FeelingCategoryWalkDemo from './FeelingCategoryWalkDemo.tsx'
 import FeelingPickerDemo from './FeelingPickerDemo.tsx'
+import FeelingPillDemo from './FeelingPillDemo.tsx'
 import FeelingPromptDemo from './FeelingPromptDemo.tsx'
 import ModalFrameDemo from './ModalFrameDemo.tsx'
 import NeedCardDemo from './NeedCardDemo.tsx'
@@ -13,6 +14,7 @@ import NeedCategoryPillDemo from './NeedCategoryPillDemo.tsx'
 import NeedCategorySiftDemo from './NeedCategorySiftDemo.tsx'
 import NeedCategoryWalkDemo from './NeedCategoryWalkDemo.tsx'
 import NeedPickerDemo from './NeedPickerDemo.tsx'
+import NeedPillDemo from './NeedPillDemo.tsx'
 import NeedPromptDemo from './NeedPromptDemo.tsx'
 import PickedEntriesDemo from './PickedEntriesDemo.tsx'
 import StepProgressDemo from './StepProgressDemo.tsx'
@@ -76,6 +78,12 @@ export const demos: Demo[] = [
     Component: FeelingCategoryCardDemo,
   },
   {
+    slug: 'feeling-pill',
+    title: 'Feeling Pill',
+    group: 'Feelings',
+    Component: FeelingPillDemo,
+  },
+  {
     slug: 'feeling-category-pill',
     title: 'Feeling Category Pill',
     group: 'Feelings',
@@ -117,6 +125,12 @@ export const demos: Demo[] = [
     title: 'Need Category Card',
     group: 'Needs',
     Component: NeedCategoryCardDemo,
+  },
+  {
+    slug: 'need-pill',
+    title: 'Need Pill',
+    group: 'Needs',
+    Component: NeedPillDemo,
   },
   {
     slug: 'need-category-pill',
