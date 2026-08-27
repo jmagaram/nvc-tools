@@ -88,14 +88,21 @@ straight from `src/` and adds nothing to it.
 - **The block is the note's copy.** What goes in is a fence whose body is the
   same bullets as before, so the note still reads with the plugin off. The
   plugin redraws it as a list, a table, or one comma-separated line
-  (`PickedEntries`), and the layout is switched from a right-click menu or the
-  block's corner button. `registerBlocks` in `obsidian/block.tsx` registers one
-  processor per language — `nvc`, `nvc-list`, `nvc-table`, `nvc-inline` —
-  because a code block processor is handed the body and never the info string,
-  so a ```` ```nvc table ```` argument could not be read without going back to
-  the file. Switching rewrites the fence line through `vault.process`, so the
-  choice lives in the note and each block keeps its own. A block whose body does
-  not parse is shown verbatim rather than half-swallowed.
+  (`PickedEntries`), switched from a right-click menu or the block's corner
+  button. `registerBlocks` in `obsidian/block.tsx` registers one processor per
+  language — `nvc`, `nvc-list`, `nvc-table`, `nvc-inline` — because a code block
+  processor is handed the body and never the info string, so a ```` ```nvc table
+  ```` argument could not be read without going back to the file. Switching
+  rewrites the fence line, so the choice lives in the note and each block keeps
+  its own. A block whose body does not parse is shown verbatim rather than
+  half-swallowed.
+- **There is a way out.** **Convert to Markdown**, in the same menu, replaces the
+  whole fence with the layout on screen written as ordinary markdown — a real
+  pipe table that Obsidian's own table editor can add columns to. One-way by
+  design: past there the plugin has no claim on the text. Both that and a layout
+  switch go through `rewrite`, which uses the editor holding the note when there
+  is one so the change is a single undo, and falls back to `vault.process` where
+  none has it.
 - **Closing cancels.** The corner `x` and Escape both land in `onClose` and
   insert nothing, on the walk screen as well as the browse screen. **Back** and
   **Skip Rest** are what keep your picks.

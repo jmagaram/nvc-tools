@@ -46,6 +46,42 @@ export function toBlock(entries: readonly Picked[]): string {
   return body ? `\`\`\`${languageFor('list')}\n${body}\n\`\`\`` : ''
 }
 
+/** A cell's text, with the one character that would split it in two escaped. */
+function cell(text: string): string {
+  return text.replace(/\|/g, '\\|')
+}
+
+/**
+ * The same picks as ordinary markdown, in the layout they are being drawn in —
+ * what a block turns into when someone converts it and takes the text back.
+ *
+ * The table is one row per category, exactly what the block on screen shows:
+ * converting should hand over what you were already looking at, not a second
+ * arrangement of it. Cells are left unpadded because Obsidian's table editor
+ * reflows them on the first edit, and hand-aligned columns go stale the moment
+ * anyone types in one.
+ */
+export function toPlainMarkdown(
+  entries: readonly Picked[],
+  format: Format,
+): string {
+  if (format === 'table') {
+    return [
+      '| Category | Words |',
+      '| --- | --- |',
+      ...entries.map(
+        (entry) => `| ${cell(entry.category)} | ${cell(entry.words.join(', '))} |`,
+      ),
+    ].join('\n')
+  }
+
+  if (format === 'inline') {
+    return entries.flatMap((entry) => entry.words).join(', ')
+  }
+
+  return toMarkdown(entries)
+}
+
 /**
  * `toMarkdown` backwards, for a block that is about to be drawn.
  *
