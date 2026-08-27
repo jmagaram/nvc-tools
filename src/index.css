@@ -1,3 +1,13 @@
+/* The gallery has no palette of its own — every component draws in
+   `currentColor` on whatever is behind it, which is the whole reason a theme
+   can reach them. Saying `light dark` hands the choice to the browser: it
+   paints its own dark canvas and light ink when the OS asks for dark, and the
+   components follow without naming a colour. Standing in, roughly, for the
+   light and dark an Obsidian theme would bring. */
+:root {
+  color-scheme: light dark;
+}
+
 body {
   font-family: Kalam, "Comic Sans MS", cursive;
   font-size: 1.15rem;
