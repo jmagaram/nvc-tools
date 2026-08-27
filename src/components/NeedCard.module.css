@@ -1,5 +1,3 @@
-/* A single column, where FeelingCard needs two: needs carry no met/unmet label
-   to set beside the word, so there is nothing to put in a second column. */
 .card {
   display: grid;
   gap: 0.25rem;
