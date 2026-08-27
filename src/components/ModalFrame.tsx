@@ -5,6 +5,10 @@ import styles from './ModalFrame.module.css'
  * What the title bar reads. A modal at the top of its stack names itself; one a
  * level down offers the way back instead, because what it is showing already
  * says where you are and the way out matters more than the name.
+ *
+ * The `label` on the way back names the screen it returns to rather than the
+ * move — the title the level above is wearing, so that the two read as the
+ * same place.
  */
 export type ModalHeading =
   | { kind: 'title'; text: string }
@@ -17,7 +21,7 @@ type Props = {
   onClose: () => void
   /** Fills the scrolling body between the title bar and the buttons. */
   children: ReactNode
-  /** The button row pinned to the bottom. */
+  /** The button row pinned to the bottom, or null for a screen that has none. */
   footer: ReactNode
   /**
    * Obsidian lays a modal out edge to edge on a phone and as a centred card
@@ -38,7 +42,8 @@ type Props = {
  *
  * The two bars own different scopes and never trade: the title bar says where
  * you are and how to go up, the button row says what becomes of the whole
- * modal. A step inside the content puts its own way onwards in `footer`.
+ * modal. A step inside the content that has nothing to say about the whole
+ * modal passes `null` and is shown without a button row.
  */
 export default function ModalFrame({
   heading,
@@ -74,7 +79,10 @@ export default function ModalFrame({
           is the whole reason to preview a component in here: a picker that
           grows between steps pushes on this and nothing else. */}
       <div className={styles.body}>{children}</div>
-      <div className={styles.footer}>{footer}</div>
+      {/* No row at all when a screen has nothing to say about the whole modal.
+          An empty one would still spend its border and its padding on saying
+          nothing, at the bottom of the sparsest screen there is. */}
+      {footer !== null && <div className={styles.footer}>{footer}</div>}
     </div>
   )
 }

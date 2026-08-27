@@ -21,6 +21,9 @@ import type {
   Visited,
 } from '../machines/needPicker.ts'
 
+/** What the modal is called, and so what the way out of a walk points back at. */
+const TITLE = 'Needs'
+
 /** How the modal was last dismissed, so OK and Cancel read as different. */
 type LastClose =
   | { kind: 'open' }
@@ -60,21 +63,17 @@ export default function NeedPickerDemo() {
   const picked = chosen(state)
   const total = count(state)
 
-  /* Two scopes, two regions. The title bar owns the walk: it names the modal at
-     the top level and offers the way back a level down. The button row only
-     ever speaks for the whole modal — never for the category — so during a walk
-     it holds the one thing left to say, which is the same 'close' the back
-     button raises, worded for someone who is counting questions rather than
-     screens. */
+  /* Two scopes, two regions, and only one way out of a walk. The title bar owns
+     the walk: it names the modal at the top level and holds the way back a
+     level down, labelled with the title it is going back to rather than with
+     the move — 'back' alone leaves open what becomes of the answers already
+     given. The button row only ever speaks for the whole modal, never for the
+     category, so a walk gives it nothing to say and is shown without one. */
   const heading: ModalHeading = state.walk
-    ? { kind: 'back', label: 'Back', onBack: () => dispatch({ type: 'close' }) }
-    : { kind: 'title', text: 'Needs' }
+    ? { kind: 'back', label: TITLE, onBack: () => dispatch({ type: 'close' }) }
+    : { kind: 'title', text: TITLE }
 
-  const footer = state.walk ? (
-    <button type="button" onClick={() => dispatch({ type: 'close' })}>
-      Skip Rest
-    </button>
-  ) : (
+  const footer = state.walk ? null : (
     <>
       <button type="button" onClick={cancel}>
         Cancel
@@ -154,11 +153,12 @@ export default function NeedPickerDemo() {
         <>
           {picker}
           {/* Bare, the picker has no chrome to leave a walk from, so the demo
-              stands in for the host the same way the modal footer does. */}
+              stands in for the host the same way the modal title bar does —
+              same words, so what a host has to provide is plain. */}
           {state.walk && (
             <p>
               <button type="button" onClick={() => dispatch({ type: 'close' })}>
-                Skip Rest
+                <span aria-hidden="true">&lsaquo;</span> {TITLE}
               </button>
             </p>
           )}

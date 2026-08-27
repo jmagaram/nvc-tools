@@ -17,6 +17,9 @@ import type {
 import { useFocusScreen } from '../src/focusScreen.ts'
 import Credit from './Credit.tsx'
 
+/** What the modal is called, and so what the way out of a walk points back at. */
+const TITLE = 'Feelings'
+
 type Props = {
   /** Obsidian's title bar, which the heading is drawn into. */
   titleEl: HTMLElement
@@ -57,29 +60,25 @@ export default function FeelingPickerHost({
   const totals = counts(state)
   const total = totals.met + totals.unmet
 
-  /* Two scopes, two regions. The title bar owns the walk: it names the modal at
-     the top level and offers the way back a level down. The button row only
-     ever speaks for the whole modal — never for the category — so during a walk
-     it holds the one thing left to say, which is the same 'close' the back
-     button raises, worded for someone who is counting questions rather than
-     screens. */
+  /* Two scopes, two regions, and only one way out of a walk. The title bar owns
+     the walk: it names the modal at the top level and holds the way back a
+     level down, labelled with the title it is going back to rather than with
+     the move — 'back' alone leaves open what becomes of the answers already
+     given. The button row only ever speaks for the whole modal, never for the
+     category, so a walk gives it nothing to say and it is not drawn at all. */
   const heading = state.walk ? (
     <button
       type="button"
       className="nvc-back"
       onClick={() => dispatch({ type: 'close' })}
     >
-      <span aria-hidden="true">&lsaquo;</span> Back
+      <span aria-hidden="true">&lsaquo;</span> {TITLE}
     </button>
   ) : (
-    <>Feelings</>
+    <>{TITLE}</>
   )
 
-  const buttons = state.walk ? (
-    <button type="button" onClick={() => dispatch({ type: 'close' })}>
-      Skip Rest
-    </button>
-  ) : (
+  const buttons = state.walk ? null : (
     <>
       <button type="button" onClick={onCancel}>
         Cancel

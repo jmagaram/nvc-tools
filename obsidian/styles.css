@@ -34,6 +34,14 @@
   font-size: var(--font-smallest);
 }
 
+/* A walk has nothing to say about the whole modal — the way back out of it is
+   in the title bar, and it is the only one — so the host draws no buttons at
+   all. The row itself is Obsidian's and is made when the modal opens, so it is
+   hidden while nothing is portalled into it rather than taken away. */
+.nvc-modal .modal-button-container:empty {
+  display: none;
+}
+
 /* Reads as a control rather than a heading, but keeps the title bar the same
    height so it does not jump as you move up and down a level. */
 .nvc-modal .nvc-back {

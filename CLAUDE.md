@@ -107,9 +107,9 @@ straight from `src/` and adds nothing to it.
 - **The arrow keys need focus.** `FeelingPrompt` / `NeedPrompt` answer on ←
   and →, but only while focus is inside the region, and a walk opens from a
   card that is gone by the time it does. Browsing, ← and → move between the
-  tabs, and the chrome that gets you there — Obsidian's own modal element,
-  the portalled **Back** and **Skip Rest** — all sit outside the picker.
-  Hosts — the two modals and the four demo pages alike — call
+  tabs, and the chrome that gets you there — Obsidian's own modal element, the
+  portalled way back — all sits outside the picker. Hosts — the two modals and
+  the four demo pages alike — call
   `useFocusScreen(screenKey(state))`. A machine's `screenKey` names the screen
   and everything about it worth moving focus for; the element to focus marks
   itself with a matching `data-prompt` or `data-browse`. Nothing on either may
@@ -129,8 +129,12 @@ straight from `src/` and adds nothing to it.
   host may restyle spells out its own `outline` in `currentColor` rather than
   leaning on the UA default.
 - **Closing cancels.** The corner `x` and Escape both land in `onClose` and
-  insert nothing, on the walk screen as well as the browse screen. **Back** and
-  **Skip Rest** are what keep your picks.
+  insert nothing, on the walk screen as well as the browse screen. The way back
+  in the title bar is what keeps your picks, and it is the only one: a walk is
+  drawn with no button row at all, because that row speaks for the whole modal
+  and a walk has nothing to say there. It is labelled with the screen it
+  returns to — **‹ Feelings**, **‹ Needs**, the title one level up — rather than
+  *Back*, which left open what became of the answers already given.
 - **Styles.** Component CSS modules use only `currentColor` and `inherit`, so an
   Obsidian theme reaches them untouched and they ship as they are.
   `obsidian/styles.css` holds only the plugin's own chrome, for the modal and
