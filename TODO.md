@@ -8,6 +8,51 @@ oddities in there are faithful to the source.
 
 ### Animation on swipe
 
+### Double-height tabs on the feeling picker
+
+The two tabs read **Needs unmet** and **Needs met**. Both open on the same word,
+so the one that tells them apart comes last, and the count pushes it further
+right still — `Needs unmet (3)` beside `Needs met (5)`. The eye has to read to
+the end of a tab to know which tab it is.
+
+The direction chosen is a tab two lines tall: a large word, with the met/unmet
+clause in smaller type beneath it. **Unpleasant** over _when needs are not met_,
+**Pleasant** over _when needs are met_.
+
+Not a width fix. Measured against a 375px iPhone, where the modal body is about
+327px: a front-loaded single-line pair — `Unmet needs (3)` and `Met needs` —
+wants roughly 180px of that, so it fits with room over. What does not fit is the
+clause used as the label itself; `When needs are not satisfied` beside `When
+needs are met` runs past the edge. The second line buys teaching, not room, and
+it is paid for in height on the screen with the least of it.
+
+Not **Positive** and **Negative**, which is where this started. NVC treats a
+feeling as information about a need rather than a verdict on the person having
+it, and the source inventory's own headings are "feelings when your needs are
+satisfied" and "when they are not" — never good or bad (see _Source_ below, and
+the note at the top of `feelings.ts`). A two-line tab in those words puts the
+verdict in the large type and the frame in the small type, which files grief and
+anger under _Negative_ in the loudest word on the screen. Met and unmet also
+point somewhere: to the need under the feeling, which is the next tool here,
+where a verdict is a dead end. And a word can sit on both sides of met/unmet —
+`surprised` does — where it cannot be both good and bad.
+
+**Unpleasant** and **Pleasant** describe how a feeling lands rather than valuing
+it, which is the most a large word can honestly do. The cost is that they still
+sort the feeling instead of pointing at the need, so the clause underneath is
+carrying the NVC work and cannot be dropped later for tidiness.
+
+What is open is the drawing of it: how the two lines sit against each other in
+size, weight and opacity, given that the unselected tab is already dimmed and
+the selected one already carries weight; where the count goes; whether a 2px
+underline still reads as a tab under two lines of text; the vertical cost of
+three lines of chrome before the first card; and the accessible name, since both
+lines become the button's name and are announced on every press.
+
+It lands in `TABS` in `src/components/FeelingPicker.tsx` and in `.tabs` /
+`.tabs .tab` in `FeelingPicker.module.css`. The feeling picker is the only one
+with tabs — needs are one undivided list, with no split to label.
+
 ### Re-opening a category and backing out erases what it held
 
 Re-open a category from its card and leave it — **Back** in the title bar or
