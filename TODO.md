@@ -6,13 +6,19 @@ oddities in there are faithful to the source.
 
 ## Open
 
+### Miscellaneous
+
+The feeling dialog says "How are you feeling?" They may be describing something that happened a while ago. Better for generic "Feelings" and "Needs".
+
+### Animation on swipe
+
 ### Re-opening a category and backing out erases what it held
 
 Re-open a category from its card and leave it — **Back** in the title bar or
 **Skip Rest** in the button row — before answering anything, and everything
 previously picked in that category is lost.
 Reproduced in August 2026: `Angry` holding `incensed · indignant · outraged`,
-re-opened, backed straight out — the card came back reading *none of these*.
+re-opened, backed straight out — the card came back reading _none of these_.
 
 The cause is `close` in `src/machines/feelingPicker.ts`, which writes
 `feelingCategoryWalk.picked(walk)`. That reports only the walk just performed,
@@ -49,13 +55,13 @@ and it lands in `src/machines/`, which the plugin only consumes.
 The evaluation-flavoured `Aversion` words — `hate`, `dislike`, `contempt`,
 `animosity` — and `resentful` in `Angry`. NVC treats these as thoughts about
 another person rather than feelings, yet the inventory lists them. They are
-faithful to the source and must stay (see *Confirmed upstream* below); what is
+faithful to the source and must stay (see _Confirmed upstream_ below); what is
 open is whether anything in the data should flag them, and whether a tool built
 on this should say something when one is picked.
 
 ### Whether to ship our own definitions of doctrinal words
 
-Background in *The definitions are ours* below — every gloss in `feelings.ts`
+Background in _The definitions are ours_ below — every gloss in `feelings.ts`
 and `needs.ts` was written for this project, because the source defines nothing.
 To settle:
 
@@ -95,7 +101,7 @@ crediting CNVC is expected. The gallery does so in `src/App.tsx`.
 
 #### Variants, and why they are not this
 
-- *Nonviolent Communication: A Language of Life* (Rosenberg, PuddleDancer Press)
+- _Nonviolent Communication: A Language of Life_ (Rosenberg, PuddleDancer Press)
   carries an older list — "Some Basic Needs We All Have", grouped as Autonomy,
   Celebration, Integrity, Interdependence, Play, Spiritual Communion, Physical
   Nurturance. The ancestor of the CNVC handout, not a competing edition.
@@ -123,7 +129,7 @@ faithful to the source, so do not "fix" it:
 - Phrase entries: `to know and be known`, `to see and be seen`,
   `to understand and be understood`. `respect/self-respect` is one entry
   upstream, not two.
-- Nouns that do not fit "I feel ___": `grief`, `turmoil`, `wonder`, `agony`,
+- Nouns that do not fit "I feel \_\_\_": `grief`, `turmoil`, `wonder`, `agony`,
   `dread`.
 - The evaluation-flavoured `Aversion` words — `hate`, `dislike`, `contempt`,
   `animosity` — and `resentful` in `Angry`. NVC treats these as thoughts about
