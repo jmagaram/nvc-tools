@@ -6,6 +6,20 @@ oddities in there are faithful to the source.
 
 ## Open
 
+### The big categories are too long to walk
+
+`Connection` is 28 needs and `Meaning` is 21 — two thirds of the inventory
+behind two of the seven doors. Walking one costs an answer per word whether or
+not the word was ever a candidate, and nothing on the browse screen says how
+big a category is or what is inside it, so the only way to find out what
+`Connection` covers is to pay for the walk.
+
+Screens to consider are drawn in `docs/need-picker.md`: a browse row carrying a
+sample and a count, the category as a checklist, a shortlist-then-walk funnel,
+a paginated walk, a filter across all 75 words, sub-groups inside the big
+categories, and the minimal change of offering the list part way through a
+walk. Nothing decided.
+
 ### Animation on swipe
 
 ### Double-height tabs on the feeling picker
