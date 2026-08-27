@@ -40,8 +40,9 @@
   outline: none;
 }
 
+/* `--nvc-ring` for the reason `FeelingCategoryCard` gives. */
 .card:has(.button:focus-visible) {
-  outline: 2px solid;
+  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }
 

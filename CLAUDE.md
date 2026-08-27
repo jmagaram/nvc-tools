@@ -137,6 +137,14 @@ straight from `src/` and adds nothing to it.
   for a block in a note. `src/index.css` is
   gallery-only — every rule in it targets `body` or a bare element and would
   restyle the whole app.
+- **`--nvc-ring` is the one colour a host may hand a component.** Focus rings
+  take `var(--nvc-ring, …)`, falling back to `currentColor` softened towards the
+  background. Pills and cards reset `box-shadow`, which is what Obsidian draws
+  focus with, so its ring cannot survive them and they draw their own — and an
+  undiluted one reads as hard black beside the app's quieter grey. The plugin
+  points `--nvc-ring` at `--background-modifier-border-focus` so the picker
+  speaks in the same voice as the buttons under it. Nothing else in a component
+  names a colour.
 
 ## Commands
 

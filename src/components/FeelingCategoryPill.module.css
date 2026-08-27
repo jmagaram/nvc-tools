@@ -15,11 +15,16 @@
   cursor: pointer;
 }
 
-/* Spelled out rather than left to the UA default, for the same reason the
-   reset above exists: a host that dresses bare buttons may have flattened the
-   default ring too. Offset clear of the pill's own border. */
+/* Spelled out because the reset above took the host's own ring away with it:
+   Obsidian draws focus with a box-shadow, and `box-shadow: none` at 0,2,0
+   out-specifies its `button:focus-visible`. Offset clear of the pill's border.
+
+   `--nvc-ring` is how a host puts its own focus colour back — the plugin points
+   it at Obsidian's. Failing that, the text colour softened towards the
+   background: undiluted `currentColor` is the strongest ink on the page and
+   reads as a hard black box beside the quieter rings an app draws itself. */
 .pill.pill:focus-visible {
-  outline: 2px solid;
+  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }
 

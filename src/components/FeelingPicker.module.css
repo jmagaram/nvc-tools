@@ -62,7 +62,10 @@
      clipped away; the sides have the strip's own gap to spend. The extra top
      padding above is the room this borrows. */
   inset: 2px -0.35rem 4px;
-  border: 2px solid;
+  /* `--nvc-ring` for the reason `FeelingPrompt` gives, and it matters more here:
+     the chosen tab is already marked in full-strength `currentColor`, so a ring
+     in the same ink competes with the mark instead of sitting behind it. */
+  border: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   border-radius: 0.2rem;
 }
 

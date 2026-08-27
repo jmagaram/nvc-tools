@@ -48,8 +48,12 @@
   outline: none;
 }
 
+/* `--nvc-ring` is how a host puts its own focus colour here — the plugin points
+   it at Obsidian's. Failing that, the text colour softened towards the
+   background, which is quieter than the hard box undiluted `currentColor`
+   draws. */
 .card:has(.button:focus-visible) {
-  outline: 2px solid;
+  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }
 

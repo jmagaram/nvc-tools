@@ -17,6 +17,14 @@
    squat ones. */
 .nvc-modal {
   --dialog-width: 420px;
+
+  /* The one colour the plugin does hand a component, and only because it is the
+     app's rather than the plugin's. A pill and a card reset `box-shadow`, which
+     is what Obsidian draws focus with, so its ring cannot survive them and they
+     draw their own — and a ring in `currentColor` came out as hard black next
+     to the quiet grey on Cancel and OK a few pixels below. Pointing this at the
+     app's own focus colour puts them back in the same voice. */
+  --nvc-ring: var(--background-modifier-border-focus, currentColor);
 }
 
 /* The line that carries the CNVC credit, under the categories. */

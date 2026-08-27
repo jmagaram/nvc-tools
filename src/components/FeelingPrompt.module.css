@@ -19,9 +19,14 @@
    Drawn inside, which is the only place that survives every host. An outward
    ring needs the scrolling box around it to have spare padding: the gallery's
    ModalFrame does, so it showed in full, and Obsidian's modal does not, so its
-   top edge was clipped away. */
+   top edge was clipped away.
+
+   `--nvc-ring` is how a host puts its own focus colour here — the plugin points
+   it at Obsidian's. Failing that, the text colour softened towards the
+   background: this ring frames a whole screen, so undiluted `currentColor`
+   would draw a hard box around everything. */
 .prompt:focus {
-  outline: 2px solid;
+  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: -2px;
 }
 
