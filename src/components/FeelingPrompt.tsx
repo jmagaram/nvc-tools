@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import FeelingCard from './FeelingCard.tsx'
 import StepProgress from './StepProgress.tsx'
+import type { StepMark } from './StepProgress.tsx'
 import styles from './FeelingPrompt.module.css'
 
 /** Which way an answer sends the card, and which way it tilts on the way out. */
@@ -25,10 +26,10 @@ type Props = {
   definition: string
   /** Whether the category signals needs met or needs unmet. */
   kind: 'met' | 'unmet'
-  /** Zero-based position of this feeling within the category. */
-  index: number
-  /** How many feelings the category holds. */
-  total: number
+  /** What was said to each step already answered, oldest first. */
+  past: readonly StepMark[]
+  /** How many steps come after the one on screen. */
+  upcoming: number
   /** Accept this feeling and move on. */
   onAccept: () => void
   /** Reject this feeling and move on. */
@@ -40,8 +41,8 @@ export default function FeelingPrompt({
   category,
   definition,
   kind,
-  index,
-  total,
+  past,
+  upcoming,
   onAccept,
   onReject,
 }: Props) {
@@ -88,8 +89,8 @@ export default function FeelingPrompt({
       onKeyDown={answerOnArrow}
     >
       <StepProgress
-        total={total}
-        current={index}
+        past={past}
+        upcoming={upcoming}
         label={`Feelings in ${category}`}
       />
 

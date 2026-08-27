@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import NeedCard from './NeedCard.tsx'
 import StepProgress from './StepProgress.tsx'
+import type { StepMark } from './StepProgress.tsx'
 import styles from './NeedPrompt.module.css'
 
 /** Which way an answer sends the card, and which way it tilts on the way out. */
@@ -22,10 +23,10 @@ type Props = {
   category: string
   /** A short plain-language gloss of the need. */
   definition: string
-  /** Zero-based position of this need within the category. */
-  index: number
-  /** How many needs the category holds. */
-  total: number
+  /** What was said to each step already answered, oldest first. */
+  past: readonly StepMark[]
+  /** How many steps come after the one on screen. */
+  upcoming: number
   /** Accept this need and move on. */
   onAccept: () => void
   /** Reject this need and move on. */
@@ -36,8 +37,8 @@ export default function NeedPrompt({
   word,
   category,
   definition,
-  index,
-  total,
+  past,
+  upcoming,
   onAccept,
   onReject,
 }: Props) {
@@ -84,8 +85,8 @@ export default function NeedPrompt({
       onKeyDown={answerOnArrow}
     >
       <StepProgress
-        total={total}
-        current={index}
+        past={past}
+        upcoming={upcoming}
         label={`Needs in ${category}`}
       />
 

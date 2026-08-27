@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import FeelingPrompt from '../components/FeelingPrompt.tsx'
+import type { StepMark } from '../components/StepProgress.tsx'
 import { categories } from '../data/feelings.ts'
 
 export default function FeelingPromptDemo() {
@@ -12,6 +13,11 @@ export default function FeelingPromptDemo() {
   // Keep the feeling in range when a shorter category is chosen.
   const clamped = Math.min(index, category.feelings.length - 1)
   const feeling = category.feelings[clamped]
+  // Stand-in history: this demo is about the card, so the answers behind
+  // the cursor are made up rather than controlled.
+  const past: StepMark[] = Array.from({ length: clamped }, (_, at) =>
+    at % 3 === 0 ? 'chosen' : 'skipped',
+  )
 
   return (
     <>
@@ -47,8 +53,8 @@ export default function FeelingPromptDemo() {
         category={category.name}
         definition={feeling.definition}
         kind={category.kind}
-        index={clamped}
-        total={category.feelings.length}
+        past={past}
+        upcoming={category.feelings.length - clamped - 1}
         onAccept={() => setAccepted(accepted + 1)}
         onReject={() => setRejected(rejected + 1)}
       />

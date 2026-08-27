@@ -8,9 +8,9 @@
   list-style: none;
 }
 
-/* The three states are told apart by fill and size alone, the same way the
-   cards tell met from unmet without colour. The `li` is kept in the state
-   selectors so they outrank this shared rule. */
+/* The states are told apart by fill and size alone, the same way the cards tell
+   met from unmet without colour. The `li` is kept in the state selectors so they
+   outrank this shared rule. */
 .steps li {
   width: 0.6rem;
   height: 0.6rem;
@@ -18,17 +18,22 @@
   border-radius: 0.1rem;
 }
 
-.steps li.done {
+/* Fill means kept, not asked, so the row counts the picks back as well as the
+   ground covered. */
+.steps li.chosen {
   background: currentColor;
 }
 
-/* The cursor is filled like a done step but taller, so it reads as a caret
+/* The cursor is filled like a chosen step but taller, so it reads as a caret
    sitting between what is behind and what is ahead. */
 .steps li.current {
   height: 1.4rem;
   background: currentColor;
 }
 
+/* A step passed over is drawn like one not yet reached — what tells them apart
+   is which side of the caret they sit on. */
+.steps li.skipped,
 .steps li.upcoming {
   background: none;
 }

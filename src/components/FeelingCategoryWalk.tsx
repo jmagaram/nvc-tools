@@ -24,8 +24,8 @@ export default function FeelingCategoryWalk({ state, onAction }: Props) {
       category={state.category}
       definition={current.definition}
       kind={state.kind}
-      index={answered.length}
-      total={answered.length + 1 + upcoming.length}
+      past={answered.map((answer) => (answer.picked ? 'chosen' : 'skipped'))}
+      upcoming={upcoming.length}
       onAccept={() => onAction({ type: 'accept' })}
       onReject={() => onAction({ type: 'reject' })}
     />

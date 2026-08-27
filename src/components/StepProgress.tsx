@@ -1,30 +1,34 @@
 import styles from './StepProgress.module.css'
 
+/** What was said to a step already answered. */
+export type StepMark = 'chosen' | 'skipped'
+
 type Props = {
-  /** How many steps there are in all. */
-  total: number
-  /** Zero-based position of the cursor. */
-  current: number
+  /** What was said to each step already answered, oldest first. */
+  past: readonly StepMark[]
+  /** How many steps come after the one on screen. */
+  upcoming: number
   /** Describes the sequence to assistive tech, e.g. 'Feelings in Engaged'. */
   label: string
 }
 
-type Status = 'done' | 'current' | 'upcoming'
+type Status = StepMark | 'current' | 'upcoming'
 
-function statusOf(index: number, current: number): Status {
-  if (index < current) return 'done'
-  if (index === current) return 'current'
-  return 'upcoming'
-}
+export default function StepProgress({ past, upcoming, label }: Props) {
+  // The cursor is wherever the past runs out, so it cannot fall off the bar.
+  const statuses: Status[] = [
+    ...past,
+    'current',
+    ...Array.from({ length: upcoming }, (): Status => 'upcoming'),
+  ]
 
-export default function StepProgress({ total, current, label }: Props) {
   return (
     <ol className={styles.steps} aria-label={label}>
-      {Array.from({ length: total }, (_, index) => (
+      {statuses.map((status, index) => (
         <li
           key={index}
-          className={styles[statusOf(index, current)]}
-          aria-current={index === current ? 'step' : undefined}
+          className={styles[status]}
+          aria-current={status === 'current' ? 'step' : undefined}
         />
       ))}
     </ol>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import NeedPrompt from '../components/NeedPrompt.tsx'
+import type { StepMark } from '../components/StepProgress.tsx'
 import { categories } from '../data/needs.ts'
 
 export default function NeedPromptDemo() {
@@ -12,6 +13,11 @@ export default function NeedPromptDemo() {
   // Keep the need in range when a shorter category is chosen.
   const clamped = Math.min(index, category.needs.length - 1)
   const need = category.needs[clamped]
+  // Stand-in history: this demo is about the card, so the answers behind
+  // the cursor are made up rather than controlled.
+  const past: StepMark[] = Array.from({ length: clamped }, (_, at) =>
+    at % 3 === 0 ? 'chosen' : 'skipped',
+  )
 
   return (
     <>
@@ -46,8 +52,8 @@ export default function NeedPromptDemo() {
         word={need.word}
         category={category.name}
         definition={need.definition}
-        index={clamped}
-        total={category.needs.length}
+        past={past}
+        upcoming={category.needs.length - clamped - 1}
         onAccept={() => setAccepted(accepted + 1)}
         onReject={() => setRejected(rejected + 1)}
       />
