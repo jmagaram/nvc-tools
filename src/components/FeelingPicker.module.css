@@ -3,29 +3,41 @@
   gap: 1rem;
 }
 
-/* The rule under the tabs runs the full width; the selected tab's own bottom
-   border sits on top of it, so the panel reads as hanging off that tab. */
+/* The rule runs the full width of the picker, past both tabs; the chosen tab
+   sits on it with a thicker mark of its own. Nothing is boxed, so the strip
+   reads as one line with a label underscored rather than two little folders. */
 .tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 1.25rem;
   border-bottom: 1px solid;
 }
 
 .tab {
   margin-bottom: -1px;
-  padding: 0.3rem 0.75rem;
-  border: 1px solid transparent;
-  border-radius: 0.25rem 0.25rem 0 0;
+  padding: 0.25rem 0.1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
   background: none;
+  font: inherit;
   color: inherit;
   cursor: pointer;
+  outline-offset: 2px;
 }
 
-/* The chosen side is told by the border alone — no colour, the same way met
-   and unmet are told apart everywhere else. */
+/* The chosen side is told by that mark and by weight — no colour, the same way
+   met and unmet are told apart everywhere else. The other tab is dimmed rather
+   than drawn differently, so switching only moves the emphasis. */
+.tab[aria-pressed='false'] {
+  opacity: 0.6;
+}
+
+.tab[aria-pressed='false']:hover {
+  opacity: 1;
+}
+
 .tab[aria-pressed='true'] {
-  border-color: currentColor;
-  border-bottom-color: transparent;
+  border-bottom-color: currentColor;
+  font-weight: 600;
 }
 
 .panel {
