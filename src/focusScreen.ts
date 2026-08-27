@@ -18,9 +18,9 @@ import { useEffect, useRef } from 'react'
  * Browsing, it is the category just walked, or the chosen tab before anything
  * has been. Both matter for the same reason the prompt does: a host's chrome
  * sits outside this subtree — Obsidian focuses the modal element, which is an
- * ancestor, and `Back` and `Skip Rest` are portalled elsewhere — so otherwise
- * there is nothing focused for Tab to carry on from, and the picker's own arrow
- * keys have nowhere to land.
+ * ancestor, and the way back out of a walk is portalled elsewhere — so
+ * otherwise there is nothing focused for Tab to carry on from, and the
+ * picker's own arrow keys have nowhere to land.
  *
  * Whether to take focus at all is the host's call, which is why it is a hook
  * here rather than an effect in the component. Returns the ref to put on the

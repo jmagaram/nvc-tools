@@ -91,12 +91,15 @@
 }
 
 /* Cards size themselves to the text; auto-fill lets a row hold as many as fit
-   rather than stretching two cards across the page. The floor is low enough
-   that a phone still gets two columns: one column per row makes a card wide
-   and squat, and the picked words read better wrapped down a narrow card. */
+   rather than stretching two cards across the page. The floor is a whole
+   line's worth, because that is what a card holds — a heading and a run of
+   picked words. A lower one put the two-column threshold in the middle of the
+   widths a modal actually takes, so the same picker came out stacked in
+   Obsidian and side by side in the gallery. Past 20rem a card is only getting
+   wider, so a page-width surface still wraps. */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   gap: 0.5rem;
   align-items: start;
 }

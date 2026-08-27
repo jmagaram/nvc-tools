@@ -10,11 +10,11 @@
  * modals add, is Obsidian's own version of it.
  */
 
-/* Obsidian's own default is 560px. The walk shows one word at a time and the
-   browse view is a wrap-flow of pills, so nothing here wants that width; 420 is
-   the number the gallery preview settled on, where a definition wraps to two
-   lines and the walked categories fall into two tall cards rather than three
-   squat ones. */
+/* Obsidian's own default is 560px. The walk shows one word at a time, and the
+   browse view is a wrap-flow of pills over a single stack of cards, so nothing
+   here wants that width; 420 is the number the gallery preview settled on,
+   where a definition wraps to two lines and a card still holds its heading and
+   its picked words on one. */
 .nvc-modal {
   --dialog-width: 420px;
 

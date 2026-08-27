@@ -35,13 +35,14 @@
   border-radius: inherit;
 }
 
-/* Show focus on the card, not just the category text. */
-.button:focus-visible {
+/* Show focus on the card, not just the category text. ':focus' rather than
+   ':focus-visible', and `--nvc-ring`, for the reasons `FeelingCategoryCard`
+   gives. */
+.button:focus {
   outline: none;
 }
 
-/* `--nvc-ring` for the reason `FeelingCategoryCard` gives. */
-.card:has(.button:focus-visible) {
+.card:has(.button:focus) {
   outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }

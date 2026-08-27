@@ -43,8 +43,16 @@
   border-radius: inherit;
 }
 
-/* Show focus on the card, not just the category text. */
-.button:focus-visible {
+/* Show focus on the card, not just the category text.
+
+   ':focus', not ':focus-visible', for the reason `FeelingPrompt` gives:
+   coming back from a walk this is the button `data-browse` focuses, and a
+   programmatic focus that followed a click does not satisfy the heuristic — so
+   leaving a walk with the mouse landed on a card with nothing drawn on it,
+   which is the one case the resume exists for. The wider selector costs
+   nothing: a click anywhere on this card opens the category, so the card it
+   would ring is gone by the next frame. */
+.button:focus {
   outline: none;
 }
 
@@ -52,7 +60,7 @@
    it at Obsidian's. Failing that, the text colour softened towards the
    background, which is quieter than the hard box undiluted `currentColor`
    draws. */
-.card:has(.button:focus-visible) {
+.card:has(.button:focus) {
   outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }
