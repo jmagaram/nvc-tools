@@ -1,7 +1,7 @@
 {
   "id": "nvc-picker",
-  "name": "NVC (Non-Violent Communcation) Tools",
-  "version": "0.1.0",
+  "name": "NVC (Non-Violent Communication) Tools",
+  "version": "0.1.1",
   "minAppVersion": "1.5.0",
   "description": "Browse and insert feelings, emotions, and needs from the CNVC inventories.",
   "author": "Justin Magaram",
