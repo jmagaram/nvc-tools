@@ -34,7 +34,14 @@
   left: 0;
   right: 0;
   pointer-events: none;
-  animation: 400ms forwards;
+  /* Longhands, not `animation: 400ms forwards`. A nameless shorthand sets
+     animation-name to none, and a minifier is then entitled to collapse the
+     whole declaration to `animation: none` and take the duration with it —
+     which is what happened, leaving the flight running for 0s in every built
+     copy while `npm run dev` looked fine. The name arrives from .accept /
+     .reject below. */
+  animation-duration: 400ms;
+  animation-fill-mode: forwards;
 }
 
 /* Right for yes, left for no — the same sides as the arrow keys and the
