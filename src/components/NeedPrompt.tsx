@@ -124,10 +124,12 @@ export default function NeedPrompt({
           button sits on the side its arrow key points to. */}
       <div className={styles.actions}>
         <button type="button" onClick={() => answer('reject')}>
-          <span aria-hidden="true">←</span> Not this
+          <span aria-hidden="true">←</span>
+          Not this
         </button>
         <button type="button" onClick={() => answer('accept')}>
-          Yes, I need this <span aria-hidden="true">→</span>
+          Yes
+          <span aria-hidden="true">→</span>
         </button>
       </div>
     </div>

@@ -197,6 +197,15 @@
   gap: 1rem;
 }
 
+/* A beat of air between a label and its arrow, so the arrow reads as the
+   direction the answer sends the card rather than as part of the word. The
+   glyph leads one button and trails the other, and a lone <span> matches both
+   :first-child and :last-child in either — a text node is not an element child
+   — so a directional margin has no way to tell them apart. `gap` is symmetric
+   and needs no selector at all. In `em`, to track the button's own text. */
 .actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   padding: 0.5rem 1rem;
 }
