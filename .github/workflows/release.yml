@@ -1,0 +1,58 @@
+# Cut a release when a version tag is pushed.
+#
+# The tag must equal the `version` in manifest.json exactly — no `v` prefix.
+# `npm run version:bump <x.y.z>` sets that and prints the tag commands.
+#
+# The release is created as a draft so the notes can be written by hand, and as
+# a pre-release because the plugin is still in beta. Publish the draft to make
+# it visible; BRAT cannot see a draft. Drop `--prerelease` for the first public
+# release.
+
+name: Release Obsidian plugin
+
+on:
+  push:
+    tags: ['*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - run: npm ci
+
+      # Typechecks, then writes main.js, manifest.json, styles.css and
+      # versions.json into dist-plugin/.
+      - run: npm run plugin:build
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist-plugin/main.js
+            dist-plugin/manifest.json
+            dist-plugin/styles.css
+
+      # Obsidian downloads these three by name off the release, so they go up
+      # as individual assets rather than an archive.
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          gh release create "$tag" \
+            --title="$tag" \
+            --draft \
+            --prerelease \
+            dist-plugin/main.js \
+            dist-plugin/manifest.json \
+            dist-plugin/styles.css

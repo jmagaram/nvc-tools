@@ -67,7 +67,9 @@ src/
   demos/             one demo page per component, plus index.ts registry
   machines/          pure state machines (state + action + reduce, no React)
 obsidian/            the Obsidian plugin — the second surface, see below
-scripts/             deploy-plugin.mjs
+scripts/             deploy-plugin.mjs, version-bump.mjs
+manifest.json        the plugin's, at the root because that is where Obsidian
+versions.json        reads them from — see **Releasing** below
 ```
 
 ## The Obsidian plugin
@@ -155,7 +157,36 @@ straight from `src/` and adds nothing to it.
 - `npm run dev` — dev server
 - `npm run build` — typecheck (`tsc -b`) and build
 - `npm run lint` — **oxlint**, not ESLint. Config is `.oxlintrc.json`.
-- `npm run plugin:build` — build the plugin into `dist-plugin/`
+- `npm run plugin:build` — typecheck and build the plugin into `dist-plugin/`
 - `npm run plugin:deploy` — build, then copy it into the vault named by
   `OBSIDIAN_VAULT` in `.env.local` (gitignored)
 - `npm run plugin:dev` — rebuild and redeploy on every change
+- `npm run version:bump <x.y.z>` — set the plugin's version, see below
+
+## Releasing
+
+The plugin is not in the community directory yet. It goes out as a GitHub
+pre-release that testers install with BRAT, by repo path.
+
+- **The root is Obsidian's, not ours.** `manifest.json`, `versions.json`,
+  `README.md` and `LICENSE` sit at the repo root because that is the only place
+  the community directory looks — it reads the manifest at the HEAD of the
+  default branch. Nothing else about the repo has to be plugin-shaped; the
+  gallery stays where it is. `vite.plugin.config.ts` copies the two JSON files
+  from the root into `dist-plugin/`.
+- **`main.js` is never committed.** It and `styles.css` are build output, and
+  `.gitignore` excludes `dist-plugin`. They reach people as assets attached to
+  a release. The gallery's own build lands in `dist/` with hashed names, so the
+  two never collide.
+- **One version, three places.** Root `manifest.json`, `versions.json`, and the
+  git tag, which must equal the manifest's `version` exactly — no `v` prefix, no
+  pre-release suffix. `npm run version:bump` writes the first two and prints the
+  tag commands rather than running them.
+- **Pushing a tag cuts the release.** `.github/workflows/release.yml` builds and
+  opens a *draft* pre-release with `main.js`, `manifest.json` and `styles.css`
+  attached. The draft is deliberate — it is where the notes get written — but
+  BRAT cannot see one, so it has to be published.
+- **After the directory, a bump is a broadcast.** Once the plugin is listed,
+  the root `manifest.json` version is what tells every installed copy there is
+  an update. From then on a beta gets a tag and a release *without* a manifest
+  bump, or it ships to everyone.

@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "plugin:build": "vite build --config vite.plugin.config.ts",
+    "plugin:build": "tsc -b && vite build --config vite.plugin.config.ts",
+    "version:bump": "node scripts/version-bump.mjs",
     "plugin:deploy": "npm run plugin:build && node scripts/deploy-plugin.mjs",
     "plugin:dev": "vite build --config vite.plugin.config.ts --watch --mode deploy"
   },

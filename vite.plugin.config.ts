@@ -9,16 +9,18 @@ import { deployToVault } from './scripts/deploy-plugin.mjs'
 const OUT_DIR = 'dist-plugin'
 
 /**
- * The three files Obsidian wants alongside main.js that no bundler produces.
- * styles.css is written by the build from the CSS modules, so it is not here —
- * obsidian/styles.css reaches it as an import in main.ts's graph instead.
+ * The two files Obsidian wants alongside main.js that no bundler produces.
+ * They live at the repo root, not next to the plugin source, because that is
+ * where the community directory reads them from — see README.md. styles.css is
+ * not here: the build writes it from the CSS modules, which obsidian/styles.css
+ * reaches as an import in main.ts's graph.
  */
 function copyPluginFiles(): Plugin {
   return {
     name: 'nvc-copy-plugin-files',
     closeBundle() {
       for (const file of ['manifest.json', 'versions.json']) {
-        copyFileSync(`obsidian/${file}`, `${OUT_DIR}/${file}`)
+        copyFileSync(file, `${OUT_DIR}/${file}`)
       }
     },
   }
