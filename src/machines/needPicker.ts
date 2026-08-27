@@ -1,46 +1,35 @@
-import type { FeelingCategory } from '../data/feelings.ts'
-import * as feelingCategoryWalk from './feelingCategoryWalk.ts'
+import type { NeedCategory } from '../data/needs.ts'
+import * as needCategoryWalk from './needCategoryWalk.ts'
 import { shuffle } from './shuffle.ts'
 
 /** A category that has been walked through, and what was picked in it. */
 export type Visited = {
   category: string
-  kind: 'met' | 'unmet'
   /** May be empty: the walk happened but nothing in it applied. */
   words: readonly string[]
 }
 
-/** A category as the browse view needs it — no feelings, just the label. */
-type Choice = {
-  category: string
-  kind: 'met' | 'unmet'
-}
-
-export type FeelingPickerState = {
+export type NeedPickerState = {
   /**
    * Every category, shuffled once so no category is always first. Held in
    * state rather than read from the data module so that `reduce` can resolve
    * an 'open' action by name, and the component needs no data of its own.
    */
-  categories: readonly FeelingCategory[]
-  /** Which half of the list is on screen. Remembered across a walk. */
-  tab: 'met' | 'unmet'
+  categories: readonly NeedCategory[]
   /** Categories already walked, most recently closed first. */
   visited: readonly Visited[]
   /**
    * The walk in progress, or null while browsing. Never a finished walk: the
-   * last answer closes it, so if this is set there is a feeling to answer.
+   * last answer closes it, so if this is set there is a need to answer.
    */
-  walk: feelingCategoryWalk.FeelingCategoryWalkState | null
+  walk: needCategoryWalk.NeedCategoryWalkState | null
 }
 
-export type FeelingPickerAction =
-  /** Show the other half of the list. */
-  | { type: 'tab'; kind: 'met' | 'unmet' }
+export type NeedPickerAction =
   /** Start walking a category, by name. */
   | { type: 'open'; category: string }
-  /** Answer the feeling the walk is showing. */
-  | { type: 'answer'; answer: feelingCategoryWalk.FeelingCategoryWalkAction }
+  /** Answer the need the walk is showing. */
+  | { type: 'answer'; answer: needCategoryWalk.NeedCategoryWalkAction }
   /** Leave the walk, keeping whatever was picked. */
   | { type: 'close' }
 
@@ -48,15 +37,16 @@ export type FeelingPickerAction =
  * Start browsing. The category order is fixed here and never changes again, so
  * the pill row only ever shrinks as categories are walked — nothing a person is
  * part way through reading rearranges under them.
+ *
+ * There is no tab here and no `kind`: the CNVC inventory splits feelings into
+ * needs met and needs unmet, but the needs themselves are one undivided list.
  */
 export function init(
-  categories: readonly FeelingCategory[],
+  categories: readonly NeedCategory[],
   rng: () => number = Math.random,
-): FeelingPickerState {
+): NeedPickerState {
   return {
     categories: shuffle(categories, rng),
-    // Someone reaching for this tool usually has an unmet need on their mind.
-    tab: 'unmet',
     visited: [],
     walk: null,
   }
@@ -64,7 +54,7 @@ export function init(
 
 /** What was picked in `category` last time it was walked, if it was. */
 function wordsPicked(
-  state: FeelingPickerState,
+  state: NeedPickerState,
   category: string,
 ): readonly string[] {
   return state.visited.find((v) => v.category === category)?.words ?? []
@@ -74,16 +64,22 @@ function wordsPicked(
  * Record what a walk came to and go back to the categories. Moving the
  * category to the front of `visited` is what puts its card top-left, where the
  * person was last looking.
+ *
+ * Keyed by category, which matters: `safety` is listed under both `Connection`
+ * and `Physical Wellbeing` upstream, so the same word can be picked twice and
+ * each card has to keep its own copy.
  */
 function close(
-  state: FeelingPickerState,
-  walk: feelingCategoryWalk.FeelingCategoryWalkState,
-): FeelingPickerState {
+  state: NeedPickerState,
+  walk: needCategoryWalk.NeedCategoryWalkState,
+): NeedPickerState {
   const closed: Visited = {
     category: walk.category,
-    kind: walk.kind,
     // Readable part way through, so backing out early still keeps picks.
-    words: feelingCategoryWalk.picked(walk).map((f) => f.word),
+    // This reports only the walk just performed, so backing out of a re-opened
+    // category overwrites what it held — the same open bug `feelingPicker` has,
+    // copied deliberately so the two stay in step. See TODO.md.
+    words: needCategoryWalk.picked(walk).map((n) => n.word),
   }
   return {
     ...state,
@@ -96,39 +92,34 @@ function close(
 }
 
 export function reduce(
-  state: FeelingPickerState,
-  action: FeelingPickerAction,
+  state: NeedPickerState,
+  action: NeedPickerAction,
   rng: () => number = Math.random,
-): FeelingPickerState {
+): NeedPickerState {
   switch (action.type) {
-    case 'tab':
-      // The tabs are not on screen during a walk, so this cannot arrive then.
-      return state.walk ? state : { ...state, tab: action.kind }
-
     case 'open': {
       if (state.walk) return state
       const category = state.categories.find((c) => c.name === action.category)
       if (!category) return state
-      const opened = { ...state, tab: category.kind }
-      const walk = feelingCategoryWalk.init(
+      const walk = needCategoryWalk.init(
         category,
         wordsPicked(state, category.name),
         rng,
       )
       // A category with nothing in it is over before it began, so there is no
       // walk screen to show.
-      return feelingCategoryWalk.isDone(walk)
-        ? close(opened, walk)
-        : { ...opened, walk }
+      return needCategoryWalk.isDone(walk)
+        ? close(state, walk)
+        : { ...state, walk }
     }
 
     case 'answer': {
       if (!state.walk) return state
-      const walk = feelingCategoryWalk.reduce(state.walk, action.answer)
+      const walk = needCategoryWalk.reduce(state.walk, action.answer)
       // The last answer ends the walk, and the screen it would leave behind
       // says no more than the card waiting on the other side — the category
       // just walked is the first one there. So go straight back.
-      return feelingCategoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
+      return needCategoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
     }
 
     case 'close':
@@ -142,7 +133,7 @@ export function reduce(
  * An empty card says 'I looked here and found nothing', which is worth seeing
  * once; keeping every one of them would fill the view with cards saying nothing.
  */
-function shownAsCard(state: FeelingPickerState): Set<string> {
+function shownAsCard(state: NeedPickerState): Set<string> {
   const shown = new Set(
     state.visited.filter((v) => v.words.length > 0).map((v) => v.category),
   )
@@ -151,42 +142,37 @@ function shownAsCard(state: FeelingPickerState): Set<string> {
   return shown
 }
 
-/** Cards for the current tab, most recently closed first. */
-export function cards(state: FeelingPickerState): Visited[] {
+/** Cards, most recently closed first. */
+export function cards(state: NeedPickerState): Visited[] {
   const shown = shownAsCard(state)
-  return state.visited.filter(
-    (v) => v.kind === state.tab && shown.has(v.category),
-  )
+  return state.visited.filter((v) => shown.has(v.category))
 }
 
 /**
- * Pills for the current tab, in the order fixed at `init`. Together with
- * `cards` this is every category on this side of the split and nothing twice,
- * which is why neither group needs a heading to explain what it leaves out.
+ * Pills, in the order fixed at `init`. Together with `cards` this is every
+ * category and nothing twice, which is why neither group needs a heading to
+ * explain what it leaves out.
  */
-export function pills(state: FeelingPickerState): Choice[] {
+export function pills(state: NeedPickerState): string[] {
   const shown = shownAsCard(state)
   return state.categories
-    .filter((c) => c.kind === state.tab && !shown.has(c.name))
-    .map((c) => ({ category: c.name, kind: c.kind }))
+    .filter((c) => !shown.has(c.name))
+    .map((c) => c.name)
 }
 
-/** How many feelings are picked on each side, for the tab labels. */
-export function counts(state: FeelingPickerState): {
-  met: number
-  unmet: number
-} {
-  const total = (kind: 'met' | 'unmet') =>
-    state.visited
-      .filter((v) => v.kind === kind)
-      .reduce((sum, v) => sum + v.words.length, 0)
-  return { met: total('met'), unmet: total('unmet') }
+/**
+ * How many needs are picked in all. One number rather than the two
+ * `feelingPicker` reports, because there are no tab labels to fill — a host
+ * showing a count on an OK button is what this is for.
+ */
+export function count(state: NeedPickerState): number {
+  return state.visited.reduce((sum, v) => sum + v.words.length, 0)
 }
 
 /**
  * Everything picked, grouped by category and newest first — what a host would
  * insert. Categories walked without picking anything are left out.
  */
-export function chosen(state: FeelingPickerState): Visited[] {
+export function chosen(state: NeedPickerState): Visited[] {
   return state.visited.filter((v) => v.words.length > 0)
 }

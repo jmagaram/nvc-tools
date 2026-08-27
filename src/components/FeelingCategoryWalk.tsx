@@ -1,17 +1,17 @@
 import FeelingPrompt from './FeelingPrompt.tsx'
 import type {
-  CategoryWalkAction,
-  CategoryWalkState,
-} from '../machines/categoryWalk.ts'
+  FeelingCategoryWalkAction,
+  FeelingCategoryWalkState,
+} from '../machines/feelingCategoryWalk.ts'
 
 type Props = {
   /** Where the walk has got to. */
-  state: CategoryWalkState
+  state: FeelingCategoryWalkState
   /** Called with the answer the person gave to the feeling on screen. */
-  onAction: (action: CategoryWalkAction) => void
+  onAction: (action: FeelingCategoryWalkAction) => void
 }
 
-export default function CategoryWalk({ state, onAction }: Props) {
+export default function FeelingCategoryWalk({ state, onAction }: Props) {
   // A finished walk has nothing left to ask. What that looks like — a summary,
   // a closing dialog — belongs to whatever is hosting the picker.
   if (state.progress.status === 'done') return null

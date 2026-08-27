@@ -1,6 +1,6 @@
 import FeelingCategoryCard from './FeelingCategoryCard.tsx'
 import FeelingCategoryPill from './FeelingCategoryPill.tsx'
-import CategoryWalk from './CategoryWalk.tsx'
+import FeelingCategoryWalk from './FeelingCategoryWalk.tsx'
 import { cards, counts, pills } from '../machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
@@ -39,7 +39,7 @@ export default function FeelingPicker({ state, onAction }: Props) {
     // bar and the button row, where the rest of the ways out already live.
     return (
       <div className={styles.picker}>
-        <CategoryWalk
+        <FeelingCategoryWalk
           state={state.walk}
           onAction={(answer) => onAction({ type: 'answer', answer })}
         />

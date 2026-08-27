@@ -1,4 +1,4 @@
-import { demos } from './demos/index.ts'
+import { demos, groups } from './demos/index.ts'
 import { useHashRoute } from './router.ts'
 
 export default function App() {
@@ -8,13 +8,22 @@ export default function App() {
     return (
       <>
         <h1>Components</h1>
-        <ul>
-          {demos.map((demo) => (
-            <li key={demo.slug}>
-              <a href={`#/${demo.slug}`}>{demo.title}</a>
-            </li>
-          ))}
-        </ul>
+        {/* One section per group, in the order `groups` fixes. Every demo
+            carries a group, so nothing can fall outside these headings. */}
+        {groups.map((group) => (
+          <section key={group}>
+            <h2>{group}</h2>
+            <ul>
+              {demos
+                .filter((demo) => demo.group === group)
+                .map((demo) => (
+                  <li key={demo.slug}>
+                    <a href={`#/${demo.slug}`}>{demo.title}</a>
+                  </li>
+                ))}
+            </ul>
+          </section>
+        ))}
         <footer>
           <p>
             Feelings and needs vocabulary from the Feelings and Needs Inventory,

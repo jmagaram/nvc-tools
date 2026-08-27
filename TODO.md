@@ -15,10 +15,15 @@ Reproduced in August 2026: `Angry` holding `incensed · indignant · outraged`,
 re-opened, backed straight out — the card came back reading *none of these*.
 
 The cause is `close` in `src/machines/feelingPicker.ts`, which writes
-`categoryWalk.picked(walk)`. That reports only the walk just performed, so a
-walk bailed out of has picked nothing and overwrites the earlier answers with an
-empty list. Answering two words and then backing out loses the rest the same
-way, so this is not only about untouched walks.
+`feelingCategoryWalk.picked(walk)`. That reports only the walk just performed,
+so a walk bailed out of has picked nothing and overwrites the earlier answers
+with an empty list. Answering two words and then backing out loses the rest the
+same way, so this is not only about untouched walks.
+
+`src/machines/needPicker.ts` was written as a deliberate copy of that file and
+carries the same `close`, so the bug is now in both pickers and whichever fix is
+chosen has to land in both. Keeping them identical was the point: two pickers
+that disagree about what backing out means would be worse than one shared bug.
 
 Left as is deliberately. The fix carries a semantic choice:
 
@@ -82,6 +87,11 @@ To settle:
   and leave the meaning to the reader.
 - If we keep them, whether someone with NVC training should review the wording
   before an app or plugin depends on it.
+
+This grew teeth in August 2026: `NeedCard` now puts a project-written gloss on
+screen for all 75 needs, one word at a time, and `NeedPrompt` asks the person to
+answer it. A definition nobody outside this project wrote is no longer a footnote
+in the data — it is the question being asked.
 
 ## Settled
 

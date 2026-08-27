@@ -1,15 +1,15 @@
 import { useState } from 'react'
-import CategoryWalk from '../components/CategoryWalk.tsx'
+import FeelingCategoryWalk from '../components/FeelingCategoryWalk.tsx'
 import { categories } from '../data/feelings.ts'
-import { init, picked, reduce } from '../machines/categoryWalk.ts'
+import { init, picked, reduce } from '../machines/feelingCategoryWalk.ts'
 import type {
-  CategoryWalkAction,
-  CategoryWalkState,
-} from '../machines/categoryWalk.ts'
+  FeelingCategoryWalkAction,
+  FeelingCategoryWalkState,
+} from '../machines/feelingCategoryWalk.ts'
 
-export default function CategoryWalkDemo() {
+export default function FeelingCategoryWalkDemo() {
   const [categoryIndex, setCategoryIndex] = useState(2)
-  const [state, setState] = useState<CategoryWalkState>(() =>
+  const [state, setState] = useState<FeelingCategoryWalkState>(() =>
     init(categories[2]),
   )
   // Standing in for whatever the app stores between sessions, so that
@@ -18,7 +18,7 @@ export default function CategoryWalkDemo() {
     Record<string, string[]>
   >({})
 
-  const dispatch = (action: CategoryWalkAction) =>
+  const dispatch = (action: FeelingCategoryWalkAction) =>
     setState((current) => reduce(current, action))
 
   const wordsPicked = picked(state).map((feeling) => feeling.word)
@@ -53,7 +53,7 @@ export default function CategoryWalkDemo() {
         </button>
       </label>
       <hr />
-      <CategoryWalk state={state} onAction={dispatch} />
+      <FeelingCategoryWalk state={state} onAction={dispatch} />
 
       {/* The walk renders nothing once it is done, so the chrome around
           it — here the demo page, later a modal — shows the result. */}

@@ -16,13 +16,18 @@ Obsidian plugin — for now the gallery is the only surface.
   `src/index.css` only when it is genuinely global across components.
 - Components are **presentational only**: props in, JSX out. No state, no
   effects, no fetching, no globals, no awareness of routing. State belongs in
-  the demo page (and later, in the app).
+  the demo page (and later, in the app). The one exception is **transient
+  animation state** — something that exists only for the length of a transition
+  and that no host could ever read back. `FeelingPrompt` and `NeedPrompt` keep
+  the card just answered so it has something to fly off with; putting that in a
+  machine would make every host own a timer just to end an animation.
 - **Flow state lives in a machine.** When a component walks someone through
   several steps, put the state in `src/machines/` as a pure module — a state
   type, an action type, `init`, `reduce`, and selectors, with no React import.
   The component takes `state` and `onAction` props; the demo page (later the
   app or an Obsidian modal) owns the `useState` that drives it. See
-  `src/machines/categoryWalk.ts` and `src/components/CategoryWalk.tsx`.
+  `src/machines/feelingCategoryWalk.ts` and
+  `src/components/FeelingCategoryWalk.tsx`.
 - Type props with an explicit `type Props = { ... }`.
 - **Terminology.** The domain noun is **feeling**, never *emotion* — that is what
   `src/data/feelings.ts` and the CNVC source call it. A **category** is a named

@@ -21,7 +21,7 @@ type Progress =
     }
   | { status: 'done'; answered: Answered[] }
 
-export type CategoryWalkState = {
+export type FeelingCategoryWalkState = {
   /** The category being walked through, e.g. 'Engaged'. */
   category: string
   /** Whether the category signals needs met or needs unmet. */
@@ -29,7 +29,7 @@ export type CategoryWalkState = {
   progress: Progress
 }
 
-export type CategoryWalkAction = { type: 'accept' } | { type: 'reject' }
+export type FeelingCategoryWalkAction = { type: 'accept' } | { type: 'reject' }
 
 /**
  * Start a walk through `category`. Feelings named in `alreadyPicked` are asked
@@ -40,7 +40,7 @@ export function init(
   category: FeelingCategory,
   alreadyPicked: readonly string[] = [],
   rng: () => number = Math.random,
-): CategoryWalkState {
+): FeelingCategoryWalkState {
   const wasPicked = new Set(alreadyPicked)
   const order = [
     ...shuffle(
@@ -66,9 +66,9 @@ export function init(
 
 /** Answer the current feeling and move on. The walk only runs forwards. */
 export function reduce(
-  state: CategoryWalkState,
-  action: CategoryWalkAction,
-): CategoryWalkState {
+  state: FeelingCategoryWalkState,
+  action: FeelingCategoryWalkAction,
+): FeelingCategoryWalkState {
   if (state.progress.status === 'done') return state
 
   const { answered, current, upcoming } = state.progress
@@ -84,7 +84,7 @@ export function reduce(
 }
 
 /** Whether every feeling in the category has been asked about. */
-export function isDone(state: CategoryWalkState): boolean {
+export function isDone(state: FeelingCategoryWalkState): boolean {
   return state.progress.status === 'done'
 }
 
@@ -93,7 +93,7 @@ export function isDone(state: CategoryWalkState): boolean {
  * part way through as well as at the end, so a host that closes a walk early
  * can still keep what was picked.
  */
-export function picked(state: CategoryWalkState): Feeling[] {
+export function picked(state: FeelingCategoryWalkState): Feeling[] {
   return state.progress.answered
     .filter((answer) => answer.picked)
     .map((answer) => answer.feeling)

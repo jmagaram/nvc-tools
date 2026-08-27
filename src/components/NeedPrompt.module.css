@@ -1,0 +1,91 @@
+.prompt {
+  display: grid;
+  gap: 1rem;
+}
+
+/* The prompt takes focus so the arrow keys have somewhere to land; push the
+   ring out so it reads as a frame around the whole thing. */
+.prompt:focus-visible {
+  outline-offset: 0.5rem;
+}
+
+/* Tall enough for the longest definition to wrap without moving the buttons
+   below it. A walk is a couple of dozen of these in a row, so the answer
+   buttons have to stay under the cursor. */
+.stage {
+  position: relative;
+  min-height: 10rem;
+  display: grid;
+  align-content: start;
+  /* A card on its way out flies past the edges. Clip it here so it slides
+     under the sides of the stage rather than over the page or out of a
+     narrow modal. */
+  overflow: clip;
+}
+
+/* The card just answered. Lifted out of flow so it cannot push the stage
+   around while the next card is already sitting in its place underneath, and
+   left at its natural height rather than stretched to the stage. */
+.leaving {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  animation: 320ms ease-in forwards;
+}
+
+/* Right for yes, left for no — the same sides as the arrow keys and the
+   buttons, so the card leaves in the direction the answer points. */
+.accept {
+  animation-name: flyRight;
+}
+
+.reject {
+  animation-name: flyLeft;
+}
+
+/* The next card rises into the gap the old one left, like the deck dealing. */
+.arriving {
+  animation: arrive 220ms ease-out;
+}
+
+@keyframes flyRight {
+  to {
+    transform: translate(110%, -8%) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flyLeft {
+  to {
+    transform: translate(-110%, -8%) rotate(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes arrive {
+  from {
+    transform: translateY(1.5rem) scale(0.97);
+    opacity: 0;
+  }
+}
+
+/* Collapse the flight rather than removing it: the leaving card is torn down
+   on animationend, and `animation: none` would never fire that event. */
+@media (prefers-reduced-motion: reduce) {
+  .leaving,
+  .arriving {
+    animation-duration: 1ms;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.actions button {
+  padding: 0.5rem 1rem;
+}
