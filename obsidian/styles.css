@@ -27,6 +27,33 @@
   --nvc-ring: var(--background-modifier-border-focus, currentColor);
 }
 
+/* Room for a focus ring along the top edge of the scrolling body.
+
+   Obsidian's `mod-scrollable-content` gives that body `overflow: auto` and a
+   padding with no top to it — the gap above the first row belongs to the title
+   bar, which is outside the scroll box. So the first pill or card sits flush
+   against the top edge, and a ring drawn outside it is clipped: `outline: 3px`
+   at `outline-offset: 2px` reaches 5px past the border box, and a scroll
+   container has nowhere to put what is above its content. The gallery never
+   showed this because `ModalFrame`'s body pads on all four sides.
+
+   5px rather than a size token, because the number is the ring's and not the
+   layout's: it is the offset plus the width, and it is what the rings in the
+   component modules are drawn with. The other three edges already have
+   `--size-4-4` and need nothing.
+
+   `scroll-padding` for the same reason a level up: focusing a pill further
+   down scrolls it into view, and without this the browser stops with its top
+   edge exactly at the edge of the box — ring outside again, this time with the
+   padding scrolled away. It costs nothing when nothing scrolls.
+
+   Written with `.mod-scrollable-content` so it is the same three classes as the
+   rule it is amending, and lands after it. */
+.nvc-modal.mod-scrollable-content .modal-content {
+  padding-top: 5px;
+  scroll-padding: 5px;
+}
+
 /* The line that carries the CNVC credit, under the categories. */
 .nvc-modal .nvc-credit {
   margin: var(--size-4-3) 0 0;
