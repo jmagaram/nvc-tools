@@ -1,5 +1,6 @@
 import NeedCategoryCard from './NeedCategoryCard.tsx'
 import NeedCategoryPill from './NeedCategoryPill.tsx'
+import NeedCategorySift from './NeedCategorySift.tsx'
 import NeedCategoryWalk from './NeedCategoryWalk.tsx'
 import { cards, pills, resumeAt } from '../machines/needPicker.ts'
 import type {
@@ -9,34 +10,51 @@ import type {
 import styles from './NeedPicker.module.css'
 
 type Props = {
-  /** Which categories have been walked, and the walk in progress if any. */
+  /** Which categories have been visited, and the one open now if any. */
   state: NeedPickerState
   /** Called with whatever the person just did. */
   onAction: (action: NeedPickerAction) => void
 }
 
-/** Stands in for the needs when a category was walked and none applied. */
+/** Stands in for the needs when a category was opened and none applied. */
 const EMPTY_TEXT = 'none of these'
 
 /**
- * Browse every need category and walk through the ones that look right.
+ * Browse every need category and go through the ones that look right.
+ *
+ * Three screens: the categories, one category's words all at once, and — for
+ * whoever wants to be asked rather than to scan — that category one word at a
+ * time. The ways between them are all the host's chrome, because they speak for
+ * the screen rather than for anything inside it.
  *
  * The cards and the pills together are every category there is — the ones
- * already walked, and the rest. That is why neither group carries a heading:
- * there is no partial list to explain. And no tabs, unlike `FeelingPicker`:
- * the met/unmet split belongs to the feelings, not to the needs.
+ * already visited, and the rest. That is why neither group carries a heading:
+ * there is no partial list to explain. And no tabs, unlike `FeelingPicker`: the
+ * met/unmet split belongs to the feelings, not to the needs.
  */
 export default function NeedPicker({ state, onAction }: Props) {
-  if (state.walk) {
-    // The machine closes the walk on the last answer, so this only ever shows a
-    // need waiting to be answered. Leaving part way through is a 'close' action
-    // the host raises from its own chrome — a modal puts it in the title bar
-    // and the button row, where the rest of the ways out already live.
+  const visit = state.visit
+
+  if (visit?.phase === 'walk') {
+    // The machine ends the walk on the last answer and lands back on the grid,
+    // so this only ever shows a need waiting to be answered. Leaving part way
+    // through is a 'close' action the host raises from its own chrome.
     return (
       <div className={styles.picker}>
         <NeedCategoryWalk
-          state={state.walk}
+          state={visit.walk}
           onAction={(answer) => onAction({ type: 'answer', answer })}
+        />
+      </div>
+    )
+  }
+
+  if (visit) {
+    return (
+      <div className={styles.picker}>
+        <NeedCategorySift
+          state={visit.sift}
+          onAction={(action) => onAction({ type: 'sift', action })}
         />
       </div>
     )
@@ -44,8 +62,8 @@ export default function NeedPicker({ state, onAction }: Props) {
 
   const shown = cards(state)
   const rest = pills(state)
-  // Coming back from a walk, focus belongs on the category just walked, which
-  // is always a card by then. Before anything has been walked there is no such
+  // Coming back from a category, focus belongs on the one just closed, which is
+  // always a card by then. Before anything has been opened there is no such
   // card and no tabs to fall back to, so the list takes it — a staging point
   // for Tab, which is why it draws no ring of its own.
   const resume = resumeAt(state)
@@ -62,7 +80,7 @@ export default function NeedPicker({ state, onAction }: Props) {
       data-browse={resume === null ? '' : undefined}
     >
       <div className={styles.panel}>
-        {/* Cards first, then pills: walked categories, then the rest. Together
+        {/* Cards first, then pills: visited categories, then the rest. Together
             they are every category, which is why neither group needs a heading
             saying what it leaves out. An empty group is left out entirely so it
             does not spend a gap. */}

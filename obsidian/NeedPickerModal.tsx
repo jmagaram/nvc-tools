@@ -14,8 +14,8 @@ import NeedPickerHost from './NeedPickerHost.tsx'
 export default class NeedPickerModal extends Modal {
   private root: Root | null = null
   private footerEl: HTMLElement | null = null
-  /** The way out of a walk, while there is one. Set by the host; see `close`. */
-  private leaveWalk: (() => void) | null = null
+  /** The way off the screen on top, unless it is the categories. See `close`. */
+  private leaveTop: (() => void) | null = null
   private onSubmit: (entries: Visited[]) => void
 
   constructor(app: App, onSubmit: (entries: Visited[]) => void) {
@@ -38,12 +38,12 @@ export default class NeedPickerModal extends Modal {
       <NeedPickerHost
         titleEl={this.titleEl}
         footerEl={this.footerEl}
-        onWalkChange={(leaveWalk) => {
-          this.leaveWalk = leaveWalk
+        onLeaveTopChange={(leaveTop) => {
+          this.leaveTop = leaveTop
         }}
         /* `dismiss` rather than `close`: these two are only ever reachable
-           from the categories, where there is no walk to leave, and saying so
-           keeps them right if that ever stops being true. */
+           from the categories, where there is nothing above to leave, and
+           saying so keeps them right if that ever stops being true. */
         onSubmit={(entries) => {
           this.onSubmit(entries)
           this.dismiss()
@@ -54,22 +54,23 @@ export default class NeedPickerModal extends Modal {
   }
 
   /**
-   * The corner `x` and Escape both arrive here, and during a walk they mean
-   * the walk rather than the modal — the screen on top is the one a dismiss is
-   * about. The host leaves the way out in `leaveWalk` while there is one, so
-   * this needs to know nothing about either picker.
+   * The corner `x` and Escape both arrive here, and inside a category they mean
+   * that screen rather than the modal — the one on top is what a dismiss is
+   * about. The host leaves the way off it in `leaveTop` whenever there is one,
+   * so this needs to know nothing about either picker, or about how many
+   * screens deep they go.
    *
    * Going back keeps the picks, exactly as the way back in the title bar does.
    * The two are synonyms on purpose: one of them is labelled and one is where
    * a thumb already goes, and with both meaning the same thing there is
-   * nothing on the walk screen that can throw work away. Losing everything is
+   * nothing inside a category that can throw work away. Losing everything is
    * still one gesture, but only from the categories, where all of it is on
    * screen to lose.
    */
   close() {
-    const leaveWalk = this.leaveWalk
-    if (leaveWalk) {
-      leaveWalk()
+    const leaveTop = this.leaveTop
+    if (leaveTop) {
+      leaveTop()
       return
     }
     this.dismiss()

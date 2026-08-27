@@ -7,7 +7,10 @@ import {
   count,
   init,
   reduce,
+  screen,
   screenKey,
+  visitCategory,
+  visitCount,
 } from '../src/machines/needPicker.ts'
 import type {
   NeedPickerAction,
@@ -30,11 +33,11 @@ type Props = {
   /** Close, insert nothing. */
   onCancel: () => void
   /**
-   * Handed the way out of a walk whenever there is one, and null on the way
-   * back to the categories — which is what tells the modal's own `x` and
-   * Escape they are speaking for the whole modal again.
+   * Handed the way off whichever screen is on top, whenever that is not the
+   * categories, and null on the way back to them — which is what tells the
+   * modal's own `x` and Escape they are speaking for the whole modal again.
    */
-  onWalkChange: (leaveWalk: (() => void) | null) => void
+  onLeaveTopChange: (leaveTop: (() => void) | null) => void
 }
 
 /**
@@ -56,7 +59,7 @@ export default function NeedPickerHost({
   footerEl,
   onSubmit,
   onCancel,
-  onWalkChange,
+  onLeaveTopChange,
 }: Props) {
   const [state, setState] = useState<NeedPickerState>(() => init(categories))
 
@@ -65,62 +68,77 @@ export default function NeedPickerHost({
 
   const bodyRef = useFocusScreen(screenKey(state))
 
+  const view = screen(state)
+
+  const leaveTop = () => dispatch({ type: 'close' })
+
   /* Obsidian's title bar is its own, and so is the `x` in the corner of it.
-     Both it and Escape land in `Modal.close`, which has no way to see a walk
-     from where it sits — so the walk leaves the way out of itself here, and
-     takes it away again on the way back to the categories. `dispatch` reads
-     the state it is given rather than the one it closed over, so what is left
-     here does not go stale between renders. */
+     Both it and Escape land in `Modal.close`, which has no way to see which
+     screen is on top from where it sits — so anything above the categories
+     leaves the way off itself here, and takes it away again on the way back to
+     them. `dispatch` reads the state it is given rather than the one it closed
+     over, so what is left here does not go stale between renders. */
   useEffect(() => {
-    onWalkChange(state.walk ? () => dispatch({ type: 'close' }) : null)
-    return () => onWalkChange(null)
+    onLeaveTopChange(state.visit ? leaveTop : null)
+    return () => onLeaveTopChange(null)
   })
 
   const total = count(state)
 
-  /* Two scopes, two regions, and only one way out of a walk. The title bar owns
-     the walk: it names the modal at the top level and holds the way back a
-     level down, labelled with the title it is going back to rather than with
-     the move — 'back' alone leaves open what becomes of the answers already
-     given. The button row only ever speaks for the whole modal, never for the
-     category, so a walk gives it nothing to say and it is not drawn at all. */
-  const heading = state.walk ? (
-    <button
-      type="button"
-      className="nvc-back"
-      onClick={() => dispatch({ type: 'close' })}
-    >
-      <span aria-hidden="true">&lsaquo;</span> {TITLE}
-    </button>
-  ) : (
-    <>{TITLE}</>
-  )
+  /* Both bars speak for the screen on top, which is the same rule the `x`
+     follows. The way back is labelled with the screen it returns to rather than
+     with the move — 'back' alone leaves open what becomes of the answers
+     already given. From a walk that is the category it started in, because that
+     is where its answers land. */
+  const heading =
+    view === 'browse' ? (
+      <>{TITLE}</>
+    ) : (
+      <button type="button" className="nvc-back" onClick={leaveTop}>
+        <span aria-hidden="true">&lsaquo;</span>{' '}
+        {view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE)}
+      </button>
+    )
 
-  const buttons = state.walk ? null : (
-    <>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
-      <button
-        type="button"
-        className="mod-cta"
-        /* Newest-walked first is what puts the last card top-left. Read top to
-           bottom in a note, the order you walked them reads better. */
-        onClick={() => onSubmit([...chosen(state)].reverse())}
-      >
-        OK ({total})
-      </button>
-    </>
-  )
+  /* A walk is still drawn with no button row at all: it is one question, and
+     answering it is the only way to move. The grid has two ways on and they
+     both belong here, out of reach of a list long enough to scroll. */
+  const buttons =
+    view === 'browse' ? (
+      <>
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="mod-cta"
+          /* Newest-closed first is what puts the last card top-left. Read top
+             to bottom in a note, the order you visited them reads better. */
+          onClick={() => onSubmit([...chosen(state)].reverse())}
+        >
+          OK ({total})
+        </button>
+      </>
+    ) : view === 'sift' ? (
+      <>
+        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
+          One at a time <span aria-hidden="true">&rsaquo;</span>
+        </button>
+        <button type="button" className="mod-cta" onClick={leaveTop}>
+          Done ({visitCount(state)})
+        </button>
+      </>
+    ) : null
 
   return (
     <>
       {createPortal(heading, titleEl)}
       <div ref={bodyRef}>
         <NeedPicker state={state} onAction={dispatch} />
-        {/* Only while browsing: the walk screen is one question at a time and
-            has no room to spare, and the credit is as visible either way. */}
-        {!state.walk && <Credit />}
+        {/* Only while browsing: a screen inside a category is either one
+            question or a long grid, and neither has room to spare — the credit
+            is as visible either way. */}
+        {view === 'browse' && <Credit />}
       </div>
       {createPortal(buttons, footerEl)}
     </>

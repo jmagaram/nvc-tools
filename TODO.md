@@ -6,19 +6,21 @@ oddities in there are faithful to the source.
 
 ## Open
 
-### The big categories are too long to walk
+### What is left of the picker redesign
 
-`Connection` is 28 needs and `Meaning` is 21 — two thirds of the inventory
-behind two of the seven doors. Walking one costs an answer per word whether or
-not the word was ever a candidate, and nothing on the browse screen says how
-big a category is or what is inside it, so the only way to find out what
-`Connection` covers is to pay for the walk.
+The sift landed (see _Settled_ below) and took the length problem with it. Three
+directions from `docs/need-picker.md` are still open and are all additive:
 
-Screens to consider are drawn in `docs/need-picker.md`: a browse row carrying a
-sample and a count, the category as a checklist, a shortlist-then-walk funnel,
-a paginated walk, a filter across all 75 words, sub-groups inside the big
-categories, and the minimal change of offering the list part way through a
-walk. Nothing decided.
+- **Counts and sample words on the browse screen.** The pills still say only a
+  name, so `Connection` and `Play` look alike until you open them. `pills` in
+  both picker machines would return a name, a sample and a count.
+- **A filter across every word.** The only screen that copes gracefully with
+  `safety` sitting in two categories, and it makes the inventory usable as a
+  reference. No machine needed if the box lives in the host.
+- **Sub-groups inside the big categories.** `Connection` is really four or five
+  ideas, and a 28-word grid would read far better in groups of six. The cost is
+  editorial: the headings would be ours, sitting in a sourced list, so they
+  belong in the data as a clearly-labelled second layer.
 
 ### Animation on swipe
 
@@ -67,44 +69,6 @@ It lands in `TABS` in `src/components/FeelingPicker.tsx` and in `.tabs` /
 `.tabs .tab` in `FeelingPicker.module.css`. The feeling picker is the only one
 with tabs — needs are one undivided list, with no split to label.
 
-### Re-opening a category and backing out erases what it held
-
-Re-open a category from its card and leave it — **Back** in the title bar or
-**Skip Rest** in the button row — before answering anything, and everything
-previously picked in that category is lost.
-Reproduced in August 2026: `Angry` holding `incensed · indignant · outraged`,
-re-opened, backed straight out — the card came back reading _none of these_.
-
-The cause is `close` in `src/machines/feelingPicker.ts`, which writes
-`feelingCategoryWalk.picked(walk)`. That reports only the walk just performed,
-so a walk bailed out of has picked nothing and overwrites the earlier answers
-with an empty list. Answering two words and then backing out loses the rest the
-same way, so this is not only about untouched walks.
-
-`src/machines/needPicker.ts` was written as a deliberate copy of that file and
-carries the same `close`, so the bug is now in both pickers and whichever fix is
-chosen has to land in both. Keeping them identical was the point: two pickers
-that disagree about what backing out means would be worse than one shared bug.
-
-Left as is deliberately. The fix carries a semantic choice:
-
-- Treat an untouched walk as a pure cancel and restore the previous words.
-  Simplest, but still loses data on a partly-answered walk.
-- On close, keep the words accepted this walk **plus** any previously-picked
-  words this walk never got around to asking about. Never discards a decision
-  that was not revisited, while still honouring a "not this" that removes a
-  word. This is the better of the two.
-
-Worth weighing against the intended model: `categoryWalk.init` deliberately
-asks previously-picked words first, so re-walking a category is meant to be a
-quick pass of "yes, still applies". Backing out of that pass currently reads as
-re-deciding everything, which is not what the person did.
-
-As of August 2026 this ships: `obsidian/` wraps both pickers as a plugin, so
-the erasure now costs someone real words on their way into a note, not just a
-demo page. Still not fixed — the semantic choice above has to be made first,
-and it lands in `src/machines/`, which the plugin only consumes.
-
 ### Whether the data should mark the words NVC treats as thoughts
 
 The evaluation-flavoured `Aversion` words — `hate`, `dislike`, `contempt`,
@@ -131,6 +95,55 @@ answer it. A definition nobody outside this project wrote is no longer a footnot
 in the data — it is the question being asked.
 
 ## Settled
+
+### A category is sifted, and only walked if you ask
+
+`Connection` is 28 needs and `Meaning` 21 — two thirds of the inventory behind
+two of seven doors — and a walk cost one answer per word whether or not the word
+was ever a candidate. `docs/need-picker.md` drew eight ways out of that. What
+shipped is the grid: a category opens as all of its words at once, marked from
+whatever was picked there before, and marking is the answer.
+
+The pivotal decision was making `Done` primary and the walk secondary rather
+than offering them as peers. Once the grid can be a final answer, its question
+cannot be *which of these might apply* — you cannot write words into a note that
+someone only said might apply. It became *which of these apply*, and the walk
+stopped being a toll booth. That is also what dissolves the case that started
+this: marking 23 words costs 23 taps, which is irreducible; what made it a
+hassle was the 28 extra yes/no answers layered on top.
+
+No size threshold, deliberately. Gating on "more than six" was considered and
+dropped: it makes what tapping a category does unpredictable for no reason a
+person can see — `Peace` (7) would sift where `Autonomy` (5) walked — and it
+costs a branch in every machine and host. A two-word grid is no worse than two
+cards.
+
+The walk goes through the **whole** category with the marks first, not just the
+marks. Walking only what was already marked can confirm but never discover, and
+being asked about a word you would never have picked off a list is the thing the
+walk exists for. `*CategoryWalk.init` already ordered `alreadyPicked` first, so
+this needed no new code.
+
+Definitions live in a strip at the foot of the grid showing whichever word was
+last touched. Hovering or tabbing shows one as well as tapping, so reading a
+gloss never costs a mark, and the strip holds its height so the grid does not
+shift under a finger.
+
+### Re-opening a category and backing out no longer erases what it held
+
+Fixed by the sift above, and worth recording because the old shape made it
+inevitable. `close` used to write `categoryWalk.picked(walk)` — only the walk
+just performed — so backing out of a re-opened category overwrote everything
+with an empty list. Reproduced in August 2026: `Angry` holding
+`incensed · indignant · outraged`, re-opened, backed straight out, card came
+back reading _none of these_.
+
+Now the grid's `marked` is the record and a walk hands its answers back through
+`fold`: what the walk asked about, it decides; what it never reached keeps what
+the grid said. So leaving a walk part way through keeps both halves. The fix is
+the second of the two options weighed here originally, and it stopped being
+optional — a walk is now something entered *after* marking, so bailing out of
+one had far more to lose.
 
 ### Source: the CNVC Feelings and Needs Inventory
 

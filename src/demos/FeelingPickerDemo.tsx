@@ -13,7 +13,10 @@ import {
   counts,
   init,
   reduce,
+  screen,
   screenKey,
+  visitCategory,
+  visitCount,
 } from '../machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
@@ -65,30 +68,53 @@ export default function FeelingPickerDemo() {
   const totals = counts(state)
   const total = totals.met + totals.unmet
 
-  /* Two scopes, two regions, and only one way out of a walk. The title bar owns
-     the walk: it names the modal at the top level and holds the way back a
-     level down, labelled with the title it is going back to rather than with
-     the move — 'back' alone leaves open what becomes of the answers already
-     given. The button row only ever speaks for the whole modal, never for the
-     category, so a walk gives it nothing to say and is shown without one. */
-  const heading: ModalHeading = state.walk
-    ? { kind: 'back', label: TITLE, onBack: () => dispatch({ type: 'close' }) }
-    : { kind: 'title', text: TITLE }
+  /* Both bars speak for the screen on top, which is the same rule the close
+     button follows. Three screens, so three of each.
 
-  const footer = state.walk ? null : (
-    <>
-      <button type="button" onClick={cancel}>
-        Cancel
-      </button>
-      <button type="button" onClick={ok}>
-        OK ({total})
-      </button>
-    </>
-  )
+     The way back is labelled with the screen it returns to rather than with the
+     move — 'back' alone leaves open what becomes of the answers already given.
+     From a walk that is the category it started in, because that is where its
+     answers land. */
+  const view = screen(state)
 
-  /* A walk opens from a card or a pill that is gone the moment it does, so
-     the prompt is given focus and the arrow keys answer straight away. A
-     modal host does the same. */
+  const leaveTop = () => dispatch({ type: 'close' })
+
+  const heading: ModalHeading =
+    view === 'browse'
+      ? { kind: 'title', text: TITLE }
+      : {
+          kind: 'back',
+          label: view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE),
+          onBack: leaveTop,
+        }
+
+  /* A walk is still drawn with no button row at all: it is one question, and
+     answering it is the only way to move. The grid has two ways on and they
+     both belong up here, out of reach of a list long enough to scroll. */
+  const footer =
+    view === 'browse' ? (
+      <>
+        <button type="button" onClick={cancel}>
+          Cancel
+        </button>
+        <button type="button" onClick={ok}>
+          OK ({total})
+        </button>
+      </>
+    ) : view === 'sift' ? (
+      <>
+        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
+          One at a time <span aria-hidden="true">&rsaquo;</span>
+        </button>
+        <button type="button" onClick={leaveTop}>
+          Done ({visitCount(state)})
+        </button>
+      </>
+    ) : null
+
+  /* Every screen here opens from a control that is gone the moment it does, so
+     each one is handed the focus: the grid so Tab starts inside it, the prompt
+     so the arrow keys answer straight away. A modal host does the same. */
   const bodyRef = useFocusScreen(screenKey(state))
 
   const picker = (
@@ -147,7 +173,7 @@ export default function FeelingPickerDemo() {
             /* Closing is leaving whatever is on top: the walk from a walk, the
                modal from the categories. Same as the way back beside it, so
                nothing on the walk screen can lose a pick. */
-            onClose={state.walk ? () => dispatch({ type: 'close' }) : cancel}
+            onClose={state.visit ? leaveTop : cancel}
             footer={footer}
           >
             {picker}
@@ -156,17 +182,29 @@ export default function FeelingPickerDemo() {
       ) : (
         <>
           {picker}
-          {/* Bare, the picker has no chrome to leave a walk from, so the demo
-              stands in for the host the same way the modal title bar does —
-              same words, so what a host has to provide is plain. */}
-          {state.walk && (
+          {/* Bare, the picker has no chrome to leave a category from or to go
+              on with, so the demo stands in for the host the same way the modal
+              bars do — same words, so what a host has to provide is plain. */}
+          {state.visit && (
             <p>
-              <button
-                type="button"
-                onClick={() => dispatch({ type: 'close' })}
-              >
-                <span aria-hidden="true">&lsaquo;</span> {TITLE}
+              <button type="button" onClick={leaveTop}>
+                <span aria-hidden="true">&lsaquo;</span>{' '}
+                {view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE)}
               </button>
+              {view === 'sift' && (
+                <>
+                  {' '}
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: 'walk' })}
+                  >
+                    One at a time <span aria-hidden="true">&rsaquo;</span>
+                  </button>{' '}
+                  <button type="button" onClick={leaveTop}>
+                    Done ({visitCount(state)})
+                  </button>
+                </>
+              )}
             </p>
           )}
         </>

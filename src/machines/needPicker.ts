@@ -1,13 +1,29 @@
 import type { NeedCategory } from '../data/needs.ts'
+import * as needCategorySift from './needCategorySift.ts'
 import * as needCategoryWalk from './needCategoryWalk.ts'
 import { shuffle } from './shuffle.ts'
 
-/** A category that has been walked through, and what was picked in it. */
+/** A category that has been looked at, and what was picked in it. */
 export type Visited = {
   category: string
-  /** May be empty: the walk happened but nothing in it applied. */
+  /** May be empty: the category was opened but nothing in it applied. */
   words: readonly string[]
 }
+
+/**
+ * A category being looked at. Sifting is the screen; a walk runs *inside* a
+ * visit rather than beside one, and hands its answers back when it ends — so
+ * the sift is present either way and its `marked` is the only record of what
+ * the category holds. A walk is a way of going through the words, never a
+ * second answer competing with the grid.
+ */
+export type Visit =
+  | { phase: 'sift'; sift: needCategorySift.NeedCategorySiftState }
+  | {
+      phase: 'walk'
+      sift: needCategorySift.NeedCategorySiftState
+      walk: needCategoryWalk.NeedCategoryWalkState
+    }
 
 export type NeedPickerState = {
   /**
@@ -16,27 +32,32 @@ export type NeedPickerState = {
    * an 'open' action by name, and the component needs no data of its own.
    */
   categories: readonly NeedCategory[]
-  /** Categories already walked, most recently closed first. */
+  /** Categories already looked at, most recently closed first. */
   visited: readonly Visited[]
-  /**
-   * The walk in progress, or null while browsing. Never a finished walk: the
-   * last answer closes it, so if this is set there is a need to answer.
-   */
-  walk: needCategoryWalk.NeedCategoryWalkState | null
+  /** The category open right now, or null while browsing. */
+  visit: Visit | null
 }
 
 export type NeedPickerAction =
-  /** Start walking a category, by name. */
+  /** Open a category, by name. */
   | { type: 'open'; category: string }
+  /** Mark, unmark, or read a definition on the grid. */
+  | { type: 'sift'; action: needCategorySift.NeedCategorySiftAction }
+  /** Go through this category one word at a time instead. */
+  | { type: 'walk' }
   /** Answer the need the walk is showing. */
   | { type: 'answer'; answer: needCategoryWalk.NeedCategoryWalkAction }
-  /** Leave the walk, keeping whatever was picked. */
+  /**
+   * Leave whatever is on top: a walk goes back to the grid it started from, and
+   * the grid goes back to the categories. The same rule the modal's `x` and its
+   * title bar already follow, which is why one action serves both.
+   */
   | { type: 'close' }
 
 /**
  * Start browsing. The category order is fixed here and never changes again, so
- * the pill row only ever shrinks as categories are walked — nothing a person is
- * part way through reading rearranges under them.
+ * the pill row only ever shrinks as categories are visited — nothing a person
+ * is part way through reading rearranges under them.
  *
  * There is no tab here and no `kind`: the CNVC inventory splits feelings into
  * needs met and needs unmet, but the needs themselves are one undivided list.
@@ -48,11 +69,11 @@ export function init(
   return {
     categories: shuffle(categories, rng),
     visited: [],
-    walk: null,
+    visit: null,
   }
 }
 
-/** What was picked in `category` last time it was walked, if it was. */
+/** What was picked in `category` last time it was open, if it was. */
 function wordsPicked(
   state: NeedPickerState,
   category: string,
@@ -61,7 +82,27 @@ function wordsPicked(
 }
 
 /**
- * Record what a walk came to and go back to the categories. Moving the
+ * Fold a walk's answers back into the grid it started from.
+ *
+ * What the walk asked about, the walk decides — including words it turned up
+ * that were never marked, which is the whole reason it goes through everything
+ * rather than only the marks. What it never got to keeps whatever the grid
+ * already said, so leaving a walk part way through cannot throw away a mark it
+ * had not reached yet. That is the bug the old `close` had, and it would have
+ * bitten far harder here: a walk is now something you enter *after* marking.
+ */
+function fold(
+  sift: needCategorySift.NeedCategorySiftState,
+  walk: needCategoryWalk.NeedCategoryWalkState,
+): needCategorySift.NeedCategorySiftState {
+  const asked = new Set(walk.progress.answered.map((a) => a.need.word))
+  const answeredYes = needCategoryWalk.picked(walk).map((need) => need.word)
+  const unasked = sift.marked.filter((word) => !asked.has(word))
+  return needCategorySift.withMarked(sift, [...answeredYes, ...unasked])
+}
+
+/**
+ * Record what the grid came to and go back to the categories. Moving the
  * category to the front of `visited` is what puts its card top-left, where the
  * person was last looking.
  *
@@ -69,17 +110,13 @@ function wordsPicked(
  * and `Physical Wellbeing` upstream, so the same word can be picked twice and
  * each card has to keep its own copy.
  */
-function close(
+function closeVisit(
   state: NeedPickerState,
-  walk: needCategoryWalk.NeedCategoryWalkState,
+  sift: needCategorySift.NeedCategorySiftState,
 ): NeedPickerState {
   const closed: Visited = {
-    category: walk.category,
-    // Readable part way through, so backing out early still keeps picks.
-    // This reports only the walk just performed, so backing out of a re-opened
-    // category overwrites what it held — the same open bug `feelingPicker` has,
-    // copied deliberately so the two stay in step. See TODO.md.
-    words: needCategoryWalk.picked(walk).map((n) => n.word),
+    category: sift.category,
+    words: sift.marked,
   }
   return {
     ...state,
@@ -87,7 +124,7 @@ function close(
       closed,
       ...state.visited.filter((v) => v.category !== closed.category),
     ],
-    walk: null,
+    visit: null,
   }
 }
 
@@ -98,32 +135,70 @@ export function reduce(
 ): NeedPickerState {
   switch (action.type) {
     case 'open': {
-      if (state.walk) return state
+      if (state.visit) return state
       const category = state.categories.find((c) => c.name === action.category)
       if (!category) return state
-      const walk = needCategoryWalk.init(
-        category,
-        wordsPicked(state, category.name),
-        rng,
-      )
-      // A category with nothing in it is over before it began, so there is no
-      // walk screen to show.
+      // No special case for a category with nothing in it: an empty grid is a
+      // screen that can be drawn, where an empty walk was a state that could
+      // not be written down.
+      return {
+        ...state,
+        visit: {
+          phase: 'sift',
+          sift: needCategorySift.init(
+            category,
+            wordsPicked(state, category.name),
+          ),
+        },
+      }
+    }
+
+    case 'sift': {
+      // The grid is not on screen during a walk, so this cannot arrive then.
+      if (state.visit?.phase !== 'sift') return state
+      return {
+        ...state,
+        visit: {
+          phase: 'sift',
+          sift: needCategorySift.reduce(state.visit.sift, action.action),
+        },
+      }
+    }
+
+    case 'walk': {
+      if (state.visit?.phase !== 'sift') return state
+      const { sift } = state.visit
+      const category = state.categories.find((c) => c.name === sift.category)
+      if (!category) return state
+      // Marked first, which `needCategoryWalk.init` already does with whatever
+      // it is handed — so this reads as 'confirm these, then meet the rest'
+      // and discovery survives being able to skip the walk entirely.
+      const walk = needCategoryWalk.init(category, sift.marked, rng)
+      // A category with nothing to ask has no walk screen to show, so stay.
       return needCategoryWalk.isDone(walk)
-        ? close(state, walk)
-        : { ...state, walk }
+        ? state
+        : { ...state, visit: { phase: 'walk', sift, walk } }
     }
 
     case 'answer': {
-      if (!state.walk) return state
-      const walk = needCategoryWalk.reduce(state.walk, action.answer)
-      // The last answer ends the walk, and the screen it would leave behind
-      // says no more than the card waiting on the other side — the category
-      // just walked is the first one there. So go straight back.
-      return needCategoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
+      if (state.visit?.phase !== 'walk') return state
+      const { sift } = state.visit
+      const walk = needCategoryWalk.reduce(state.visit.walk, action.answer)
+      // The last answer ends the walk and lands back on the grid, which now
+      // shows what the walk came to — worth seeing before `Done`.
+      return needCategoryWalk.isDone(walk)
+        ? { ...state, visit: { phase: 'sift', sift: fold(sift, walk) } }
+        : { ...state, visit: { phase: 'walk', sift, walk } }
     }
 
-    case 'close':
-      return state.walk ? close(state, state.walk) : state
+    case 'close': {
+      if (!state.visit) return state
+      if (state.visit.phase === 'walk') {
+        const { sift, walk } = state.visit
+        return { ...state, visit: { phase: 'sift', sift: fold(sift, walk) } }
+      }
+      return closeVisit(state, state.visit.sift)
+    }
   }
 }
 
@@ -171,14 +246,33 @@ export function count(state: NeedPickerState): number {
 
 /**
  * Everything picked, grouped by category and newest first — what a host would
- * insert. Categories walked without picking anything are left out.
+ * insert. Categories opened without picking anything are left out.
  */
 export function chosen(state: NeedPickerState): Visited[] {
   return state.visited.filter((v) => v.words.length > 0)
 }
 
 /**
- * The category a returning browse screen puts focus on — the one just walked.
+ * Which of the three screens is on top. Hosts draw a different title bar and a
+ * different button row for each, and asking here keeps them from having to
+ * learn the shape of a visit.
+ */
+export function screen(state: NeedPickerState): 'browse' | 'sift' | 'walk' {
+  return state.visit ? state.visit.phase : 'browse'
+}
+
+/** The category open right now — what a title bar a level down is named after. */
+export function visitCategory(state: NeedPickerState): string | null {
+  return state.visit?.sift.category ?? null
+}
+
+/** How many are marked in the open category, for its `Done (3)`. */
+export function visitCount(state: NeedPickerState): number {
+  return state.visit ? needCategorySift.count(state.visit.sift) : 0
+}
+
+/**
+ * The category a returning browse screen puts focus on — the one just closed.
  * Null before anything has been, where `NeedPicker` falls back to the list
  * itself. Always drawn as a card: `shownAsCard` keeps the most recently closed
  * category there even when it came back empty. There are no tabs to take it
@@ -190,13 +284,15 @@ export function resumeAt(state: NeedPickerState): string | null {
 
 /**
  * Which screen a host is looking at, for `useFocusScreen`. Everything named
- * here is a reason to move focus: a new need to answer, the category just
- * walked.
+ * here is a reason to move focus: a new need to answer, a category just opened,
+ * the category just closed. Marking a word on the grid is deliberately not one
+ * — see `needCategorySift.screenKey`.
  */
 export function screenKey(state: NeedPickerState): string {
-  const walk = state.walk
-  if (walk) {
-    return `prompt:${walk.category}:${walk.progress.answered.length}`
+  const visit = state.visit
+  if (!visit) return `browse:${resumeAt(state) ?? ''}`
+  if (visit.phase === 'walk') {
+    return needCategoryWalk.screenKey(visit.walk)
   }
-  return `browse:${resumeAt(state) ?? ''}`
+  return needCategorySift.screenKey(visit.sift)
 }

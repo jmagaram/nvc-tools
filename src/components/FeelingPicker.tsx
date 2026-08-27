@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react'
 
 import FeelingCategoryCard from './FeelingCategoryCard.tsx'
 import FeelingCategoryPill from './FeelingCategoryPill.tsx'
+import FeelingCategorySift from './FeelingCategorySift.tsx'
 import FeelingCategoryWalk from './FeelingCategoryWalk.tsx'
 import { cards, counts, pills, resumeAt } from '../machines/feelingPicker.ts'
 import type {
@@ -11,7 +12,7 @@ import type {
 import styles from './FeelingPicker.module.css'
 
 type Props = {
-  /** Which categories have been walked, and the walk in progress if any. */
+  /** Which categories have been visited, and the one open now if any. */
   state: FeelingPickerState
   /** Called with whatever the person just did. */
   onAction: (action: FeelingPickerAction) => void
@@ -26,24 +27,41 @@ const TABS: { kind: 'unmet' | 'met'; label: string }[] = [
 ]
 
 /**
- * Browse every feeling category and walk through the ones that look right.
+ * Browse every feeling category and go through the ones that look right.
+ *
+ * Three screens: the categories, one category's words all at once, and — for
+ * whoever wants to be asked rather than to scan — that category one word at a
+ * time. The ways between them are all the host's chrome, because they speak for
+ * the screen rather than for anything inside it.
  *
  * A tab holds one side of the NVC split, and within it the cards and the pills
- * together are every category on that side — the ones already walked, and the
+ * together are every category on that side — the ones already visited, and the
  * rest. That is why neither group carries a heading: there is no partial list
  * to explain.
  */
 export default function FeelingPicker({ state, onAction }: Props) {
-  if (state.walk) {
-    // The machine closes the walk on the last answer, so this only ever shows a
-    // feeling waiting to be answered. Leaving part way through is a 'close'
-    // action the host raises from its own chrome — a modal puts it in the title
-    // bar and the button row, where the rest of the ways out already live.
+  const visit = state.visit
+
+  if (visit?.phase === 'walk') {
+    // The machine ends the walk on the last answer and lands back on the grid,
+    // so this only ever shows a feeling waiting to be answered. Leaving part
+    // way through is a 'close' action the host raises from its own chrome.
     return (
       <div className={styles.picker}>
         <FeelingCategoryWalk
-          state={state.walk}
+          state={visit.walk}
           onAction={(answer) => onAction({ type: 'answer', answer })}
+        />
+      </div>
+    )
+  }
+
+  if (visit) {
+    return (
+      <div className={styles.picker}>
+        <FeelingCategorySift
+          state={visit.sift}
+          onAction={(action) => onAction({ type: 'sift', action })}
         />
       </div>
     )

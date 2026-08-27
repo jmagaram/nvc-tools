@@ -32,8 +32,9 @@ Obsidian plugin — for now the gallery is the only surface.
 - **Terminology.** The domain noun is **feeling**, never *emotion* — that is what
   `src/data/feelings.ts` and the CNVC source call it. A **category** is a named
   group of feelings with a `kind` of `'met' | 'unmet'`; needs have categories
-  too, but no `kind`. Name a component for the scope it covers: `*Picker` walks
-  every category, `*Walk` walks one, `*Prompt` asks about one word, `*Card`
+  too, but no `kind`. Name a component for the scope it covers: `*Picker` covers
+  every category, `*Sift` shows one category's words all at once, `*Walk` goes
+  through one category a word at a time, `*Prompt` asks about one word, `*Card`
   just displays one thing. Prefer the singular (`NeedCategoryCard`, not
   `Needs…`) to match the data types.
 - **Make impossible states unrepresentable.** Prefer a shape that cannot express
@@ -106,6 +107,19 @@ straight from `src/` and adds nothing to it.
   switch go through `rewrite`, which uses the editor holding the note when there
   is one so the change is a single undo, and falls back to `vault.process` where
   none has it.
+- **Marking is the answer; the walk is the second gear.** A category opens as
+  `*CategorySift` — every word in it at once, in source order, with whatever was
+  picked there last time already marked. `Done` commits the marks as they
+  stand, which is why the question is *which of these apply* and never *which
+  might*: nothing asks again afterwards. **One at a time** starts a walk through
+  the *whole* category with the marks first, so the walk keeps what it was for —
+  being asked about words you would never pick off a list — rather than becoming
+  a confirmation pass. A walk runs inside a visit and hands its answers back:
+  what it asked about, it decides; what it never reached keeps whatever the grid
+  said. That is why leaving a walk part way through cannot lose a mark, and it
+  is the whole of `fold` in the two picker machines. The grid never shuffles —
+  the walk does, so that no word is always first, but a grid shows every word at
+  once and being able to find the one you saw a moment ago is worth more.
 - **The arrow keys need focus.** `FeelingPrompt` / `NeedPrompt` answer on ←
   and →, but only while focus is inside the region, and a walk opens from a
   card that is gone by the time it does. Browsing, ← and → move between the
@@ -114,13 +128,15 @@ straight from `src/` and adds nothing to it.
   the four demo pages alike — call
   `useFocusScreen(screenKey(state))`. A machine's `screenKey` names the screen
   and everything about it worth moving focus for; the element to focus marks
-  itself with a matching `data-prompt` or `data-browse`. Nothing on either may
-  carry a `role` or an `aria-label`: either becomes the region's accessible
-  name and is announced on every card.
-- **Coming back lands on the category just walked.** `resumeAt` names it, the
+  itself with a matching `data-prompt`, `data-sift` or `data-browse`. Nothing on
+  any of them may carry a `role` or an `aria-label`: either becomes the region's
+  accessible name and is announced on every card. A sift's key is the category
+  and nothing else — marking a word is not a new screen, and a count in the key
+  would take focus off whatever was just tapped, on every tap.
+- **Coming back lands on the category just left.** `resumeAt` names it, the
   card carries `resume`, and the card's heading button takes the focus — so
-  returning from a walk shows what you just did rather than nothing. Before
-  anything is walked `FeelingPicker` falls back to the chosen tab and
+  returning from a category shows what you just did rather than nothing. Before
+  anything is opened `FeelingPicker` falls back to the chosen tab and
   `NeedPicker`, which has none, to the list itself. The tab is in
   `feelingPicker`'s `screenKey` for this reason: switching tabs takes that card
   off screen, and focus would otherwise be left on nothing and the arrow keys
@@ -132,21 +148,27 @@ straight from `src/` and adds nothing to it.
   leaning on the UA default.
 - **Closing leaves whatever is on top.** The corner `x` and Escape both mean
   the screen showing, not the session: from the categories they cancel the
-  modal and insert nothing, and from a walk they leave the walk and keep its
-  picks. In the plugin both arrive at `Modal.close`, which is where the guard
-  sits rather than on either gesture; the host leaves the way out there through
-  `onWalkChange` while a walk is up, so the modal needs to know nothing about
-  either picker, and `dismiss` is how the modal closes for real past the guard.
-  The demo pages do the same through `ModalFrame`'s `onClose`.
-- **The way back is labelled; the `x` is where the thumb already is.** The
-  title bar a level down carries the screen it returns to — **‹ Feelings**,
-  **‹ Needs**, the title one level up — rather than *Back*, which left open what
-  became of the answers already given. The `x` now does the same thing. They
-  are synonyms on purpose: with both meaning one thing, nothing on the walk
-  screen can throw work away, and losing everything stays one gesture but only
-  from the categories, where all of it is on screen to lose. A walk is still
-  drawn with no button row at all, because that row speaks for the whole modal
-  and a walk has nothing to say there.
+  modal and insert nothing, from a grid they leave the category and keep its
+  marks, and from a walk they leave the walk and land back on the grid. In the
+  plugin all of it arrives at `Modal.close`, which is where the guard sits
+  rather than on any one gesture; the host leaves the way off the top screen
+  there through `onLeaveTopChange` whenever there is one, so the modal needs to
+  know nothing about either picker or about how many screens deep they go, and
+  `dismiss` is how the modal closes for real past the guard. The demo pages do
+  the same through `ModalFrame`'s `onClose`.
+- **The chrome speaks for the screen on top.** Both bars follow the rule the `x`
+  already did. The title bar a level down carries the screen it returns to —
+  **‹ Feelings**, **‹ Needs**, or from a walk the category it started in, since
+  that is where its answers land — rather than *Back*, which left open what
+  became of the answers already given. The `x` is a synonym for it on purpose:
+  with both meaning one thing, nothing inside a category can throw work away,
+  and losing everything stays one gesture but only from the categories, where
+  all of it is on screen to lose. The button row changes with the screen too:
+  `Cancel` and `OK` speak for the modal from the categories, **One at a time**
+  and `Done` speak for the category on a grid — up in the row rather than in the
+  body, where a list of 28 would scroll them out of reach — and a walk is still
+  drawn with no button row at all, because it is one question and answering it
+  is the only way to move.
 - **Styles.** Component CSS modules use only `currentColor` and `inherit`, so an
   Obsidian theme reaches them untouched and they ship as they are.
   `obsidian/styles.css` holds only the plugin's own chrome, for the modal and

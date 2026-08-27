@@ -13,7 +13,10 @@ import {
   count,
   init,
   reduce,
+  screen,
   screenKey,
+  visitCategory,
+  visitCount,
 } from '../machines/needPicker.ts'
 import type {
   NeedPickerAction,
@@ -63,30 +66,53 @@ export default function NeedPickerDemo() {
   const picked = chosen(state)
   const total = count(state)
 
-  /* Two scopes, two regions, and only one way out of a walk. The title bar owns
-     the walk: it names the modal at the top level and holds the way back a
-     level down, labelled with the title it is going back to rather than with
-     the move — 'back' alone leaves open what becomes of the answers already
-     given. The button row only ever speaks for the whole modal, never for the
-     category, so a walk gives it nothing to say and is shown without one. */
-  const heading: ModalHeading = state.walk
-    ? { kind: 'back', label: TITLE, onBack: () => dispatch({ type: 'close' }) }
-    : { kind: 'title', text: TITLE }
+  /* Both bars speak for the screen on top, which is the same rule the close
+     button follows. Three screens, so three of each.
 
-  const footer = state.walk ? null : (
-    <>
-      <button type="button" onClick={cancel}>
-        Cancel
-      </button>
-      <button type="button" onClick={ok}>
-        OK ({total})
-      </button>
-    </>
-  )
+     The way back is labelled with the screen it returns to rather than with the
+     move — 'back' alone leaves open what becomes of the answers already given.
+     From a walk that is the category it started in, because that is where its
+     answers land. */
+  const view = screen(state)
 
-  /* A walk opens from a card or a pill that is gone the moment it does, so
-     the prompt is given focus and the arrow keys answer straight away. A
-     modal host does the same. */
+  const leaveTop = () => dispatch({ type: 'close' })
+
+  const heading: ModalHeading =
+    view === 'browse'
+      ? { kind: 'title', text: TITLE }
+      : {
+          kind: 'back',
+          label: view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE),
+          onBack: leaveTop,
+        }
+
+  /* A walk is still drawn with no button row at all: it is one question, and
+     answering it is the only way to move. The grid has two ways on and they
+     both belong up here, out of reach of a list long enough to scroll. */
+  const footer =
+    view === 'browse' ? (
+      <>
+        <button type="button" onClick={cancel}>
+          Cancel
+        </button>
+        <button type="button" onClick={ok}>
+          OK ({total})
+        </button>
+      </>
+    ) : view === 'sift' ? (
+      <>
+        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
+          One at a time <span aria-hidden="true">&rsaquo;</span>
+        </button>
+        <button type="button" onClick={leaveTop}>
+          Done ({visitCount(state)})
+        </button>
+      </>
+    ) : null
+
+  /* Every screen here opens from a control that is gone the moment it does, so
+     each one is handed the focus: the grid so Tab starts inside it, the prompt
+     so the arrow keys answer straight away. A modal host does the same. */
   const bodyRef = useFocusScreen(screenKey(state))
 
   const picker = (
@@ -143,9 +169,10 @@ export default function NeedPickerDemo() {
             heading={heading}
             size={device.size}
             /* Closing is leaving whatever is on top: the walk from a walk, the
-               modal from the categories. Same as the way back beside it, so
-               nothing on the walk screen can lose a pick. */
-            onClose={state.walk ? () => dispatch({ type: 'close' }) : cancel}
+               category from its grid, the modal from the categories. Same as
+               the way back beside it, so nothing inside a category can lose a
+               pick. */
+            onClose={state.visit ? leaveTop : cancel}
             footer={footer}
           >
             {picker}
@@ -154,14 +181,29 @@ export default function NeedPickerDemo() {
       ) : (
         <>
           {picker}
-          {/* Bare, the picker has no chrome to leave a walk from, so the demo
-              stands in for the host the same way the modal title bar does —
-              same words, so what a host has to provide is plain. */}
-          {state.walk && (
+          {/* Bare, the picker has no chrome to leave a category from or to go
+              on with, so the demo stands in for the host the same way the modal
+              bars do — same words, so what a host has to provide is plain. */}
+          {state.visit && (
             <p>
-              <button type="button" onClick={() => dispatch({ type: 'close' })}>
-                <span aria-hidden="true">&lsaquo;</span> {TITLE}
+              <button type="button" onClick={leaveTop}>
+                <span aria-hidden="true">&lsaquo;</span>{' '}
+                {view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE)}
               </button>
+              {view === 'sift' && (
+                <>
+                  {' '}
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: 'walk' })}
+                  >
+                    One at a time <span aria-hidden="true">&rsaquo;</span>
+                  </button>{' '}
+                  <button type="button" onClick={leaveTop}>
+                    Done ({visitCount(state)})
+                  </button>
+                </>
+              )}
             </p>
           )}
         </>
@@ -195,9 +237,18 @@ export default function NeedPickerDemo() {
       )}
 
       <p>
+        A category opens as all of its words at once, in the order the source
+        lists them, with whatever was picked there before already marked.{' '}
+        <strong>One at a time</strong> goes through the whole category as cards
+        instead, marked words first, and hands its answers back to the grid —
+        so leaving a walk part way through keeps both what it decided and what
+        it never reached. Touch or hover a word to read its definition without
+        marking it.
+      </p>
+      <p>
         The category order is shuffled once when the page loads and never
-        changes, so the pill row only ever shrinks. Walk a category without
-        picking anything and it shows as an empty card until you close another
+        changes, so the pill row only ever shrinks. Leave a category without
+        marking anything and it shows as an empty card until you close another
         one, then it drops back to a pill. There are no tabs here: the met and
         unmet split belongs to the feelings, not to the needs.
       </p>

@@ -1,0 +1,102 @@
+.sift {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* Focused only so the screen has somewhere to start — see useFocusScreen. No
+   ring: it is the whole grid, and a box round everything says nothing about
+   where the next keystroke goes. The words draw their own. */
+.sift:focus {
+  outline: none;
+}
+
+.heading {
+  margin: 0;
+}
+
+/* Reads as an aside to the category name rather than a second heading. */
+.count {
+  font-size: 0.85em;
+  font-weight: normal;
+  opacity: 0.7;
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* The same shape as a category pill, for the reason given there: a real button,
+   so the ring lands on the whole word. The class is doubled to out-specify a
+   host's own button chrome — see the comment on `.tabs .tab` in
+   FeelingPicker.module.css. */
+.word.word {
+  display: inline-block;
+  height: auto;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid;
+  border-radius: 999px;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Marked is drawn with a tick and a heavier border, never a colour: these
+   modules name none, so that an Obsidian theme reaches them untouched. The tick
+   is always in the box and only sometimes visible, and the border grows into
+   padding given back — so marking a word cannot change its width and shuffle
+   the rows under the finger that tapped it. A heavier *word* would, which is
+   why the weight is left alone and the border carries it instead. */
+.word.word::before {
+  content: '✓';
+  visibility: hidden;
+  margin-right: 0.3rem;
+}
+
+.word.word[aria-pressed='true']::before {
+  visibility: visible;
+}
+
+.word.word[aria-pressed='true'] {
+  border-width: 2px;
+  padding: calc(0.1rem - 1px) calc(0.6rem - 1px);
+}
+
+/* Spelled out for the reason `FeelingCategoryPill` gives: the reset above took
+   the host's own ring away with it, and `--nvc-ring` is how a host puts its
+   colour back. */
+.word.word:focus-visible {
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline-offset: 2px;
+}
+
+/* The same solid/dashed split the cards and pills use, so the same category
+   reads as the same thing wherever it is drawn. Doubled up to match
+   `.word.word` above, whose `border` shorthand would otherwise out-specify
+   these. */
+.word.met {
+  border-style: solid;
+}
+
+.word.unmet {
+  border-style: dashed;
+}
+
+/* Two lines' worth, held whether or not there is anything in it. A strip that
+   collapsed when nothing was showing would move the grid every time the pointer
+   left it. */
+.gloss {
+  margin: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid;
+  min-height: 3em;
+  font-size: 0.9em;
+}
+
+.hint {
+  opacity: 0.7;
+}

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import FeelingCardDemo from './FeelingCardDemo.tsx'
 import FeelingCategoryCardDemo from './FeelingCategoryCardDemo.tsx'
 import FeelingCategoryPillDemo from './FeelingCategoryPillDemo.tsx'
+import FeelingCategorySiftDemo from './FeelingCategorySiftDemo.tsx'
 import FeelingCategoryWalkDemo from './FeelingCategoryWalkDemo.tsx'
 import FeelingPickerDemo from './FeelingPickerDemo.tsx'
 import FeelingPromptDemo from './FeelingPromptDemo.tsx'
@@ -9,6 +10,7 @@ import ModalFrameDemo from './ModalFrameDemo.tsx'
 import NeedCardDemo from './NeedCardDemo.tsx'
 import NeedCategoryCardDemo from './NeedCategoryCardDemo.tsx'
 import NeedCategoryPillDemo from './NeedCategoryPillDemo.tsx'
+import NeedCategorySiftDemo from './NeedCategorySiftDemo.tsx'
 import NeedCategoryWalkDemo from './NeedCategoryWalkDemo.tsx'
 import NeedPickerDemo from './NeedPickerDemo.tsx'
 import NeedPromptDemo from './NeedPromptDemo.tsx'
@@ -42,6 +44,12 @@ export const demos: Demo[] = [
     title: 'Feeling Picker',
     group: 'Feelings',
     Component: FeelingPickerDemo,
+  },
+  {
+    slug: 'feeling-category-sift',
+    title: 'Feeling Category Sift',
+    group: 'Feelings',
+    Component: FeelingCategorySiftDemo,
   },
   {
     slug: 'feeling-category-walk',
@@ -79,6 +87,12 @@ export const demos: Demo[] = [
     title: 'Need Picker',
     group: 'Needs',
     Component: NeedPickerDemo,
+  },
+  {
+    slug: 'need-category-sift',
+    title: 'Need Category Sift',
+    group: 'Needs',
+    Component: NeedCategorySiftDemo,
   },
   {
     slug: 'need-category-walk',
