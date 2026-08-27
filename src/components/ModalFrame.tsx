@@ -17,7 +17,11 @@ export type ModalHeading =
 type Props = {
   /** The title, or the way back up a level. */
   heading: ModalHeading
-  /** Called when the close button is pressed. Closing a modal is cancelling. */
+  /**
+   * Called when the close button is pressed. It leaves whatever is on top,
+   * which is the host's to decide: a screen a level down goes back up, and only
+   * the top of the stack cancels the modal.
+   */
   onClose: () => void
   /** Fills the scrolling body between the title bar and the buttons. */
   children: ReactNode

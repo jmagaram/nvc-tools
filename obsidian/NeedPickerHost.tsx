@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import NeedPicker from '../src/components/NeedPicker.tsx'
 import { categories } from '../src/data/needs.ts'
@@ -29,6 +29,12 @@ type Props = {
   onSubmit: (entries: Visited[]) => void
   /** Close, insert nothing. */
   onCancel: () => void
+  /**
+   * Handed the way out of a walk whenever there is one, and null on the way
+   * back to the categories — which is what tells the modal's own `x` and
+   * Escape they are speaking for the whole modal again.
+   */
+  onWalkChange: (leaveWalk: (() => void) | null) => void
 }
 
 /**
@@ -50,6 +56,7 @@ export default function NeedPickerHost({
   footerEl,
   onSubmit,
   onCancel,
+  onWalkChange,
 }: Props) {
   const [state, setState] = useState<NeedPickerState>(() => init(categories))
 
@@ -57,6 +64,17 @@ export default function NeedPickerHost({
     setState((current) => reduce(current, action))
 
   const bodyRef = useFocusScreen(screenKey(state))
+
+  /* Obsidian's title bar is its own, and so is the `x` in the corner of it.
+     Both it and Escape land in `Modal.close`, which has no way to see a walk
+     from where it sits — so the walk leaves the way out of itself here, and
+     takes it away again on the way back to the categories. `dispatch` reads
+     the state it is given rather than the one it closed over, so what is left
+     here does not go stale between renders. */
+  useEffect(() => {
+    onWalkChange(state.walk ? () => dispatch({ type: 'close' }) : null)
+    return () => onWalkChange(null)
+  })
 
   const total = count(state)
 

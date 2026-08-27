@@ -130,13 +130,23 @@ straight from `src/` and adds nothing to it.
   that followed a click — so a region styles plain `:focus`, and anything a
   host may restyle spells out its own `outline` in `currentColor` rather than
   leaning on the UA default.
-- **Closing cancels.** The corner `x` and Escape both land in `onClose` and
-  insert nothing, on the walk screen as well as the browse screen. The way back
-  in the title bar is what keeps your picks, and it is the only one: a walk is
+- **Closing leaves whatever is on top.** The corner `x` and Escape both mean
+  the screen showing, not the session: from the categories they cancel the
+  modal and insert nothing, and from a walk they leave the walk and keep its
+  picks. In the plugin both arrive at `Modal.close`, which is where the guard
+  sits rather than on either gesture; the host leaves the way out there through
+  `onWalkChange` while a walk is up, so the modal needs to know nothing about
+  either picker, and `dismiss` is how the modal closes for real past the guard.
+  The demo pages do the same through `ModalFrame`'s `onClose`.
+- **The way back is labelled; the `x` is where the thumb already is.** The
+  title bar a level down carries the screen it returns to — **‹ Feelings**,
+  **‹ Needs**, the title one level up — rather than *Back*, which left open what
+  became of the answers already given. The `x` now does the same thing. They
+  are synonyms on purpose: with both meaning one thing, nothing on the walk
+  screen can throw work away, and losing everything stays one gesture but only
+  from the categories, where all of it is on screen to lose. A walk is still
   drawn with no button row at all, because that row speaks for the whole modal
-  and a walk has nothing to say there. It is labelled with the screen it
-  returns to — **‹ Feelings**, **‹ Needs**, the title one level up — rather than
-  *Back*, which left open what became of the answers already given.
+  and a walk has nothing to say there.
 - **Styles.** Component CSS modules use only `currentColor` and `inherit`, so an
   Obsidian theme reaches them untouched and they ship as they are.
   `obsidian/styles.css` holds only the plugin's own chrome, for the modal and

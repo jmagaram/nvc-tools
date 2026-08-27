@@ -144,8 +144,10 @@ export default function FeelingPickerDemo() {
           <ModalFrame
             heading={heading}
             size={device.size}
-            // Closing a modal is cancelling, on both screens.
-            onClose={cancel}
+            /* Closing is leaving whatever is on top: the walk from a walk, the
+               modal from the categories. Same as the way back beside it, so
+               nothing on the walk screen can lose a pick. */
+            onClose={state.walk ? () => dispatch({ type: 'close' }) : cancel}
             footer={footer}
           >
             {picker}

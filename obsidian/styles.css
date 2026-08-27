@@ -42,6 +42,15 @@
   display: none;
 }
 
+/* The title bar holds the way back out of a walk rather than a heading, and a
+   phone centres it: `.is-phone .modal-title` is `text-align: center`, where
+   every other width leaves it at `start`. A control belongs in the corner it
+   was in a moment ago, not in the middle of the bar, so the bar is put back to
+   reading order on every surface. */
+.nvc-modal .modal-title {
+  text-align: start;
+}
+
 /* Reads as a control rather than a heading, but keeps the title bar the same
    height so it does not jump as you move up and down a level. */
 .nvc-modal .nvc-back {
@@ -52,6 +61,13 @@
   color: var(--text-normal);
   font: inherit;
   cursor: pointer;
+
+  /* The space between the chevron and the word cannot be written in the
+     markup. Obsidian's `button` is `display: inline-flex`, so the chevron's
+     span is one flex item and the space and the word together are the next —
+     an anonymous item whose leading whitespace is trimmed, the way the start
+     of any line is. `gap` is the one that survives. */
+  gap: var(--size-2-2);
 }
 
 /* An `nvc-*` block in a note. The layouts themselves come from the component's

@@ -8,11 +8,14 @@ import NeedPickerHost from './NeedPickerHost.tsx'
  * Ask about needs in an Obsidian modal.
  *
  * The twin of `FeelingPickerModal`, down to the close behaviour: Obsidian
- * brings the chrome, and closing by the corner `x` or by Escape cancels.
+ * brings the chrome, and closing leaves whatever is on top — the modal from
+ * the categories, the walk from a walk.
  */
 export default class NeedPickerModal extends Modal {
   private root: Root | null = null
   private footerEl: HTMLElement | null = null
+  /** The way out of a walk, while there is one. Set by the host; see `close`. */
+  private leaveWalk: (() => void) | null = null
   private onSubmit: (entries: Visited[]) => void
 
   constructor(app: App, onSubmit: (entries: Visited[]) => void) {
@@ -35,13 +38,46 @@ export default class NeedPickerModal extends Modal {
       <NeedPickerHost
         titleEl={this.titleEl}
         footerEl={this.footerEl}
+        onWalkChange={(leaveWalk) => {
+          this.leaveWalk = leaveWalk
+        }}
+        /* `dismiss` rather than `close`: these two are only ever reachable
+           from the categories, where there is no walk to leave, and saying so
+           keeps them right if that ever stops being true. */
         onSubmit={(entries) => {
           this.onSubmit(entries)
-          this.close()
+          this.dismiss()
         }}
-        onCancel={() => this.close()}
+        onCancel={() => this.dismiss()}
       />,
     )
+  }
+
+  /**
+   * The corner `x` and Escape both arrive here, and during a walk they mean
+   * the walk rather than the modal — the screen on top is the one a dismiss is
+   * about. The host leaves the way out in `leaveWalk` while there is one, so
+   * this needs to know nothing about either picker.
+   *
+   * Going back keeps the picks, exactly as the way back in the title bar does.
+   * The two are synonyms on purpose: one of them is labelled and one is where
+   * a thumb already goes, and with both meaning the same thing there is
+   * nothing on the walk screen that can throw work away. Losing everything is
+   * still one gesture, but only from the categories, where all of it is on
+   * screen to lose.
+   */
+  close() {
+    const leaveWalk = this.leaveWalk
+    if (leaveWalk) {
+      leaveWalk()
+      return
+    }
+    this.dismiss()
+  }
+
+  /** Close for real, past the guard in `close`. */
+  private dismiss() {
+    super.close()
   }
 
   onClose() {
