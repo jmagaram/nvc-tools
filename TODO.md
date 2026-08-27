@@ -6,10 +6,6 @@ oddities in there are faithful to the source.
 
 ## Open
 
-### Miscellaneous
-
-The feeling dialog says "How are you feeling?" They may be describing something that happened a while ago. Better for generic "Feelings" and "Needs".
-
 ### Animation on swipe
 
 ### Re-opening a category and backing out erases what it held

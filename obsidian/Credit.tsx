@@ -10,8 +10,8 @@
 export default function Credit() {
   return (
     <p className="nvc-credit">
-      Feelings and needs from the Feelings and Needs Inventory, © 2023 Center
-      for Nonviolent Communication, cnvc.org.
+      Feelings and Needs Inventory, © 2023 Center for Nonviolent Communication,
+      cnvc.org.
     </p>
-  )
+  );
 }

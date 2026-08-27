@@ -66,7 +66,7 @@ export default function FeelingPickerHost({
       <span aria-hidden="true">&lsaquo;</span> Back
     </button>
   ) : (
-    <>How are you feeling?</>
+    <>Feelings</>
   )
 
   const buttons = state.walk ? (

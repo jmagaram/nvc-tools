@@ -62,7 +62,7 @@ export default function NeedPickerDemo() {
      screens. */
   const heading: ModalHeading = state.walk
     ? { kind: 'back', label: 'Back', onBack: () => dispatch({ type: 'close' }) }
-    : { kind: 'title', text: 'What do you need?' }
+    : { kind: 'title', text: 'Needs' }
 
   const footer = state.walk ? (
     <button type="button" onClick={() => dispatch({ type: 'close' })}>

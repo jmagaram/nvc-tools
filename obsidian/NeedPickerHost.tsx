@@ -66,7 +66,7 @@ export default function NeedPickerHost({
       <span aria-hidden="true">&lsaquo;</span> Back
     </button>
   ) : (
-    <>What do you need?</>
+    <>Needs</>
   )
 
   const buttons = state.walk ? (

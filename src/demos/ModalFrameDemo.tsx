@@ -11,7 +11,7 @@ const PARAGRAPH =
   'button row should stay put while it does.'
 
 export default function ModalFrameDemo() {
-  const [title, setTitle] = useState('How are you feeling?')
+  const [title, setTitle] = useState('Feelings')
   const [device, setDevice] = useState(devices[0])
   const [paragraphs, setParagraphs] = useState(1)
   const [dialogWidth, setDialogWidth] = useState(420)

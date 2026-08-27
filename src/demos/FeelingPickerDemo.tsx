@@ -64,7 +64,7 @@ export default function FeelingPickerDemo() {
      screens. */
   const heading: ModalHeading = state.walk
     ? { kind: 'back', label: 'Back', onBack: () => dispatch({ type: 'close' }) }
-    : { kind: 'title', text: 'How are you feeling?' }
+    : { kind: 'title', text: 'Feelings' }
 
   const footer = state.walk ? (
     <button type="button" onClick={() => dispatch({ type: 'close' })}>
