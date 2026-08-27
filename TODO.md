@@ -39,34 +39,10 @@ asks previously-picked words first, so re-walking a category is meant to be a
 quick pass of "yes, still applies". Backing out of that pass currently reads as
 re-deciding everything, which is not what the person did.
 
-### What the modal's close button should do part way through a walk
-
-`ModalFrame` puts an `x` in the title bar, and it cancels on both screens:
-close, insert nothing. On the walk screen that leaves a destructive control an
-inch from **Back**, which keeps everything picked so far. Both read as "get me
-out of here", and only one of them costs you the session.
-
-Not academic, because the gesture is not ours to remove. Obsidian's `Modal`
-draws its own close button, and Escape dismisses it. It can be styled away —
-Obsidian's own confirmation modals do exactly that, with
-`.is-mobile .mod-confirmation .modal-close-button { display: none }` — but
-whether Escape can be intercepted was not checked, and that is the half that
-matters, since a key press cannot be aimed away from.
-
-The candidates, roughly in order of how much they ask of the plugin:
-
-- Leave it. Consistent, and the count on **OK** at least makes the loss
-  visible before you reach for the corner.
-- Hide the close button while a walk is running, so **Back** and **Skip Rest**
-  are the only ways off that screen. Does nothing about Escape.
-- Confirm on close when anything is picked. The usual guard, and the only one
-  that also covers Escape.
-- Treat closing with picks as **OK** rather than **Cancel**. Cheapest to build
-  and never loses data, but it makes closing a modal commit something, which no
-  other modal in Obsidian does.
-
-Worth settling before the plugin exists, because the answer decides whether
-`ModalFrame` needs to know a walk is running.
+As of August 2026 this ships: `obsidian/` wraps both pickers as a plugin, so
+the erasure now costs someone real words on their way into a note, not just a
+demo page. Still not fixed — the semantic choice above has to be made first,
+and it lands in `src/machines/`, which the plugin only consumes.
 
 ### Whether the data should mark the words NVC treats as thoughts
 
@@ -153,6 +129,31 @@ faithful to the source, so do not "fix" it:
   `animosity` — and `resentful` in `Angry`. NVC treats these as thoughts about
   another person rather than feelings, yet the inventory lists them. Whether the
   data should mark them is open, above.
+
+### What the modal's close button does part way through a walk
+
+**It cancels** — the corner `x` and Escape alike, on the walk screen as well as
+the browse screen. Nothing is inserted, on either.
+
+Decided August 2026, when `obsidian/` was built. The alternatives considered
+were hiding the close button mid-walk (does nothing about Escape, which cannot
+be aimed away from), confirming before discarding, and treating a close with
+picks as **OK**.
+
+What settled it: closing a modal cancels it everywhere else in Obsidian, and
+making this one modal commit — or argue back — would be the surprising thing.
+The count on **OK (6)** already says what is at stake before you reach for the
+corner, and **Back** and **Skip Rest** both sit on screen keeping everything
+picked. The gesture that loses work is the one that looks like leaving; the two
+that look like going back are the ones that don't.
+
+It costs nothing to build, which is the other half of it: closing already lands
+in `Modal.onClose`, which unmounts without submitting. And it answers the
+question the section used to end on — **`ModalFrame` does not need to know a
+walk is running**, and neither does the plugin.
+
+Worth reopening if it bites in practice. The confirm-on-close guard is the
+fallback, and it is the only candidate that also covers Escape.
 
 ### The definitions are ours, not the source's
 

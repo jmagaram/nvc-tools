@@ -65,10 +65,38 @@ src/
   data/              NVC reference data (feelings, needs)
   demos/             one demo page per component, plus index.ts registry
   machines/          pure state machines (state + action + reduce, no React)
+obsidian/            the Obsidian plugin — the second surface, see below
+scripts/             deploy-plugin.mjs
 ```
+
+## The Obsidian plugin
+
+`obsidian/` is the second surface: two commands, `NVC: Insert feelings…` and
+`NVC: Insert needs…`, each opening a picker over the active note and inserting
+grouped bullets at the cursor. It imports straight from `src/` and adds nothing
+to it.
+
+- **The modal is the host.** `FeelingPickerHost` / `NeedPickerHost` are their
+  demo pages with the controls taken off — same `useState`, same `reduce`, same
+  `chosen` on OK. Obsidian glue stays in the `*Modal` files beside them.
+- **`ModalFrame` is not imported here.** It stands in for Obsidian's chrome so
+  the gallery can preview the shape; the plugin has the real thing, and uses
+  `titleEl`, `contentEl` and `.modal-button-container` directly.
+- **Closing cancels.** The corner `x` and Escape both land in `onClose` and
+  insert nothing, on the walk screen as well as the browse screen. **Back** and
+  **Skip Rest** are what keep your picks.
+- **Styles.** Component CSS modules use only `currentColor` and `inherit`, so an
+  Obsidian theme reaches them untouched and they ship as they are.
+  `obsidian/styles.css` holds only what belongs to the modal. `src/index.css` is
+  gallery-only — every rule in it targets `body` or a bare element and would
+  restyle the whole app.
 
 ## Commands
 
 - `npm run dev` — dev server
 - `npm run build` — typecheck (`tsc -b`) and build
 - `npm run lint` — **oxlint**, not ESLint. Config is `.oxlintrc.json`.
+- `npm run plugin:build` — build the plugin into `dist-plugin/`
+- `npm run plugin:deploy` — build, then copy it into the vault named by
+  `OBSIDIAN_VAULT` in `.env.local` (gitignored)
+- `npm run plugin:dev` — rebuild and redeploy on every change

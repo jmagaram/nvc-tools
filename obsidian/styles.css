@@ -1,0 +1,50 @@
+/*
+ * Everything the components need is in their own CSS modules, which the build
+ * bundles into this file. What is written by hand here is only what belongs to
+ * the modal rather than to a component — three rules, and no colour: the
+ * component styles use `currentColor` and `inherit` throughout, so an Obsidian
+ * theme reaches them without help.
+ */
+
+/* Obsidian's own default is 560px. The walk shows one word at a time and the
+   browse view is a wrap-flow of pills, so nothing here wants that width; 420 is
+   the number the gallery preview settled on, where a definition wraps to two
+   lines and the walked categories fall into two tall cards rather than three
+   squat ones. */
+.nvc-modal {
+  --dialog-width: 420px;
+}
+
+/* Obsidian scrolls `.modal-content` as one box, which would carry the button
+   row off the bottom with it. Three rows instead — title bar, scrolling body,
+   button row — which is the shape `ModalFrame` previews in the gallery. */
+.nvc-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.nvc-modal .nvc-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* The line that carries the CNVC credit, under the categories. */
+.nvc-modal .nvc-credit {
+  margin: var(--size-4-3) 0 0;
+  color: var(--text-faint);
+  font-size: var(--font-smallest);
+}
+
+/* Reads as a control rather than a heading, but keeps the title bar the same
+   height so it does not jump as you move up and down a level. */
+.nvc-modal .nvc-back {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+  color: var(--text-normal);
+  font: inherit;
+  cursor: pointer;
+}

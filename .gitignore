@@ -9,8 +9,12 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-plugin
 dist-ssr
 *.local
+
+# .env.local names the Obsidian vault to deploy the plugin into — one machine's
+# path, not the project's. See README.md.
 
 # Agent scratch space — holds git worktrees with their own node_modules
 .claude
