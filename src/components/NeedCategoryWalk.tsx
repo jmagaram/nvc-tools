@@ -1,14 +1,17 @@
 import NeedPrompt from './NeedPrompt.tsx'
 import type {
-  NeedCategoryWalkAction,
-  NeedCategoryWalkState,
-} from '../machines/needCategoryWalk.ts'
+  CategoryWalkAction,
+  CategoryWalkState,
+} from '../machines/categoryWalk.ts'
+import type { Need } from '../data/needs.ts'
+
+type NeedCategoryWalkState = CategoryWalkState<Need>
 
 type Props = {
   /** Where the walk has got to. */
   state: NeedCategoryWalkState
   /** Called with the answer the person gave to the need on screen. */
-  onAction: (action: NeedCategoryWalkAction) => void
+  onAction: (action: CategoryWalkAction) => void
 }
 
 export default function NeedCategoryWalk({ state, onAction }: Props) {

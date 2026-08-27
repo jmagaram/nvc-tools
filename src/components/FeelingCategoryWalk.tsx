@@ -1,14 +1,20 @@
 import FeelingPrompt from './FeelingPrompt.tsx'
 import type {
-  FeelingCategoryWalkAction,
-  FeelingCategoryWalkState,
-} from '../machines/feelingCategoryWalk.ts'
+  CategoryWalkAction,
+  CategoryWalkState,
+} from '../machines/categoryWalk.ts'
+import type { Feeling } from '../data/feelings.ts'
+
+type FeelingCategoryWalkState = CategoryWalkState<
+  Feeling,
+  { kind: 'met' | 'unmet' }
+>
 
 type Props = {
   /** Where the walk has got to. */
   state: FeelingCategoryWalkState
   /** Called with the answer the person gave to the feeling on screen. */
-  onAction: (action: FeelingCategoryWalkAction) => void
+  onAction: (action: CategoryWalkAction) => void
 }
 
 export default function FeelingCategoryWalk({ state, onAction }: Props) {

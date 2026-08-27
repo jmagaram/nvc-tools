@@ -1,5 +1,5 @@
-import type { FeelingCategory } from '../data/feelings.ts'
-import * as feelingCategoryWalk from './feelingCategoryWalk.ts'
+import type { Feeling, FeelingCategory } from '../data/feelings.ts'
+import * as categoryWalk from './categoryWalk.ts'
 import { shuffle } from './shuffle.ts'
 
 /** A category that has been walked through, and what was picked in it. */
@@ -31,7 +31,7 @@ export type FeelingPickerState = {
    * The walk in progress, or null while browsing. Never a finished walk: the
    * last answer closes it, so if this is set there is a feeling to answer.
    */
-  walk: feelingCategoryWalk.FeelingCategoryWalkState | null
+  walk: categoryWalk.CategoryWalkState<Feeling, { kind: 'met' | 'unmet' }> | null
 }
 
 export type FeelingPickerAction =
@@ -40,7 +40,7 @@ export type FeelingPickerAction =
   /** Start walking a category, by name. */
   | { type: 'open'; category: string }
   /** Answer the feeling the walk is showing. */
-  | { type: 'answer'; answer: feelingCategoryWalk.FeelingCategoryWalkAction }
+  | { type: 'answer'; answer: categoryWalk.CategoryWalkAction }
   /** Leave the walk, keeping whatever was picked. */
   | { type: 'close' }
 
@@ -77,13 +77,13 @@ function wordsPicked(
  */
 function close(
   state: FeelingPickerState,
-  walk: feelingCategoryWalk.FeelingCategoryWalkState,
+  walk: categoryWalk.CategoryWalkState<Feeling, { kind: 'met' | 'unmet' }>,
 ): FeelingPickerState {
   const closed: Visited = {
     category: walk.category,
     kind: walk.kind,
     // Readable part way through, so backing out early still keeps picks.
-    words: feelingCategoryWalk.picked(walk).map((f) => f.word),
+    words: categoryWalk.picked(walk).map((f) => f.word),
   }
   return {
     ...state,
@@ -110,25 +110,27 @@ export function reduce(
       const category = state.categories.find((c) => c.name === action.category)
       if (!category) return state
       const opened = { ...state, tab: category.kind }
-      const walk = feelingCategoryWalk.init(
-        category,
+      const walk = categoryWalk.init(
+        { name: category.name, kind: category.kind },
+        category.feelings,
+        (feeling) => feeling.word,
         wordsPicked(state, category.name),
         rng,
       )
       // A category with nothing in it is over before it began, so there is no
       // walk screen to show.
-      return feelingCategoryWalk.isDone(walk)
+      return categoryWalk.isDone(walk)
         ? close(opened, walk)
         : { ...opened, walk }
     }
 
     case 'answer': {
       if (!state.walk) return state
-      const walk = feelingCategoryWalk.reduce(state.walk, action.answer)
+      const walk = categoryWalk.reduce(state.walk, action.answer)
       // The last answer ends the walk, and the screen it would leave behind
       // says no more than the card waiting on the other side — the category
       // just walked is the first one there. So go straight back.
-      return feelingCategoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
+      return categoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
     }
 
     case 'close':

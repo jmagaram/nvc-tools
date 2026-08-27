@@ -7,16 +7,19 @@ import {
   picked,
   reduce,
   screenKey,
-} from '../machines/needCategoryWalk.ts'
+} from '../machines/categoryWalk.ts'
 import type {
-  NeedCategoryWalkAction,
-  NeedCategoryWalkState,
-} from '../machines/needCategoryWalk.ts'
+  CategoryWalkAction,
+  CategoryWalkState,
+} from '../machines/categoryWalk.ts'
+import type { Need } from '../data/needs.ts'
+
+type NeedCategoryWalkState = CategoryWalkState<Need>
 
 export default function NeedCategoryWalkDemo() {
   const [categoryIndex, setCategoryIndex] = useState(1)
   const [state, setState] = useState<NeedCategoryWalkState>(() =>
-    init(categories[1]),
+    init({ name: categories[1].name }, categories[1].needs, (need) => need.word),
   )
   // Standing in for whatever the app stores between sessions, so that
   // re-opening a category shows the previously picked needs first.
@@ -26,7 +29,7 @@ export default function NeedCategoryWalkDemo() {
 
   const bodyRef = useFocusScreen(screenKey(state))
 
-  const dispatch = (action: NeedCategoryWalkAction) =>
+  const dispatch = (action: CategoryWalkAction) =>
     setState((current) => reduce(current, action))
 
   const wordsPicked = picked(state).map((need) => need.word)
@@ -37,7 +40,14 @@ export default function NeedCategoryWalkDemo() {
     const category = categories[index]
     setPicksByCategory(remembered)
     setCategoryIndex(index)
-    setState(init(category, remembered[category.name] ?? []))
+    setState(
+      init(
+        { name: category.name },
+        category.needs,
+        (need) => need.word,
+        remembered[category.name] ?? [],
+      ),
+    )
   }
 
   return (
