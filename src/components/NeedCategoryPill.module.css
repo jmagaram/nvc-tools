@@ -1,12 +1,17 @@
 /* A real button, so the native focus ring already lands on the whole pill and
    none of the card's overlay machinery is needed here. No solid/dashed split:
-   needs are one undivided list, so there is nothing for the border to say. */
-.pill {
+   needs are one undivided list, so there is nothing for the border to say. The
+   class is doubled to out-specify a host's own button chrome — see the comment
+   on `.tabs .tab` in FeelingPicker.module.css. */
+.pill.pill {
   display: inline-block;
+  height: auto;
   padding: 0.1rem 0.6rem;
   border: 1px solid;
   border-radius: 999px;
   background: none;
+  box-shadow: none;
+  font: inherit;
   color: inherit;
   cursor: pointer;
 }

@@ -12,12 +12,22 @@
   border-bottom: 1px solid;
 }
 
-.tab {
+/* A tab is not a button, and a host may disagree. Obsidian dresses every bare
+   <button> from `button:not(.clickable-icon)`, which at 0,1,1 out-specifies a
+   single class — so this selector is nested to 0,2,0, and it has to name every
+   property that chrome sets: `border: none` leaves `border-radius` alone, and
+   the height and the shadow are never ours to begin with. The flat controls in
+   FeelingCategoryPill, NeedCategoryPill, FeelingCategoryCard and
+   NeedCategoryCard carry the same reset for the same reason. */
+.tabs .tab {
+  height: auto;
   margin-bottom: -1px;
   padding: 0.25rem 0.1rem;
   border: none;
   border-bottom: 2px solid transparent;
+  border-radius: 0;
   background: none;
+  box-shadow: none;
   font: inherit;
   color: inherit;
   cursor: pointer;

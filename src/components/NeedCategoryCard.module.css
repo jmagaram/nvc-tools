@@ -11,11 +11,17 @@
 }
 
 /* The button carries the click; its ::after stretches over the whole card so
-   anywhere in the card is a hit target, while the markup stays valid. */
-.button {
+   anywhere in the card is a hit target, while the markup stays valid. Nothing
+   about it should read as a button — it is the card's heading. Nested to
+   out-specify a host's own button chrome, and naming every property that
+   chrome sets: see the comment on `.tabs .tab` in FeelingPicker.module.css. */
+.category .button {
+  height: auto;
   padding: 0;
   border: none;
+  border-radius: 0;
   background: none;
+  box-shadow: none;
   font: inherit;
   color: inherit;
   text-align: left;

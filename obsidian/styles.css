@@ -54,14 +54,20 @@
    to reach the menu.
 
    Bottom right, because the top right of a rendered block belongs to Obsidian —
-   that is where it puts the `</>` that flips the block to source. */
-.nvc-block-menu {
+   that is where it puts the `</>` that flips the block to source.
+
+   Nested under .nvc-block for the specificity: Obsidian's own
+   `button:not(.clickable-icon)` is 0,1,1 and would otherwise win the fill, and
+   the height and the corners are never named by a plain reset at all. */
+.nvc-block .nvc-block-menu {
   position: absolute;
   bottom: 0;
   right: 0;
   display: flex;
+  height: auto;
   padding: var(--size-2-2);
   border: none;
+  border-radius: 0;
   box-shadow: none;
   background: none;
   color: var(--text-faint);
@@ -70,10 +76,10 @@
 }
 
 .nvc-block:hover .nvc-block-menu,
-.nvc-block-menu:focus-visible {
+.nvc-block .nvc-block-menu:focus-visible {
   opacity: 1;
 }
 
-.nvc-block-menu:hover {
+.nvc-block .nvc-block-menu:hover {
   color: var(--text-normal);
 }
