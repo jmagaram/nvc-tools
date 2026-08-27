@@ -7,16 +7,26 @@ import {
   picked,
   reduce,
   screenKey,
-} from '../machines/feelingCategoryWalk.ts'
+} from '../machines/categoryWalk.ts'
 import type {
-  FeelingCategoryWalkAction,
-  FeelingCategoryWalkState,
-} from '../machines/feelingCategoryWalk.ts'
+  CategoryWalkAction,
+  CategoryWalkState,
+} from '../machines/categoryWalk.ts'
+import type { Feeling } from '../data/feelings.ts'
+
+type FeelingCategoryWalkState = CategoryWalkState<
+  Feeling,
+  { kind: 'met' | 'unmet' }
+>
 
 export default function FeelingCategoryWalkDemo() {
   const [categoryIndex, setCategoryIndex] = useState(2)
   const [state, setState] = useState<FeelingCategoryWalkState>(() =>
-    init(categories[2]),
+    init<Feeling, { kind: 'met' | 'unmet' }>(
+      { name: categories[2].name, kind: categories[2].kind },
+      categories[2].feelings,
+      (feeling) => feeling.word,
+    ),
   )
   // Standing in for whatever the app stores between sessions, so that
   // re-opening a category shows the previously picked feelings first.
@@ -26,7 +36,7 @@ export default function FeelingCategoryWalkDemo() {
 
   const bodyRef = useFocusScreen(screenKey(state))
 
-  const dispatch = (action: FeelingCategoryWalkAction) =>
+  const dispatch = (action: CategoryWalkAction) =>
     setState((current) => reduce(current, action))
 
   const wordsPicked = picked(state).map((feeling) => feeling.word)
@@ -37,7 +47,14 @@ export default function FeelingCategoryWalkDemo() {
     const category = categories[index]
     setPicksByCategory(remembered)
     setCategoryIndex(index)
-    setState(init(category, remembered[category.name] ?? []))
+    setState(
+      init<Feeling, { kind: 'met' | 'unmet' }>(
+        { name: category.name, kind: category.kind },
+        category.feelings,
+        (feeling) => feeling.word,
+        remembered[category.name] ?? [],
+      ),
+    )
   }
 
   return (

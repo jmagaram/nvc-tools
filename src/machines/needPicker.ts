@@ -1,5 +1,5 @@
-import type { NeedCategory } from '../data/needs.ts'
-import * as needCategoryWalk from './needCategoryWalk.ts'
+import type { Need, NeedCategory } from '../data/needs.ts'
+import * as categoryWalk from './categoryWalk.ts'
 import { shuffle } from './shuffle.ts'
 
 /** A category that has been walked through, and what was picked in it. */
@@ -22,14 +22,14 @@ export type NeedPickerState = {
    * The walk in progress, or null while browsing. Never a finished walk: the
    * last answer closes it, so if this is set there is a need to answer.
    */
-  walk: needCategoryWalk.NeedCategoryWalkState | null
+  walk: categoryWalk.CategoryWalkState<Need> | null
 }
 
 export type NeedPickerAction =
   /** Start walking a category, by name. */
   | { type: 'open'; category: string }
   /** Answer the need the walk is showing. */
-  | { type: 'answer'; answer: needCategoryWalk.NeedCategoryWalkAction }
+  | { type: 'answer'; answer: categoryWalk.CategoryWalkAction }
   /** Leave the walk, keeping whatever was picked. */
   | { type: 'close' }
 
@@ -71,7 +71,7 @@ function wordsPicked(
  */
 function close(
   state: NeedPickerState,
-  walk: needCategoryWalk.NeedCategoryWalkState,
+  walk: categoryWalk.CategoryWalkState<Need>,
 ): NeedPickerState {
   const closed: Visited = {
     category: walk.category,
@@ -79,7 +79,7 @@ function close(
     // This reports only the walk just performed, so backing out of a re-opened
     // category overwrites what it held — the same open bug `feelingPicker` has,
     // copied deliberately so the two stay in step. See TODO.md.
-    words: needCategoryWalk.picked(walk).map((n) => n.word),
+    words: categoryWalk.picked(walk).map((n) => n.word),
   }
   return {
     ...state,
@@ -101,25 +101,27 @@ export function reduce(
       if (state.walk) return state
       const category = state.categories.find((c) => c.name === action.category)
       if (!category) return state
-      const walk = needCategoryWalk.init(
-        category,
+      const walk = categoryWalk.init<Need>(
+        { name: category.name },
+        category.needs,
+        (need) => need.word,
         wordsPicked(state, category.name),
         rng,
       )
       // A category with nothing in it is over before it began, so there is no
       // walk screen to show.
-      return needCategoryWalk.isDone(walk)
+      return categoryWalk.isDone(walk)
         ? close(state, walk)
         : { ...state, walk }
     }
 
     case 'answer': {
       if (!state.walk) return state
-      const walk = needCategoryWalk.reduce(state.walk, action.answer)
+      const walk = categoryWalk.reduce(state.walk, action.answer)
       // The last answer ends the walk, and the screen it would leave behind
       // says no more than the card waiting on the other side — the category
       // just walked is the first one there. So go straight back.
-      return needCategoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
+      return categoryWalk.isDone(walk) ? close(state, walk) : { ...state, walk }
     }
 
     case 'close':
