@@ -21,10 +21,28 @@
   font-size: 0.8em;
 }
 
+/* A word with nowhere to wrap widened the whole modal rather than being
+   clipped: the card is a grid item inside a grid inside a grid, and every
+   track above it is sized from this heading's min-content — which, for
+   something like 'movement/exercise', is the entire word, a solidus being no
+   place to break.
+
+   'anywhere', not 'break-word'. The two look interchangeable and are not: only
+   'anywhere' shrinks the min-content size, which is the number those tracks
+   are read from. 'break-word' wraps the text once the track is already too
+   wide, so it stops nothing from growing.
+
+   'hyphens' is what makes the break readable when one long word is the whole
+   problem — 'discombobu-lated' rather than a chop mid-syllable. It wants a
+   'lang' on the document, which the gallery and Obsidian both set; a host
+   without one falls back to the plain break, and 'anywhere' still holds the
+   line. */
 .word {
   margin: 0;
   font-size: 2rem;
   line-height: 1.2;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .definition {

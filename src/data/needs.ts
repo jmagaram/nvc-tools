@@ -116,7 +116,7 @@ export const categories: NeedCategory[] = [
     needs: [
       { word: 'air', definition: 'Clean air to breathe.' },
       { word: 'food', definition: 'Enough to eat, and food that nourishes.' },
-      { word: 'movement/exercise', definition: 'Using your body the way it was made to be used.' },
+      { word: 'movement or exercise', definition: 'Using your body the way it was made to be used.' },
       { word: 'rest/sleep', definition: 'Stopping long enough to be restored.' },
       { word: 'sexual expression', definition: 'Living out your sexuality.' },
       { word: 'safety', definition: 'Being out of harm’s way.' },
