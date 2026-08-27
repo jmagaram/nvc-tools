@@ -18,6 +18,180 @@
   min-height: 10rem;
   display: grid;
   align-content: start;
+  /* A card on its way out flies past the sides. Clip it there so it slides
+     under the edge of the stage rather than widening the page or spilling out
+     of a narrow modal. Vertically it stays visible: the tilt lifts a corner
+     above the stage, and that is where the stamp sits. */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* The card just answered. Lifted out of flow so it cannot push the stage
+   around while the next card is already sitting in its place underneath, and
+   left at its natural height rather than stretched to the stage. */
+.leaving {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  animation: 400ms forwards;
+}
+
+/* Right for yes, left for no — the same sides as the arrow keys and the
+   buttons, so the card leaves in the direction the answer points. The verdict
+   colour rides along on a custom property so the wash and the stamp only have
+   to be written once. */
+.accept {
+  --verdict: #1a7f37;
+  animation-name: flyRight;
+}
+
+.reject {
+  --verdict: #b3261e;
+  animation-name: flyLeft;
+}
+
+/* Two cues, borrowed from the dating apps, so the answer registers before the
+   card is gone: the whole card takes a wash of the verdict colour, and a stamp
+   lands in the corner. Both are on the leaving card only — there is no drag
+   here to preview an answer, so they mark a decision already made. */
+.wash {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.25rem;
+  background: var(--verdict);
+  opacity: 0;
+  animation: wash 400ms forwards;
+}
+
+/* Solid rather than outlined so it reads on any theme the host drops this
+   into — the card underneath sets no background of its own. */
+.stamp {
+  position: absolute;
+  top: 0.75rem;
+  margin: 0;
+  padding: 0.15em 0.5em;
+  border-radius: 0.25rem;
+  background: var(--verdict);
+  color: white;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  opacity: 0;
+  /* Rotated with the standalone property, not `transform`, so the keyframes
+     can animate scale without having to restate the tilt. */
+  scale: 1.25;
+  animation: stamp 400ms forwards;
+}
+
+/* The stamp sits on the side the card is turning away from, where the corner
+   lifts — the same place a swipe puts it. */
+.accept .stamp {
+  left: 0.75rem;
+  rotate: -12deg;
+}
+
+.reject .stamp {
+  right: 0.75rem;
+  rotate: 12deg;
+}
+
+/* The next card rises into the gap the old one left, like the deck dealing.
+   Held back until the answered card has launched: without the delay the two
+   sit stacked and neither is readable. */
+.arriving {
+  animation: arrive 220ms ease-out 200ms both;
+}
+
+/* A beat to read the verdict, then the throw. The card tilts into the answer
+   first and only launches at 35%, which is what makes the stamp legible; the
+   fade is held off until it is well on its way. */
+@keyframes flyRight {
+  0% {
+    rotate: 0deg;
+    translate: 0 0;
+    animation-timing-function: ease-out;
+  }
+  35% {
+    rotate: 4deg;
+    translate: 2% -1%;
+    opacity: 1;
+    animation-timing-function: ease-in;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    rotate: 14deg;
+    translate: 115% -12%;
+    opacity: 0;
+  }
+}
+
+@keyframes flyLeft {
+  0% {
+    rotate: 0deg;
+    translate: 0 0;
+    animation-timing-function: ease-out;
+  }
+  35% {
+    rotate: -4deg;
+    translate: -2% -1%;
+    opacity: 1;
+    animation-timing-function: ease-in;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    rotate: -14deg;
+    translate: -115% -12%;
+    opacity: 0;
+  }
+}
+
+/* Both cues arrive over the same beat the card spends tilting, then hold for
+   the throw. */
+@keyframes wash {
+  35% {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 0.18;
+  }
+}
+
+@keyframes stamp {
+  35% {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes arrive {
+  from {
+    transform: translateY(1.5rem) scale(0.97);
+    opacity: 0;
+  }
+}
+
+/* Collapse the flight rather than removing it: the leaving card is torn down
+   on animationend, and `animation: none` would never fire that event. */
+@media (prefers-reduced-motion: reduce) {
+  .leaving,
+  .wash,
+  .stamp,
+  .arriving {
+    animation-duration: 1ms;
+    animation-delay: 0s;
+  }
 }
 
 .actions {

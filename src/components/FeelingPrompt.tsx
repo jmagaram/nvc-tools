@@ -1,7 +1,20 @@
+import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import FeelingCard from './FeelingCard.tsx'
 import StepProgress from './StepProgress.tsx'
 import styles from './FeelingPrompt.module.css'
+
+/** Which way an answer sends the card, and which way it tilts on the way out. */
+type Toward = 'accept' | 'reject'
+
+/** A copy of the card just answered, kept only until it has flown off. */
+type Leaving = {
+  word: string
+  category: string
+  definition: string
+  kind: 'met' | 'unmet'
+  toward: Toward
+}
 
 type Props = {
   /** The feeling on the card right now, e.g. 'enchanted'. */
@@ -32,6 +45,23 @@ export default function FeelingPrompt({
   onAccept,
   onReject,
 }: Props) {
+  // The one place this component keeps state, and it is pure presentation: an
+  // answer is instant everywhere else, so the card that just left has to be
+  // remembered here or there is nothing to animate. By the time the flight
+  // renders, the props have already moved on to the next feeling.
+  const [leaving, setLeaving] = useState<Leaving | null>(null)
+  // Counts answers rather than feelings. Keying the cards on this restarts
+  // both animations on every answer — including one that leaves the word
+  // alone, and a second answer that lands mid-flight.
+  const [dealt, setDealt] = useState(0)
+
+  const answer = (toward: Toward) => {
+    setLeaving({ word, category, definition, kind, toward })
+    setDealt(dealt + 1)
+    if (toward === 'accept') onAccept()
+    else onReject()
+  }
+
   // Swipe keys, borrowed from the dating apps: right takes the feeling, left
   // passes on it. The whole prompt is one focusable region so the keys work
   // wherever focus sits inside it — on either button after a click, or on the
@@ -40,10 +70,10 @@ export default function FeelingPrompt({
   const answerOnArrow = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'ArrowRight') {
       event.preventDefault()
-      onAccept()
+      answer('accept')
     } else if (event.key === 'ArrowLeft') {
       event.preventDefault()
-      onReject()
+      answer('reject')
     }
   }
 
@@ -61,25 +91,50 @@ export default function FeelingPrompt({
         label={`Feelings in ${category}`}
       />
 
-      {/* The card sits alone in the stage so a later swipe animation has a
-          single element to move, and a fixed height so the card does not jump
-          between a short and a long definition. */}
+      {/* Two cards at most: the one just answered tilting away, and the one
+          rising into its place. The stage is a fixed height so neither of them
+          jostles the buttons below, and it clips the flight at its edges. */}
       <div className={styles.stage}>
-        <FeelingCard
-          word={word}
-          category={category}
-          definition={definition}
-          kind={kind}
-        />
+        {leaving && (
+          <div
+            key={`leaving-${dealt}`}
+            className={`${styles.leaving} ${styles[leaving.toward]}`}
+            aria-hidden="true"
+            // The wash and the stamp animate too, and their events bubble
+            // here. Only the card's own flight ending means it is really gone.
+            onAnimationEnd={(event) => {
+              if (event.target === event.currentTarget) setLeaving(null)
+            }}
+          >
+            <FeelingCard
+              word={leaving.word}
+              category={leaving.category}
+              definition={leaving.definition}
+              kind={leaving.kind}
+            />
+            <div className={styles.wash} />
+            <p className={styles.stamp}>
+              {leaving.toward === 'accept' ? '✓ Yes' : '✕ Not this'}
+            </p>
+          </div>
+        )}
+        <div key={`arriving-${dealt}`} className={styles.arriving}>
+          <FeelingCard
+            word={word}
+            category={category}
+            definition={definition}
+            kind={kind}
+          />
+        </div>
       </div>
 
       {/* The walk only runs forwards: answering is the only way to move. Each
           button sits on the side its arrow key points to. */}
       <div className={styles.actions}>
-        <button type="button" onClick={onReject}>
+        <button type="button" onClick={() => answer('reject')}>
           <span aria-hidden="true">←</span> Not this
         </button>
-        <button type="button" onClick={onAccept}>
+        <button type="button" onClick={() => answer('accept')}>
           Yes, I feel this <span aria-hidden="true">→</span>
         </button>
       </div>

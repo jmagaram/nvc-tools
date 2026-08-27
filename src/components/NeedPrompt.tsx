@@ -96,13 +96,21 @@ export default function NeedPrompt({
             key={`leaving-${dealt}`}
             className={`${styles.leaving} ${styles[leaving.toward]}`}
             aria-hidden="true"
-            onAnimationEnd={() => setLeaving(null)}
+            // The wash and the stamp animate too, and their events bubble
+            // here. Only the card's own flight ending means it is really gone.
+            onAnimationEnd={(event) => {
+              if (event.target === event.currentTarget) setLeaving(null)
+            }}
           >
             <NeedCard
               word={leaving.word}
               category={leaving.category}
               definition={leaving.definition}
             />
+            <div className={styles.wash} />
+            <p className={styles.stamp}>
+              {leaving.toward === 'accept' ? '✓ Yes' : '✕ Not this'}
+            </p>
           </div>
         )}
         <div key={`arriving-${dealt}`} className={styles.arriving}>
