@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Agent scratch space — holds git worktrees with their own node_modules
+.claude
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
