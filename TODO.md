@@ -8,8 +8,9 @@ oddities in there are faithful to the source.
 
 ### Re-opening a category and backing out erases what it held
 
-Re-open a category from its card and press **Back to categories** before
-answering anything, and everything previously picked in that category is lost.
+Re-open a category from its card and leave it — **Back** in the title bar or
+**Skip Rest** in the button row — before answering anything, and everything
+previously picked in that category is lost.
 Reproduced in August 2026: `Angry` holding `incensed · indignant · outraged`,
 re-opened, backed straight out — the card came back reading *none of these*.
 
@@ -32,6 +33,35 @@ Worth weighing against the intended model: `categoryWalk.init` deliberately
 asks previously-picked words first, so re-walking a category is meant to be a
 quick pass of "yes, still applies". Backing out of that pass currently reads as
 re-deciding everything, which is not what the person did.
+
+### What the modal's close button should do part way through a walk
+
+`ModalFrame` puts an `x` in the title bar, and it cancels on both screens:
+close, insert nothing. On the walk screen that leaves a destructive control an
+inch from **Back**, which keeps everything picked so far. Both read as "get me
+out of here", and only one of them costs you the session.
+
+Not academic, because the gesture is not ours to remove. Obsidian's `Modal`
+draws its own close button, and Escape dismisses it. It can be styled away —
+Obsidian's own confirmation modals do exactly that, with
+`.is-mobile .mod-confirmation .modal-close-button { display: none }` — but
+whether Escape can be intercepted was not checked, and that is the half that
+matters, since a key press cannot be aimed away from.
+
+The candidates, roughly in order of how much they ask of the plugin:
+
+- Leave it. Consistent, and the count on **OK** at least makes the loss
+  visible before you reach for the corner.
+- Hide the close button while a walk is running, so **Back** and **Skip Rest**
+  are the only ways off that screen. Does nothing about Escape.
+- Confirm on close when anything is picked. The usual guard, and the only one
+  that also covers Escape.
+- Treat closing with picks as **OK** rather than **Cancel**. Cheapest to build
+  and never loses data, but it makes closing a modal commit something, which no
+  other modal in Obsidian does.
+
+Worth settling before the plugin exists, because the answer decides whether
+`ModalFrame` needs to know a walk is running.
 
 ### Whether the data should mark the words NVC treats as thoughts
 
