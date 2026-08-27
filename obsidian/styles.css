@@ -40,16 +40,24 @@
 
 /* An `nvc-*` block in a note. The layouts themselves come from the component's
    CSS module, bundled into this file; what is here is the chrome around them. */
+/* The gutter along the bottom is where the button lives. Without it the
+   comma-separated layout — a single line — would have its bottom-right corner
+   in the same place as its top-right one, and the button would be back over
+   both the text and Obsidian's own. */
 .nvc-block {
   position: relative;
+  padding-bottom: var(--size-4-6);
 }
 
 /* Out of the way until it is wanted, but never gone for keyboard or touch:
    right-click is a desktop gesture, so on mobile this button is the only way
-   to reach the menu. */
+   to reach the menu.
+
+   Bottom right, because the top right of a rendered block belongs to Obsidian —
+   that is where it puts the `</>` that flips the block to source. */
 .nvc-block-menu {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
   display: flex;
   padding: var(--size-2-2);
