@@ -20,6 +20,6 @@
    the host's own ring away with it, and `--nvc-ring` is how a host puts its
    colour back. */
 .pill.pill:focus-visible {
-  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }

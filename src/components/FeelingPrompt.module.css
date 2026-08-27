@@ -26,7 +26,7 @@
    background: this ring frames a whole screen, so undiluted `currentColor`
    would draw a hard box around everything. */
 .prompt:focus {
-  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: -2px;
 }
 

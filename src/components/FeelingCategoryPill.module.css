@@ -24,7 +24,7 @@
    background: undiluted `currentColor` is the strongest ink on the page and
    reads as a hard black box beside the quieter rings an app draws itself. */
 .pill.pill:focus-visible {
-  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }
 
