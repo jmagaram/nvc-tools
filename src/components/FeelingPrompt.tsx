@@ -78,7 +78,15 @@ export default function FeelingPrompt({
   }
 
   return (
-    <div className={styles.prompt} tabIndex={0} onKeyDown={answerOnArrow}>
+    /* 'data-prompt' is how a host finds this region to focus it — see
+       useFocusPrompt. Not an aria attribute on purpose: a role or a label here
+       becomes the region's accessible name and gets read out on every card. */
+    <div
+      className={styles.prompt}
+      tabIndex={0}
+      data-prompt=""
+      onKeyDown={answerOnArrow}
+    >
       <StepProgress
         total={total}
         current={index}

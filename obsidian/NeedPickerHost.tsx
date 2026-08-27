@@ -8,8 +8,8 @@ import type {
   NeedPickerState,
   Visited,
 } from '../src/machines/needPicker.ts'
+import { useFocusPrompt } from '../src/focusPrompt.ts'
 import Credit from './Credit.tsx'
-import { useFocusPrompt } from './useFocusPrompt.ts'
 
 type Props = {
   /** Obsidian's title bar, which the heading is drawn into. */

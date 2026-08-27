@@ -8,8 +8,8 @@ import type {
   FeelingPickerState,
   Visited,
 } from '../src/machines/feelingPicker.ts'
+import { useFocusPrompt } from '../src/focusPrompt.ts'
 import Credit from './Credit.tsx'
-import { useFocusPrompt } from './useFocusPrompt.ts'
 
 type Props = {
   /** Obsidian's title bar, which the heading is drawn into. */

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import NeedPicker from '../components/NeedPicker.tsx'
+import { useFocusPrompt } from '../focusPrompt.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -78,7 +79,16 @@ export default function NeedPickerDemo() {
     </>
   )
 
-  const picker = <NeedPicker state={state} onAction={dispatch} />
+  /* A walk opens from a card or a pill that is gone the moment it does, so
+     the prompt is given focus and the arrow keys answer straight away. A
+     modal host does the same. */
+  const bodyRef = useFocusPrompt(state.walk)
+
+  const picker = (
+    <div ref={bodyRef}>
+      <NeedPicker state={state} onAction={dispatch} />
+    </div>
+  )
 
   return (
     <>

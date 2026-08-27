@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import FeelingCategoryWalk from '../components/FeelingCategoryWalk.tsx'
+import { useFocusPrompt } from '../focusPrompt.ts'
 import { categories } from '../data/feelings.ts'
 import { init, picked, reduce } from '../machines/feelingCategoryWalk.ts'
 import type {
@@ -17,6 +18,8 @@ export default function FeelingCategoryWalkDemo() {
   const [picksByCategory, setPicksByCategory] = useState<
     Record<string, string[]>
   >({})
+
+  const bodyRef = useFocusPrompt(state)
 
   const dispatch = (action: FeelingCategoryWalkAction) =>
     setState((current) => reduce(current, action))
@@ -53,7 +56,11 @@ export default function FeelingCategoryWalkDemo() {
         </button>
       </label>
       <hr />
-      <FeelingCategoryWalk state={state} onAction={dispatch} />
+      {/* Focused as each word comes up, the way a modal host focuses it, so
+          the arrow keys answer without a click first. */}
+      <div ref={bodyRef}>
+        <FeelingCategoryWalk state={state} onAction={dispatch} />
+      </div>
 
       {/* The walk renders nothing once it is done, so the chrome around
           it — here the demo page, later a modal — shows the result. */}
@@ -69,8 +76,8 @@ export default function FeelingCategoryWalkDemo() {
       )}
       <p>
         Walk through a category, pick a few, then switch away and back: the ones
-        you picked are asked about first. Once the prompt has focus you can run
-        the whole walk on → and ←.
+        you picked are asked about first. The prompt takes focus as each word comes
+        up, so you can run the whole walk on → and ←.
       </p>
     </>
   )
