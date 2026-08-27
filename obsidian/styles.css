@@ -1,9 +1,12 @@
 /*
  * Everything the components need is in their own CSS modules, which the build
  * bundles into this file. What is written by hand here is only what belongs to
- * the modal rather than to a component — three rules, and no colour: the
- * component styles use `currentColor` and `inherit` throughout, so an Obsidian
- * theme reaches them without help.
+ * the modal rather than to a component, and no colour of its own: the component
+ * styles use `currentColor` and `inherit` throughout, so an Obsidian theme
+ * reaches them without help.
+ *
+ * The three-row layout is not here either — `mod-scrollable-content`, which the
+ * modals add, is Obsidian's own version of it.
  */
 
 /* Obsidian's own default is 560px. The walk shows one word at a time and the
@@ -13,21 +16,6 @@
    squat ones. */
 .nvc-modal {
   --dialog-width: 420px;
-}
-
-/* Obsidian scrolls `.modal-content` as one box, which would carry the button
-   row off the bottom with it. Three rows instead — title bar, scrolling body,
-   button row — which is the shape `ModalFrame` previews in the gallery. */
-.nvc-modal .modal-content {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.nvc-modal .nvc-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
 }
 
 /* The line that carries the CNVC credit, under the categories. */

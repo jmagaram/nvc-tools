@@ -80,8 +80,11 @@ to it.
   demo pages with the controls taken off — same `useState`, same `reduce`, same
   `chosen` on OK. Obsidian glue stays in the `*Modal` files beside them.
 - **`ModalFrame` is not imported here.** It stands in for Obsidian's chrome so
-  the gallery can preview the shape; the plugin has the real thing, and uses
-  `titleEl`, `contentEl` and `.modal-button-container` directly.
+  the gallery can preview the shape; the plugin has the real thing. The modals
+  add `mod-scrollable-content` — Obsidian's own three-row modal — and draw the
+  heading and the button row through portals, because that modifier only works
+  when `.modal-button-container` is a *sibling* of `.modal-content`, not inside
+  it.
 - **Closing cancels.** The corner `x` and Escape both land in `onClose` and
   insert nothing, on the walk screen as well as the browse screen. **Back** and
   **Skip Rest** are what keep your picks.

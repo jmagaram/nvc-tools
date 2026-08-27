@@ -10,7 +10,8 @@ import FeelingPickerHost from './FeelingPickerHost.tsx'
  * Obsidian's `Modal` brings the chrome `ModalFrame` stands in for in the
  * gallery — backdrop, focus trap, title bar, close button, Escape — so none of
  * that is rebuilt here and `ModalFrame` itself is never imported. All this
- * class does is own a React root and hand the host the title bar to draw into.
+ * class does is own a React root and give the host the two elements Obsidian
+ * wants its title and buttons in.
  *
  * Closing is cancelling, by the corner `x` or by Escape alike: both land in
  * `onClose`, which unmounts without submitting. That matches every other modal
@@ -18,6 +19,7 @@ import FeelingPickerHost from './FeelingPickerHost.tsx'
  */
 export default class FeelingPickerModal extends Modal {
   private root: Root | null = null
+  private footerEl: HTMLElement | null = null
   private onSubmit: (entries: Visited[]) => void
 
   constructor(app: App, onSubmit: (entries: Visited[]) => void) {
@@ -26,11 +28,20 @@ export default class FeelingPickerModal extends Modal {
   }
 
   onOpen() {
-    this.modalEl.addClass('nvc-modal')
+    /* 'mod-scrollable-content' is Obsidian's own three-row modal: a title bar
+       and a button row that keep their height, and a body that scrolls between
+       them. It is what every scrollable modal in the app uses, and what
+       'ModalFrame' previews in the gallery. It only works if the button row is
+       a sibling of the content, so the row is made here and handed to the host
+       to fill. */
+    this.modalEl.addClasses(['nvc-modal', 'mod-scrollable-content'])
+    this.footerEl = this.modalEl.createDiv('modal-button-container')
+
     this.root = createRoot(this.contentEl)
     this.root.render(
       <FeelingPickerHost
         titleEl={this.titleEl}
+        footerEl={this.footerEl}
         onSubmit={(entries) => {
           this.onSubmit(entries)
           this.close()
@@ -41,8 +52,11 @@ export default class FeelingPickerModal extends Modal {
   }
 
   onClose() {
+    // Unmount before the elements React is portalling into go away.
     this.root?.unmount()
     this.root = null
+    this.footerEl?.remove()
+    this.footerEl = null
     this.contentEl.empty()
     this.titleEl.empty()
   }

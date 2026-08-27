@@ -12,8 +12,10 @@ import Credit from './Credit.tsx'
 import { useFocusPrompt } from './useFocusPrompt.ts'
 
 type Props = {
-  /** Obsidian's title bar, which the heading is drawn into through a portal. */
+  /** Obsidian's title bar, which the heading is drawn into. */
   titleEl: HTMLElement
+  /** The button row. A sibling of the scrolling body, not part of it. */
+  footerEl: HTMLElement
   /** Called with what to insert. Cancelling never calls this. */
   onSubmit: (entries: Visited[]) => void
   /** Close, insert nothing. */
@@ -27,9 +29,15 @@ type Props = {
  * This is `FeelingPickerDemo` with the demo controls taken off. What is left is
  * the same contract — `init` on mount, `reduce` on every action, `chosen` on OK.
  * Everything Obsidian-shaped is next door in `FeelingPickerModal`.
+ *
+ * Both bars are drawn through portals, because Obsidian owns where they go: the
+ * title bar is its own element, and the button row has to be a sibling of the
+ * scrolling content rather than inside it, or it would scroll away with it.
+ * One React root still drives all three.
  */
 export default function FeelingPickerHost({
   titleEl,
+  footerEl,
   onSubmit,
   onCancel,
 }: Props) {
@@ -61,40 +69,37 @@ export default function FeelingPickerHost({
     <>How are you feeling?</>
   )
 
+  const buttons = state.walk ? (
+    <button type="button" onClick={() => dispatch({ type: 'close' })}>
+      Skip Rest
+    </button>
+  ) : (
+    <>
+      <button type="button" onClick={onCancel}>
+        Cancel
+      </button>
+      <button
+        type="button"
+        className="mod-cta"
+        /* Newest-walked first is what puts the last card top-left. Read top to
+           bottom in a note, the order you walked them reads better. */
+        onClick={() => onSubmit([...chosen(state)].reverse())}
+      >
+        OK ({total})
+      </button>
+    </>
+  )
+
   return (
     <>
       {createPortal(heading, titleEl)}
-
-      <div className="nvc-body" ref={bodyRef}>
+      <div ref={bodyRef}>
         <FeelingPicker state={state} onAction={dispatch} />
         {/* Only while browsing: the walk screen is one question at a time and
             has no room to spare, and the credit is as visible either way. */}
         {!state.walk && <Credit />}
       </div>
-
-      <div className="modal-button-container">
-        {state.walk ? (
-          <button type="button" onClick={() => dispatch({ type: 'close' })}>
-            Skip Rest
-          </button>
-        ) : (
-          <>
-            <button type="button" onClick={onCancel}>
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="mod-cta"
-              /* Newest-walked first is what puts the last card top-left; read
-                 top to bottom in a note, the order you walked them reads
-                 better. */
-              onClick={() => onSubmit([...chosen(state)].reverse())}
-            >
-              OK ({total})
-            </button>
-          </>
-        )}
-      </div>
+      {createPortal(buttons, footerEl)}
     </>
   )
 }
