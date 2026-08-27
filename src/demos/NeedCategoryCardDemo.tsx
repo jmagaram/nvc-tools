@@ -18,6 +18,9 @@ export default function NeedCategoryCardDemo() {
   const [picked, setPicked] = useState(INITIAL)
   const [countIndexes, setCountIndexes] = useState([0, 0])
   const [clicks, setClicks] = useState([0, 0])
+  // One card at most, the way a picker uses it — so a slot number, not a
+  // checkbox apiece, which could put the mark on both.
+  const [resume, setResume] = useState(-1)
 
   return (
     <>
@@ -57,6 +60,20 @@ export default function NeedCategoryCardDemo() {
           </label>
         </Fragment>
       ))}
+      <label>
+        Resumes at{' '}
+        <select
+          value={resume}
+          onChange={(e) => setResume(Number(e.target.value))}
+        >
+          <option value={-1}>nothing</option>
+          {picked.map((_, slot) => (
+            <option key={slot} value={slot}>
+              Card {slot + 1}
+            </option>
+          ))}
+        </select>
+      </label>
       <hr />
       {picked.map((categoryIndex, slot) => {
         const category = categories[categoryIndex]
@@ -68,6 +85,7 @@ export default function NeedCategoryCardDemo() {
               category={category.name}
               needs={count === 'all' ? words : words.slice(0, count)}
               emptyText="no specific needs chosen"
+              resume={slot === resume}
               onClick={() => setClicks(setAt(clicks, slot, clicks[slot] + 1))}
             />
             <p>Clicked {clicks[slot]} times</p>

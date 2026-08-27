@@ -51,6 +51,9 @@ const COUNTS = [12, 3, 0]
 export default function FeelingCategoryCardDemo() {
   const [counts, setCounts] = useState([12, 3])
   const [clicks, setClicks] = useState([0, 0])
+  // One card at most, the way a picker uses it — so a select, not a checkbox
+  // apiece, which could put the mark on both.
+  const [resume, setResume] = useState('')
 
   const setAt = (
     values: number[],
@@ -77,6 +80,17 @@ export default function FeelingCategoryCardDemo() {
           </select>
         </label>
       ))}
+      <label>
+        Resumes at{' '}
+        <select value={resume} onChange={(e) => setResume(e.target.value)}>
+          <option value="">nothing</option>
+          {CATEGORIES.map((sample) => (
+            <option key={sample.category} value={sample.category}>
+              {sample.category}
+            </option>
+          ))}
+        </select>
+      </label>
       <hr />
       {CATEGORIES.map((sample, index) => (
         <div key={sample.category}>
@@ -85,6 +99,7 @@ export default function FeelingCategoryCardDemo() {
             kind={sample.kind}
             feelings={sample.feelings.slice(0, counts[index])}
             emptyText="no specific feelings chosen"
+            resume={sample.category === resume}
             onClick={() => setClicks(setAt(clicks, index, clicks[index] + 1))}
           />
           <p>Clicked {clicks[index]} times</p>

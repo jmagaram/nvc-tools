@@ -2,13 +2,19 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import FeelingPicker from '../src/components/FeelingPicker.tsx'
 import { categories } from '../src/data/feelings.ts'
-import { chosen, counts, init, reduce } from '../src/machines/feelingPicker.ts'
+import {
+  chosen,
+  counts,
+  init,
+  reduce,
+  screenKey,
+} from '../src/machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
   FeelingPickerState,
   Visited,
 } from '../src/machines/feelingPicker.ts'
-import { useFocusPrompt } from '../src/focusPrompt.ts'
+import { useFocusScreen } from '../src/focusScreen.ts'
 import Credit from './Credit.tsx'
 
 type Props = {
@@ -46,7 +52,7 @@ export default function FeelingPickerHost({
   const dispatch = (action: FeelingPickerAction) =>
     setState((current) => reduce(current, action))
 
-  const bodyRef = useFocusPrompt(state.walk)
+  const bodyRef = useFocusScreen(screenKey(state))
 
   const totals = counts(state)
   const total = totals.met + totals.unmet

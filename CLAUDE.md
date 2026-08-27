@@ -60,7 +60,7 @@ Obsidian plugin — for now the gallery is the only surface.
 src/
   App.tsx            gallery shell: home list + demo page
   router.ts          useHashRoute() — hand-rolled, no router dependency
-  focusPrompt.ts     useFocusPrompt() — a host puts focus on the walk's prompt
+  focusScreen.ts     useFocusScreen() — a host puts focus on the screen showing
   index.css          global stylesheet, kept tiny
   components/        presentational components
   data/              NVC reference data (feelings, needs)
@@ -106,11 +106,28 @@ straight from `src/` and adds nothing to it.
   none has it.
 - **The arrow keys need focus.** `FeelingPrompt` / `NeedPrompt` answer on ←
   and →, but only while focus is inside the region, and a walk opens from a
-  card that is gone by the time it does. Hosts — the two modals and the four
-  demo pages alike — call `useFocusPrompt`, which finds the prompt by its
-  `data-prompt` attribute. Nothing on the prompt may carry a `role` or an
-  `aria-label`: either becomes the region's accessible name and is announced on
-  every card.
+  card that is gone by the time it does. Browsing, ← and → move between the
+  tabs, and the chrome that gets you there — Obsidian's own modal element,
+  the portalled **Back** and **Skip Rest** — all sit outside the picker.
+  Hosts — the two modals and the four demo pages alike — call
+  `useFocusScreen(screenKey(state))`. A machine's `screenKey` names the screen
+  and everything about it worth moving focus for; the element to focus marks
+  itself with a matching `data-prompt` or `data-browse`. Nothing on either may
+  carry a `role` or an `aria-label`: either becomes the region's accessible
+  name and is announced on every card.
+- **Coming back lands on the category just walked.** `resumeAt` names it, the
+  card carries `resume`, and the card's heading button takes the focus — so
+  returning from a walk shows what you just did rather than nothing. Before
+  anything is walked `FeelingPicker` falls back to the chosen tab and
+  `NeedPicker`, which has none, to the list itself. The tab is in
+  `feelingPicker`'s `screenKey` for this reason: switching tabs takes that card
+  off screen, and focus would otherwise be left on nothing and the arrow keys
+  dead.
+- **Focus has to be drawn, not just held.** The regions are focused
+  programmatically, and `:focus-visible` does not match a programmatic focus
+  that followed a click — so a region styles plain `:focus`, and anything a
+  host may restyle spells out its own `outline` in `currentColor` rather than
+  leaning on the UA default.
 - **Closing cancels.** The corner `x` and Escape both land in `onClose` and
   insert nothing, on the walk screen as well as the browse screen. **Back** and
   **Skip Rest** are what keep your picks.

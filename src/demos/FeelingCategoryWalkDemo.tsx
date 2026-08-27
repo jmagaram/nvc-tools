@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import FeelingCategoryWalk from '../components/FeelingCategoryWalk.tsx'
-import { useFocusPrompt } from '../focusPrompt.ts'
+import { useFocusScreen } from '../focusScreen.ts'
 import { categories } from '../data/feelings.ts'
-import { init, picked, reduce } from '../machines/feelingCategoryWalk.ts'
+import {
+  init,
+  picked,
+  reduce,
+  screenKey,
+} from '../machines/feelingCategoryWalk.ts'
 import type {
   FeelingCategoryWalkAction,
   FeelingCategoryWalkState,
@@ -19,7 +24,7 @@ export default function FeelingCategoryWalkDemo() {
     Record<string, string[]>
   >({})
 
-  const bodyRef = useFocusPrompt(state)
+  const bodyRef = useFocusScreen(screenKey(state))
 
   const dispatch = (action: FeelingCategoryWalkAction) =>
     setState((current) => reduce(current, action))

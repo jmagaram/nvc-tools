@@ -1,7 +1,7 @@
 import NeedCategoryCard from './NeedCategoryCard.tsx'
 import NeedCategoryPill from './NeedCategoryPill.tsx'
 import NeedCategoryWalk from './NeedCategoryWalk.tsx'
-import { cards, pills } from '../machines/needPicker.ts'
+import { cards, pills, resumeAt } from '../machines/needPicker.ts'
 import type {
   NeedPickerAction,
   NeedPickerState,
@@ -44,9 +44,23 @@ export default function NeedPicker({ state, onAction }: Props) {
 
   const shown = cards(state)
   const rest = pills(state)
+  // Coming back from a walk, focus belongs on the category just walked, which
+  // is always a card by then. Before anything has been walked there is no such
+  // card and no tabs to fall back to, so the list takes it — a staging point
+  // for Tab, which is why it draws no ring of its own.
+  const resume = resumeAt(state)
 
   return (
-    <div className={styles.picker}>
+    /* 'data-browse' is how a host finds this screen to focus it — see
+       useFocusScreen. tabIndex -1 because it only ever takes focus that way:
+       as a tab stop it would sit in front of the first category for no gain.
+       Not an aria attribute, for the reason `NeedPrompt` gives. There are no
+       tabs here, so unlike `FeelingPicker` it has no arrow keys of its own. */
+    <div
+      className={styles.picker}
+      tabIndex={-1}
+      data-browse={resume === null ? '' : undefined}
+    >
       <div className={styles.panel}>
         {/* Cards first, then pills: walked categories, then the rest. Together
             they are every category, which is why neither group needs a heading
@@ -60,6 +74,7 @@ export default function NeedPicker({ state, onAction }: Props) {
                 category={card.category}
                 needs={[...card.words]}
                 emptyText={EMPTY_TEXT}
+                resume={card.category === resume}
                 onClick={() =>
                   onAction({ type: 'open', category: card.category })
                 }

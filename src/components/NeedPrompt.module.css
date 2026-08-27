@@ -1,12 +1,28 @@
+/* The padding is the ring's, below — room for it to sit clear of the dots and
+   the buttons without a host having to leave any. */
 .prompt {
   display: grid;
   gap: 1rem;
+  padding: 0.5rem;
 }
 
-/* The prompt takes focus so the arrow keys have somewhere to land; push the
-   ring out so it reads as a frame around the whole thing. */
-.prompt:focus-visible {
-  outline-offset: 0.5rem;
+/* The prompt takes focus so the arrow keys have somewhere to land, and the ring
+   frames the whole thing because the whole thing is what answers.
+
+   ':focus', not ':focus-visible'. A host focuses this itself, and a
+   programmatic focus that followed a click does not satisfy the
+   ':focus-visible' heuristic — so the ring never painted and the first
+   question read as though nothing were selected. Nothing here can take focus
+   by being clicked: the two answer buttons are the only controls inside, and
+   they draw their own ring.
+
+   Drawn inside, which is the only place that survives every host. An outward
+   ring needs the scrolling box around it to have spare padding: the gallery's
+   ModalFrame does, so it showed in full, and Obsidian's modal does not, so its
+   top edge was clipped away. */
+.prompt:focus {
+  outline: 2px solid;
+  outline-offset: -2px;
 }
 
 /* Tall enough for the longest definition to wrap without moving the buttons

@@ -2,13 +2,19 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import NeedPicker from '../src/components/NeedPicker.tsx'
 import { categories } from '../src/data/needs.ts'
-import { chosen, count, init, reduce } from '../src/machines/needPicker.ts'
+import {
+  chosen,
+  count,
+  init,
+  reduce,
+  screenKey,
+} from '../src/machines/needPicker.ts'
 import type {
   NeedPickerAction,
   NeedPickerState,
   Visited,
 } from '../src/machines/needPicker.ts'
-import { useFocusPrompt } from '../src/focusPrompt.ts'
+import { useFocusScreen } from '../src/focusScreen.ts'
 import Credit from './Credit.tsx'
 
 type Props = {
@@ -47,7 +53,7 @@ export default function NeedPickerHost({
   const dispatch = (action: NeedPickerAction) =>
     setState((current) => reduce(current, action))
 
-  const bodyRef = useFocusPrompt(state.walk)
+  const bodyRef = useFocusScreen(screenKey(state))
 
   const total = count(state)
 

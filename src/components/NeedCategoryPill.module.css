@@ -15,3 +15,11 @@
   color: inherit;
   cursor: pointer;
 }
+
+/* Spelled out rather than left to the UA default, for the same reason the
+   reset above exists: a host that dresses bare buttons may have flattened the
+   default ring too. Offset clear of the pill's own border. */
+.pill.pill:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+}

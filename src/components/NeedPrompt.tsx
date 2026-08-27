@@ -75,7 +75,7 @@ export default function NeedPrompt({
 
   return (
     /* 'data-prompt' is how a host finds this region to focus it — see
-       useFocusPrompt. Not an aria attribute on purpose: a role or a label here
+       useFocusScreen. Not an aria attribute on purpose: a role or a label here
        becomes the region's accessible name and gets read out on every card. */
     <div
       className={styles.prompt}

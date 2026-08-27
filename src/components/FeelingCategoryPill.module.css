@@ -15,6 +15,14 @@
   cursor: pointer;
 }
 
+/* Spelled out rather than left to the UA default, for the same reason the
+   reset above exists: a host that dresses bare buttons may have flattened the
+   default ring too. Offset clear of the pill's own border. */
+.pill.pill:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+}
+
 /* Same solid/dashed split the card uses, so a pill and a card for the same
    category read as the same thing. Doubled up to match `.pill.pill` above,
    whose `border` shorthand would otherwise out-specify these. */

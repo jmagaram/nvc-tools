@@ -3,6 +3,13 @@
   gap: 1rem;
 }
 
+/* Focused only so Tab has somewhere to start — see useFocusScreen. No ring:
+   it is the whole list, and a box drawn round everything says nothing about
+   where the next keystroke goes. The category it hands off to draws its own. */
+.picker:focus {
+  outline: none;
+}
+
 /* The rule runs the full width of the picker, past both tabs; the chosen tab
    sits on it with a thicker mark of its own. Nothing is boxed, so the strip
    reads as one line with a label underscored rather than two little folders. */
@@ -20,9 +27,10 @@
    FeelingCategoryPill, NeedCategoryPill, FeelingCategoryCard and
    NeedCategoryCard carry the same reset for the same reason. */
 .tabs .tab {
+  position: relative;
   height: auto;
   margin-bottom: -1px;
-  padding: 0.25rem 0.1rem;
+  padding: 0.35rem 0.1rem 0.25rem;
   border: none;
   border-bottom: 2px solid transparent;
   border-radius: 0;
@@ -31,7 +39,31 @@
   font: inherit;
   color: inherit;
   cursor: pointer;
-  outline-offset: 2px;
+}
+
+/* Drawn rather than outlined. A tab's box runs all the way down to the rule so
+   that it can wear the chosen mark as its bottom border — so an outline around
+   that box crosses the rule and comes out the other side, which reads as a
+   glitch rather than as focus. This stops just above the mark, and reaches
+   further out to the sides than the 0.1rem padding would allow.
+
+   ':focus', not ':focus-visible', for the reason `FeelingPrompt` gives: before
+   anything has been walked this is what `data-browse` focuses, and a
+   programmatic focus does not reliably satisfy the heuristic. */
+.tabs .tab:focus {
+  outline: none;
+}
+
+.tabs .tab:focus::before {
+  content: '';
+  position: absolute;
+  /* Inside the box at the top and bottom, out to the sides. The strip is the
+     first thing in a scrolling modal body, so anything above the tab is
+     clipped away; the sides have the strip's own gap to spend. The extra top
+     padding above is the room this borrows. */
+  inset: 2px -0.35rem 4px;
+  border: 2px solid;
+  border-radius: 0.2rem;
 }
 
 /* The chosen side is told by that mark and by weight — no colour, the same way

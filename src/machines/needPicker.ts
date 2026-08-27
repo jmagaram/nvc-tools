@@ -176,3 +176,27 @@ export function count(state: NeedPickerState): number {
 export function chosen(state: NeedPickerState): Visited[] {
   return state.visited.filter((v) => v.words.length > 0)
 }
+
+/**
+ * The category a returning browse screen puts focus on — the one just walked.
+ * Null before anything has been, where `NeedPicker` falls back to the list
+ * itself. Always drawn as a card: `shownAsCard` keeps the most recently closed
+ * category there even when it came back empty. There are no tabs to take it
+ * off screen, so unlike `feelingPicker` this needs no further guard.
+ */
+export function resumeAt(state: NeedPickerState): string | null {
+  return state.visited[0]?.category ?? null
+}
+
+/**
+ * Which screen a host is looking at, for `useFocusScreen`. Everything named
+ * here is a reason to move focus: a new need to answer, the category just
+ * walked.
+ */
+export function screenKey(state: NeedPickerState): string {
+  const walk = state.walk
+  if (walk) {
+    return `prompt:${walk.category}:${walk.progress.answered.length}`
+  }
+  return `browse:${resumeAt(state) ?? ''}`
+}

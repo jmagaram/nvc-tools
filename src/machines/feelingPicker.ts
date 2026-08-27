@@ -190,3 +190,30 @@ export function counts(state: FeelingPickerState): {
 export function chosen(state: FeelingPickerState): Visited[] {
   return state.visited.filter((v) => v.words.length > 0)
 }
+
+/**
+ * The category a returning browse screen puts focus on — the one just walked,
+ * so long as its tab is the one showing. Null before anything has been walked,
+ * and on the far tab from the last walk, where `FeelingPicker` falls back to
+ * the tab itself. Always drawn as a card: `shownAsCard` keeps the most recently
+ * closed category there even when it came back empty.
+ */
+export function resumeAt(state: FeelingPickerState): string | null {
+  const last = state.visited[0]
+  return last && last.kind === state.tab ? last.category : null
+}
+
+/**
+ * Which screen a host is looking at, for `useFocusScreen`. Everything named
+ * here is a reason to move focus: a new feeling to answer, the other tab, the
+ * category just walked. The tab matters even though only one card can hold
+ * focus — switching tabs takes that card off screen, and focus would be left
+ * on nothing.
+ */
+export function screenKey(state: FeelingPickerState): string {
+  const walk = state.walk
+  if (walk) {
+    return `prompt:${walk.category}:${walk.progress.answered.length}`
+  }
+  return `browse:${state.tab}:${resumeAt(state) ?? ''}`
+}

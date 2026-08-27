@@ -1,7 +1,9 @@
+import type { KeyboardEvent } from 'react'
+
 import FeelingCategoryCard from './FeelingCategoryCard.tsx'
 import FeelingCategoryPill from './FeelingCategoryPill.tsx'
 import FeelingCategoryWalk from './FeelingCategoryWalk.tsx'
-import { cards, counts, pills } from '../machines/feelingPicker.ts'
+import { cards, counts, pills, resumeAt } from '../machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
   FeelingPickerState,
@@ -50,12 +52,30 @@ export default function FeelingPicker({ state, onAction }: Props) {
   const totals = counts(state)
   const shown = cards(state)
   const rest = pills(state)
+  // Coming back from a walk, focus belongs on the category just walked, which
+  // is always a card by then. Before anything has been walked there is no such
+  // card, and the chosen tab takes it instead — something with a ring on it,
+  // rather than the list as a whole, which has nothing to show for being
+  // focused. Exactly one of the two carries `data-browse`.
+  const resume = resumeAt(state)
+
+  // Sideways moves sideways, the same as it does on a card. A modifier means
+  // the keystroke belongs to whoever is hosting this — Obsidian's hotkeys run
+  // through ⌘ and Ctrl — so those are left alone.
+  const tabOnArrow = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault()
+      const kind = event.key === 'ArrowRight' ? 'met' : 'unmet'
+      onAction({ type: 'tab', kind })
+    }
+  }
 
   return (
-    <div className={styles.picker}>
-      {/* Two toggle buttons rather than role="tab": the ARIA tab pattern also
-          promises arrow-key navigation between tabs, and these are plain
-          buttons reached with Tab like everything else on the page. */}
+    <div className={styles.picker} onKeyDown={tabOnArrow}>
+      {/* Two toggle buttons rather than role="tab": the ARIA tab pattern would
+          promise ↑ and ↓ and Home and End alongside the arrows below, and
+          these are plain buttons reached with Tab like everything else. */}
       <div className={styles.tabs}>
         {TABS.map(({ kind, label }) => (
           <button
@@ -63,6 +83,7 @@ export default function FeelingPicker({ state, onAction }: Props) {
             type="button"
             aria-pressed={state.tab === kind}
             className={styles.tab}
+            data-browse={resume === null && state.tab === kind ? '' : undefined}
             onClick={() => onAction({ type: 'tab', kind })}
           >
             {totals[kind] > 0 ? `${label} (${totals[kind]})` : label}
@@ -84,6 +105,7 @@ export default function FeelingPicker({ state, onAction }: Props) {
                 kind={card.kind}
                 feelings={[...card.words]}
                 emptyText={EMPTY_TEXT}
+                resume={card.category === resume}
                 onClick={() =>
                   onAction({ type: 'open', category: card.category })
                 }

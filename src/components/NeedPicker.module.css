@@ -3,6 +3,13 @@
   gap: 1rem;
 }
 
+/* Focused only so Tab has somewhere to start — see useFocusScreen. No ring:
+   it is the whole list, and a box drawn round everything says nothing about
+   where the next keystroke goes. The category it hands off to draws its own. */
+.picker:focus {
+  outline: none;
+}
+
 .panel {
   display: grid;
   gap: 1rem;

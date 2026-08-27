@@ -95,3 +95,11 @@ export function picked(state: NeedCategoryWalkState): Need[] {
     .filter((answer) => answer.picked)
     .map((answer) => answer.need)
 }
+
+/**
+ * Which screen a host is looking at, for `useFocusScreen`. A walk is only ever
+ * the prompt, and every answer puts a different need on it.
+ */
+export function screenKey(state: NeedCategoryWalkState): string {
+  return `prompt:${state.category}:${state.progress.answered.length}`
+}

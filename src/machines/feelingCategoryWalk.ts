@@ -98,3 +98,11 @@ export function picked(state: FeelingCategoryWalkState): Feeling[] {
     .filter((answer) => answer.picked)
     .map((answer) => answer.feeling)
 }
+
+/**
+ * Which screen a host is looking at, for `useFocusScreen`. A walk is only ever
+ * the prompt, and every answer puts a different feeling on it.
+ */
+export function screenKey(state: FeelingCategoryWalkState): string {
+  return `prompt:${state.category}:${state.progress.answered.length}`
+}

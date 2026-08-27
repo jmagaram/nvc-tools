@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import NeedCategoryWalk from '../components/NeedCategoryWalk.tsx'
-import { useFocusPrompt } from '../focusPrompt.ts'
+import { useFocusScreen } from '../focusScreen.ts'
 import { categories } from '../data/needs.ts'
-import { init, picked, reduce } from '../machines/needCategoryWalk.ts'
+import {
+  init,
+  picked,
+  reduce,
+  screenKey,
+} from '../machines/needCategoryWalk.ts'
 import type {
   NeedCategoryWalkAction,
   NeedCategoryWalkState,
@@ -19,7 +24,7 @@ export default function NeedCategoryWalkDemo() {
     Record<string, string[]>
   >({})
 
-  const bodyRef = useFocusPrompt(state)
+  const bodyRef = useFocusScreen(screenKey(state))
 
   const dispatch = (action: NeedCategoryWalkAction) =>
     setState((current) => reduce(current, action))

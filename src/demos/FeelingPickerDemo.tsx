@@ -1,14 +1,20 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import FeelingPicker from '../components/FeelingPicker.tsx'
-import { useFocusPrompt } from '../focusPrompt.ts'
+import { useFocusScreen } from '../focusScreen.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
 import { devices } from './devices.ts'
 import styles from './devices.module.css'
 import { categories } from '../data/feelings.ts'
-import { chosen, counts, init, reduce } from '../machines/feelingPicker.ts'
+import {
+  chosen,
+  counts,
+  init,
+  reduce,
+  screenKey,
+} from '../machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
   FeelingPickerState,
@@ -84,7 +90,7 @@ export default function FeelingPickerDemo() {
   /* A walk opens from a card or a pill that is gone the moment it does, so
      the prompt is given focus and the arrow keys answer straight away. A
      modal host does the same. */
-  const bodyRef = useFocusPrompt(state.walk)
+  const bodyRef = useFocusScreen(screenKey(state))
 
   const picker = (
     <div ref={bodyRef}>
