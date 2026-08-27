@@ -21,10 +21,14 @@
    picked words. A lower one put the two-column threshold in the middle of the
    widths a modal actually takes, so the same picker came out stacked in
    Obsidian and side by side in the gallery. Past 20rem a card is only getting
-   wider, so a page-width surface still wraps. */
+   wider, so a page-width surface still wraps.
+
+   `min(…, 100%)` because a floor is a minimum and a bare 20rem is one the
+   track has to honour even when there is not 20rem to give — a narrow modal
+   answered by scrolling sideways rather than by making the card narrower. */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: 0.5rem;
   align-items: start;
 }
