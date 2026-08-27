@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react'
 import NeedCategoryCard from '../components/NeedCategoryCard.tsx'
+import { useFocusScreen } from '../focusScreen.ts'
 import { categories } from '../data/needs.ts'
 
 /** How many of the category's needs to hand the card. */
@@ -21,6 +22,11 @@ export default function NeedCategoryCardDemo() {
   // One card at most, the way a picker uses it — so a slot number, not a
   // checkbox apiece, which could put the mark on both.
   const [resume, setResume] = useState(-1)
+
+  // What `resume` is for, done the way a picker does it: the browse screen
+  // coming back into view puts focus on the category just left. Without this
+  // the prop marks a button no one looks for and nothing on the page moves.
+  const bodyRef = useFocusScreen(`browse:${resume}`)
 
   return (
     <>
@@ -75,23 +81,32 @@ export default function NeedCategoryCardDemo() {
         </select>
       </label>
       <hr />
-      {picked.map((categoryIndex, slot) => {
-        const category = categories[categoryIndex]
-        const words = category.needs.map((need) => need.word)
-        const count = COUNTS[countIndexes[slot]]
-        return (
-          <div key={slot}>
-            <NeedCategoryCard
-              category={category.name}
-              needs={count === 'all' ? words : words.slice(0, count)}
-              emptyText="no specific needs chosen"
-              resume={slot === resume}
-              onClick={() => setClicks(setAt(clicks, slot, clicks[slot] + 1))}
-            />
-            <p>Clicked {clicks[slot]} times</p>
-          </div>
-        )
-      })}
+      <p>
+        Resuming moves the focus ring, and nothing else: the card marks its
+        heading with <code>data-browse</code> and a host's{' '}
+        <code>useFocusScreen</code> looks for it. In a picker that is how coming
+        back from a category lands on the one just left, rather than on nothing
+        with the arrow keys dead.
+      </p>
+      <div ref={bodyRef}>
+        {picked.map((categoryIndex, slot) => {
+          const category = categories[categoryIndex]
+          const words = category.needs.map((need) => need.word)
+          const count = COUNTS[countIndexes[slot]]
+          return (
+            <div key={slot}>
+              <NeedCategoryCard
+                category={category.name}
+                needs={count === 'all' ? words : words.slice(0, count)}
+                emptyText="no specific needs chosen"
+                resume={slot === resume}
+                onClick={() => setClicks(setAt(clicks, slot, clicks[slot] + 1))}
+              />
+              <p>Clicked {clicks[slot]} times</p>
+            </div>
+          )
+        })}
+      </div>
     </>
   )
 }

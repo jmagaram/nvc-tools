@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import FeelingCategoryCard from '../components/FeelingCategoryCard.tsx'
+import { useFocusScreen } from '../focusScreen.ts'
 
 type Sample = {
   category: string
@@ -55,6 +56,11 @@ export default function FeelingCategoryCardDemo() {
   // apiece, which could put the mark on both.
   const [resume, setResume] = useState('')
 
+  // What `resume` is for, done the way a picker does it: the browse screen
+  // coming back into view puts focus on the category just left. Without this
+  // the prop marks a button no one looks for and nothing on the page moves.
+  const bodyRef = useFocusScreen(`browse:${resume}`)
+
   const setAt = (
     values: number[],
     index: number,
@@ -92,19 +98,28 @@ export default function FeelingCategoryCardDemo() {
         </select>
       </label>
       <hr />
-      {CATEGORIES.map((sample, index) => (
-        <div key={sample.category}>
-          <FeelingCategoryCard
-            category={sample.category}
-            kind={sample.kind}
-            feelings={sample.feelings.slice(0, counts[index])}
-            emptyText="no specific feelings chosen"
-            resume={sample.category === resume}
-            onClick={() => setClicks(setAt(clicks, index, clicks[index] + 1))}
-          />
-          <p>Clicked {clicks[index]} times</p>
-        </div>
-      ))}
+      <p>
+        Resuming moves the focus ring, and nothing else: the card marks its
+        heading with <code>data-browse</code> and a host's{' '}
+        <code>useFocusScreen</code> looks for it. In a picker that is how coming
+        back from a category lands on the one just left, rather than on nothing
+        with the arrow keys dead.
+      </p>
+      <div ref={bodyRef}>
+        {CATEGORIES.map((sample, index) => (
+          <div key={sample.category}>
+            <FeelingCategoryCard
+              category={sample.category}
+              kind={sample.kind}
+              feelings={sample.feelings.slice(0, counts[index])}
+              emptyText="no specific feelings chosen"
+              resume={sample.category === resume}
+              onClick={() => setClicks(setAt(clicks, index, clicks[index] + 1))}
+            />
+            <p>Clicked {clicks[index]} times</p>
+          </div>
+        ))}
+      </div>
     </>
   )
 }
