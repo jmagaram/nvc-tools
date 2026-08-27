@@ -74,13 +74,7 @@ export default function NeedPrompt({
   }
 
   return (
-    <div
-      className={styles.prompt}
-      tabIndex={0}
-      role="group"
-      aria-label={`Do you need ${word}? Right arrow for yes, left arrow for no`}
-      onKeyDown={answerOnArrow}
-    >
+    <div className={styles.prompt} tabIndex={0} onKeyDown={answerOnArrow}>
       <StepProgress
         total={total}
         current={index}
