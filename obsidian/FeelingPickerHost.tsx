@@ -120,12 +120,8 @@ export default function FeelingPickerHost({
       </>
     ) : view === 'sift' ? (
       <>
-        <button
-          type="button"
-          className="nvc-onward"
-          onClick={() => dispatch({ type: 'walk' })}
-        >
-          Ask me about each <span aria-hidden="true">&rsaquo;</span>
+        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
+          Ask me about each
         </button>
         <button type="button" className="mod-cta" onClick={leaveTop}>
           Done

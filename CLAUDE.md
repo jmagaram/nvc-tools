@@ -176,7 +176,7 @@ straight from `src/` and adds nothing to it.
   `*CategorySift` — every word in it at once, in source order, with whatever was
   picked there last time already marked. `Done` commits the marks as they
   stand, which is why the question is *which of these apply* and never *which
-  might*: nothing asks again afterwards. **Ask me about each ›** starts a walk
+  might*: nothing asks again afterwards. **Ask me about each** starts a walk
   through the *whole* category with the marks first, so the walk keeps what it
   was for — being asked about words you would never pick off a list — rather
   than becoming a confirmation pass. A walk runs inside a visit and hands its answers back:
@@ -223,7 +223,7 @@ straight from `src/` and adds nothing to it.
   the same through `ModalFrame`'s `onClose`.
 - **The chrome speaks for the screen on top.** Both bars follow the rule the `x`
   already did. The button row changes with the screen: `Cancel` and `Insert`
-  speak for the modal from the categories, **Ask me about each ›** and `Done`
+  speak for the modal from the categories, **Ask me about each** and `Done`
   speak for the category on a grid — up in the row rather than in the body, where a list of
   28 would scroll them out of reach — and a walk is drawn with no button row at
   all, because it is one question and answering it is the only way to move.

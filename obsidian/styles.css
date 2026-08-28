@@ -135,16 +135,6 @@
   background: var(--background-modifier-hover);
 }
 
-/* The chevron on the way into a walk has the same problem `.nvc-back` does, in
-   the other direction: Obsidian's `button` is `display: inline-flex`, so the
-   word and the chevron are separate flex items and the space written between
-   them in the markup is trimmed. The browser, where the button is a plain
-   `inline-block`, keeps it — which is why this only ever looked wrong in
-   Obsidian. `gap` is the one that survives either way. */
-.nvc-modal .nvc-onward {
-  gap: var(--size-2-2);
-}
-
 /* An `nvc-*` block in a note. The layouts themselves come from the component's
    CSS module, bundled into this file; what is here is the chrome around them. */
 /* The gutter along the bottom is where the button lives. Without it the

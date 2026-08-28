@@ -108,7 +108,7 @@ export default function NeedPickerDemo() {
     ) : view === 'sift' ? (
       <>
         <button type="button" onClick={() => dispatch({ type: 'walk' })}>
-          Ask me about each <span aria-hidden="true">&rsaquo;</span>
+          Ask me about each
         </button>
         <button type="button" onClick={leaveTop}>
           Done
@@ -198,7 +198,7 @@ export default function NeedPickerDemo() {
                     type="button"
                     onClick={() => dispatch({ type: 'walk' })}
                   >
-                    Ask me about each <span aria-hidden="true">&rsaquo;</span>
+                    Ask me about each
                   </button>{' '}
                   <button type="button" onClick={leaveTop}>
                     Done
@@ -245,7 +245,7 @@ export default function NeedPickerDemo() {
       <p>
         A category opens as all of its words at once, in the order the source
         lists them, with whatever was picked there before already marked.{' '}
-        <strong>Ask me about each ›</strong> goes through the whole category
+        <strong>Ask me about each</strong> goes through the whole category
         as cards instead, marked words first, and hands its answers back to the
         grid — so leaving a walk part way through keeps both what it decided and
         what it never reached. Touch or hover a word to read its definition

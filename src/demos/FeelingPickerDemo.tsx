@@ -110,7 +110,7 @@ export default function FeelingPickerDemo() {
     ) : view === 'sift' ? (
       <>
         <button type="button" onClick={() => dispatch({ type: 'walk' })}>
-          Ask me about each <span aria-hidden="true">&rsaquo;</span>
+          Ask me about each
         </button>
         <button type="button" onClick={leaveTop}>
           Done
@@ -199,7 +199,7 @@ export default function FeelingPickerDemo() {
                     type="button"
                     onClick={() => dispatch({ type: 'walk' })}
                   >
-                    Ask me about each <span aria-hidden="true">&rsaquo;</span>
+                    Ask me about each
                   </button>{' '}
                   <button type="button" onClick={leaveTop}>
                     Done
