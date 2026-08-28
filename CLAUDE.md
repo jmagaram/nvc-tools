@@ -110,6 +110,58 @@ edge its arrow points at, which puts the two glyphs at the far left and the far
 right of the row — pointing out of the screen the way the card leaves it, and
 the way the arrow keys read.
 
+## Where the modal hangs
+
+A modal is as tall as what is in it, and the picker changes height constantly:
+switching tabs swaps a list of twelve categories for one of fourteen, opening a
+category swaps either for a grid of up to twenty-eight words, and leaving a walk
+swaps back. Centred — which is what Obsidian's `.modal-container` does, and what
+the gallery's device screen did — half of every one of those changes went
+*upwards*. The title bar and the tabs under it moved, and the tab you had just
+clicked slid out from under the pointer.
+
+So the modal hangs from a fixed line instead. The content still decides the
+height; this only decides which end it grows from, and everything above the fold
+holds still.
+
+The line is where a modal at full height would start: half of what such a one
+leaves over. Nothing is lost by not centring, because the *space* is centred —
+the tallest screen comes out exactly where it always did, every shorter screen
+hangs from that same line, and the bottom edge cannot leave the window, because
+the cap is what set the line. The room above and the room below are one
+measurement. That is why it is not a guess like a tenth or a third, which would
+have to be checked against the cap by hand and rechecked whenever the cap moved.
+
+The cap is Obsidian's `--dialog-max-height` — 85vh on a desktop, the whole window
+less the safe area on a phone — and it is what `.modal` already reads for its own
+`max-height`. The plugin reads the same variable rather than restating the
+number, so the cap and the line follow each other wherever a theme or a platform
+moves them. `styles.css` therefore sets no height at all: only `align-self` and
+the line.
+
+The two surfaces write the same sum differently, and the difference is not
+cosmetic. In the plugin it is a `margin-top` in `vh`. In the gallery
+`devices.module.css` plays the window: `.screen` is a grid that hands out a row
+track the height of the cap and centres *that*, and `.frame.desktop` hangs from
+the top of it. A margin would not do there — a percentage margin resolves against
+the containing block's **width**, so `margin-top: calc((100% - 85%) / 2)` would
+quietly measure the wrong axis, where a percentage row track resolves against the
+height. The grid is also why `.screen` names `align-items: center` where the flex
+box it replaced got that for free: a grid stretches an item to its row, and a
+modal is as tall as what is in it.
+
+Both leave a phone alone. There the modal is already most of the screen, so the
+line works out at nothing anyway, and Obsidian's phone modal is a different shape
+again — it comes up off the bottom edge.
+
+The rejected fix is worth naming, because it is the obvious one: draw both tabs
+stacked in a single grid cell and hide the unchosen one, so the picker is always
+as tall as the taller list. It stops the tab switch outright, but it is the only
+transition it stops — a walk is shorter than either list — and it charges for
+that every time you look at the shorter tab, in a band of empty space above the
+button row. Hanging the modal makes all of the transitions harmless and costs
+nothing.
+
 ## Adding a component
 
 1. `src/components/Foo.tsx` — presentational, typed props, default export,

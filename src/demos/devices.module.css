@@ -1,10 +1,19 @@
 /* The screen the modal sits in. The demo sets the width and height from the
    chosen device; the dashed border is where the screen ends. A phone modal
-   fills it, a desktop one is a card centred in it. */
+   fills it, a desktop one is a card hung in it.
+
+   A grid rather than a centring flex box, because on a desktop the screen has
+   to hand out a track of a particular height and centre *that* — see below.
+   With no track named it behaves as the flex box did: one auto row, centred —
+   which is what the two `center`s are for. A grid stretches an item to its row
+   by default where a flex box with `align-items: center` did not, and a modal
+   is as tall as what is in it. `.frame.desktop` is the one item that overrides
+   the vertical half, with an `align-self` of its own. */
 .screen {
-  display: flex;
+  display: grid;
+  align-content: center;
   align-items: center;
-  justify-content: center;
+  justify-items: center;
   max-width: 100%;
   border: 1px dashed;
   padding: 0;
@@ -12,7 +21,20 @@
 
 /* Only vertical breathing room. The gallery column is barely wider than a
    desktop modal, so there is none to spare at the sides — the gap above and
-   below is enough to read the modal as floating in a window. */
+   below is enough to read the modal as floating in a window.
+
+   The row is the screen playing the window. Obsidian caps a modal's height at
+   `--dialog-max-height`, 85vh on a desktop, and a real modal therefore never
+   touches the top or bottom of the window; a preview that let it would be
+   showing a shape Obsidian does not draw. So the screen gives out a track that
+   tall and centres it, and `.frame.desktop` hangs from the top of it — which
+   is what stops the modal moving when its content changes height. The two
+   halves of the arithmetic are one number here, so they cannot drift apart.
+
+   A track rather than a margin on the frame: a percentage margin resolves
+   against the containing block's *width*, so the same sum written as
+   `margin-top: calc((100% - 85%) / 2)` would quietly measure the wrong axis. */
 .screen.desktop {
   padding: 1rem 0;
+  grid-template-rows: 85%;
 }

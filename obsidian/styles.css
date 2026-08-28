@@ -27,6 +27,36 @@
   --nvc-ring: var(--background-modifier-border-focus, currentColor);
 }
 
+/* The modal hangs from a fixed line rather than sitting centred on one.
+   Centred — `.modal-container` is a flex box with `align-items: center` — half
+   of every height change went upwards, and the picker changes height constantly:
+   switching tabs swaps a list of 12 categories for one of 14, opening a category
+   swaps either for a grid of up to 28 words, and leaving a walk swaps back. Each
+   moved the title bar and the tabs under it, and the tab you had just clicked
+   slid out from under the pointer. The content still decides the height; this
+   only decides which end it grows from.
+
+   The line is where a modal at full height would start: half of what such a one
+   leaves over. So the tallest screen is centred exactly as it was, every shorter
+   screen hangs from that same line, and the bottom edge cannot leave the window,
+   because the cap is what set the line — the room above and the room below are
+   one measurement. It is not a guess like a tenth or a third, which would have
+   to be checked against the cap by hand.
+
+   `--dialog-max-height` is Obsidian's own, and it is what `.modal` already reads
+   for its `max-height`, so the cap and the line follow each other wherever a
+   theme or a platform moves it — and there is nothing to set here but the line.
+   `vh` and not `%`, because a percentage margin resolves against the containing
+   block's *width*: the same sum in `%` would quietly measure the wrong axis.
+
+   `.is-phone` is left alone. There Obsidian caps at the whole window less the
+   safe area, so the line works out at nothing anyway, and the phone modal is a
+   different shape again — it comes up off the bottom edge. */
+body:not(.is-phone) .nvc-modal {
+  align-self: start;
+  margin-top: calc((100vh - var(--dialog-max-height, 85vh)) / 2);
+}
+
 /* Room for a focus ring along the top edge of the scrolling body.
 
    Obsidian's `mod-scrollable-content` gives that body `overflow: auto` and a

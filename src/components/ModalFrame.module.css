@@ -13,20 +13,44 @@
  * Both shapes take their size from Obsidian's `--dialog-*` defaults, and
  * neither sets a height: a modal is as tall as what is in it, up to the cap.
  * That is worth seeing rather than papering over — it is why the frame grows
- * and shrinks as the content inside it changes step.
+ * and shrinks as the content inside it changes step. Which end it grows from is
+ * the desktop rule below.
  */
 
 /* Obsidian's own default is 560px, and a plugin narrows it by setting
    `--dialog-width` on the modal — so that is the knob here too, and whatever
-   number wins in the preview is the number to ship in styles.css. */
+   number wins in the preview is the number to ship in styles.css.
+
+   The frame hangs from the top of the space it is given rather than sitting
+   centred in it. Centred, half of every height change went upwards: switching
+   tabs, opening a category, leaving a walk — each moved the title bar and the
+   tabs under it, and the tab you had just clicked slid out from under the
+   pointer. Hanging, the content still decides the height, but it decides it
+   downwards, and everything above the fold holds still.
+
+   Nothing is lost by not centring, because the space itself is centred: the
+   screen gives out a track the height of the cap and centres that (see
+   `.screen.desktop` in devices.module.css, which plays the window). So a frame
+   tall enough to reach the cap is centred exactly as it was, a shorter one
+   hangs from that same line, and the bottom edge cannot leave the screen —
+   the room above the track and the room below it are one measurement.
+
+   `max-height: 100%` is the track, which is to say the cap. */
 .frame.desktop {
   max-width: var(--dialog-width, 560px);
+  align-self: start;
   max-height: 100%;
   border-radius: 0.5rem;
 }
 
 /* --dialog-width: 100vw, capped at 100vw less a 24px inset, so a hair off each
-   edge rather than truly edge to edge. */
+   edge rather than truly edge to edge.
+
+   Centred still, and no track to hang from: a phone modal is already most of
+   the screen, so there is barely anywhere for it to travel and nothing to be
+   gained by holding it. Obsidian's phone modal is a different shape again — it
+   comes up off the bottom edge — which is why `styles.css` leaves `.is-phone`
+   alone for the same reason. */
 .frame.phone {
   max-width: calc(100% - 24px);
   max-height: 100%;
