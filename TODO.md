@@ -6,12 +6,6 @@ oddities in there are faithful to the source.
 
 ## Open
 
-### Miscellaneous
-
-In the Feelings picker, when you select a feeling the description below changes, which is good. But some descriptions are shorter than others and it causes the dialog to resize vertically. Maybe better to allocate a minimum height of a couple lines, so it only resizes vertically if a very long description happens.
-
-In Obsidian, the "One at a time>" button looks a little weird. There is no space before the ">". The desktop browser DOES show a space, which is nice. Also, the two buttons side by side are a bit non-standard. One shows a count like "Done (4)" and the other has that symbol. What if one just said "Done" without a count. Is the count necessary? You can see how many are selected assuming no scrolling. And is there better wording for the other button? "One at a time" is more explicit as "Review each feeling one at a time" or "Focus on each individually" or "Step through each" or "Decide on each withotu distractions" or ...
-
 ### What is left of the picker redesign
 
 The sift landed (see _Settled_ below) and took the length problem with it. Three
@@ -150,6 +144,46 @@ the grid said. So leaving a walk part way through keeps both halves. The fix is
 the second of the two options weighed here originally, and it stopped being
 optional — a walk is now something entered _after_ marking, so bailing out of
 one had far more to lose.
+
+### What the buttons that end a screen are called
+
+**`Insert`, `Done` and `Ask me about each`** — one count between the three of
+them, and no chevron on any.
+
+Decided August 2026, from Obsidian, where the picker had shipped with `OK (6)`,
+`Done (4)` and `One at a time ›`. What prompted it was the smallest of the
+three: the chevron had no space before it, because Obsidian draws a button as
+`inline-flex` and the space written between the word and the glyph is trimmed —
+which is why only Obsidian showed it wrong. Pulling that thread took the other
+two with it.
+
+`OK` meant only _accept this dialog_. It was the one control in the picker that
+writes anything, and the vaguest one in it. The command already promises the
+verb — `NVC: Insert feelings…` — so the button finishes that sentence. It is
+the count that survived, and only when it is not zero: `Insert (0)` would be a
+badge announcing an absence, so `total > 0 ? ... : 'Insert'`, the idiom the tab
+labels already use.
+
+`Done` keeps its name and loses its count. It had read as the end of the whole
+thing only because it sat in the primary slot `OK` had a moment before, wearing
+the same finishing tone; now that the real finish has a name, `Done` can only
+mean done here. The count went because the grid it sits under shows every word
+at once, marks and all, so it was counting something already on screen.
+`visitCount` and the two sift machines' `count` existed to draw it and nothing
+else, and went with it.
+
+`One at a time` named the pacing rather than the offer, and **Ask me about each**
+names the offer. The `›` came off for its own reason: a chevron there is a
+wizard's _Next_, and a _Next_ implies a fixed frame, a known number of steps and
+one way forward — which made `Done` beside it read as a skip. This modal is none
+of that; the walk is one of two ways through a category, not the next leaf of
+the one way. `…` was the other candidate and would have been worse, the plugin
+already spending the ellipsis on _a dialog opens_. Nothing replaced the glyph:
+the label is a whole imperative already, and `Done` next to it wears no ornament
+either.
+
+The way _out_ keeps its chevron. `‹ Angry` is the only control on a screen drawn
+with no button row, and a back chevron reads as itself with no partner needed.
 
 ### Source: the CNVC Feelings and Needs Inventory
 

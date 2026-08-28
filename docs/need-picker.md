@@ -6,9 +6,10 @@ below are the needs', because they are worse.
 
 > **What was chosen.** **B** with the walk kept as a second gear, which is
 > **C** with the two stages offered side by side rather than in sequence — a
-> category opens as the grid, `Done` is primary, and **One at a time** starts a
-> walk through the whole category with the marks first. No size threshold: every
-> category sifts. Definitions live in a gloss strip at the foot of the grid.
+> category opens as the grid, `Done` is primary, and **Ask me about each**
+> starts a walk through the whole category with the marks first. No size
+> threshold: every category sifts. Definitions live in a gloss strip at the foot
+> of the grid.
 > **A**, **E** and **F** are still open and still additive; **D** and **G** were
 > not taken. See _Settled_ in `TODO.md` for why each call went the way it did.
 
