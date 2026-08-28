@@ -39,8 +39,15 @@
    `2lh` is two line boxes exactly, whichever line-height the host is using. The
    `3em` below it says the same thing only where that is 1.5, which is why a
    theme with a looser one could still make the strip grow under a definition
-   that had wrapped. It stays as the fallback for a webview too old for `lh`. */
+   that had wrapped. It stays as the fallback for a webview too old for `lh`.
+
+   Content-box because the two lines are the text's and not the box's. Obsidian
+   sets `* { box-sizing: border-box }` and the gallery sets nothing, so without
+   this the padding and the rule above come out of the two lines instead of
+   sitting on top of them — 1.7 lines' worth in the plugin against 2 in the
+   preview, and a 9px jump under the pointer every time a definition wrapped. */
 .gloss {
+  box-sizing: content-box;
   margin: 0;
   padding-top: 0.5rem;
   border-top: 1px solid;
