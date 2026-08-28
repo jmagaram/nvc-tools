@@ -100,11 +100,6 @@ export function isMarked(
   return state.marked.includes(word)
 }
 
-/** How many are marked, for a host drawing `Done (3)`. */
-export function count(state: NeedCategorySiftState): number {
-  return state.marked.length
-}
-
 /** The need the gloss strip is showing, or null before anything is touched. */
 export function gloss(state: NeedCategorySiftState): Need | null {
   return state.words.find((need) => need.word === state.showing) ?? null

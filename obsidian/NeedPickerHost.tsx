@@ -115,7 +115,7 @@ export default function NeedPickerHost({
              to bottom in a note, the order you visited them reads better. */
           onClick={() => onSubmit([...chosen(state)].reverse())}
         >
-          OK ({total})
+          {total > 0 ? `Insert (${total})` : 'Insert'}
         </button>
       </>
     ) : view === 'sift' ? (

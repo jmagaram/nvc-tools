@@ -22,8 +22,8 @@
      app's rather than the plugin's. A pill and a card reset `box-shadow`, which
      is what Obsidian draws focus with, so its ring cannot survive them and they
      draw their own — and a ring in `currentColor` came out as hard black next
-     to the quiet grey on Cancel and OK a few pixels below. Pointing this at the
-     app's own focus colour puts them back in the same voice. */
+     to the quiet grey on Cancel and Insert a few pixels below. Pointing this
+     at the app's own focus colour puts them back in the same voice. */
   --nvc-ring: var(--background-modifier-border-focus, currentColor);
 }
 

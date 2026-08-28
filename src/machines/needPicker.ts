@@ -238,7 +238,7 @@ export function pills(state: NeedPickerState): string[] {
 /**
  * How many needs are picked in all. One number rather than the two
  * `feelingPicker` reports, because there are no tab labels to fill — a host
- * showing a count on an OK button is what this is for.
+ * showing a count on its `Insert` button is what this is for.
  */
 export function count(state: NeedPickerState): number {
   return state.visited.reduce((sum, v) => sum + v.words.length, 0)
@@ -264,11 +264,6 @@ export function screen(state: NeedPickerState): 'browse' | 'sift' | 'walk' {
 /** The category open right now — what a title bar a level down is named after. */
 export function visitCategory(state: NeedPickerState): string | null {
   return state.visit?.sift.category ?? null
-}
-
-/** How many are marked in the open category, for its `Done (3)`. */
-export function visitCount(state: NeedPickerState): number {
-  return state.visit ? needCategorySift.count(state.visit.sift) : 0
 }
 
 /**

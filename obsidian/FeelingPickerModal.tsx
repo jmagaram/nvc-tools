@@ -14,8 +14,9 @@ import FeelingPickerHost from './FeelingPickerHost.tsx'
  * wants its title and buttons in.
  *
  * Closing leaves whatever is on top. From the categories that is the modal, by
- * the corner `x` or by Escape alike, and it inserts nothing — the count on OK
- * makes what is at stake visible first. From a walk it is the walk that goes,
+ * the corner `x` or by Escape alike, and it inserts nothing — the count on
+ * `Insert` makes what is at stake visible first. From a walk it is the walk
+ * that goes,
  * back to the categories with its picks kept, the same as the way back in the
  * title bar beside it. Both gestures arrive as `close`, so the guard is there
  * rather than on either one of them, and nothing on the walk screen can lose a

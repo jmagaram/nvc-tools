@@ -32,11 +32,17 @@
   max-height: 100%;
 }
 
+/* The bar keeps its own height rather than following its contents: a screen
+   that puts nothing in it must not pull the close button up onto the line the
+   heading of the screen before was on. One line is what a title spends, so one
+   line is what the bar is worth whether or not it holds one. Obsidian does the
+   same on `.modal-title`, which is why its `x` floats over the bar. */
 .header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+  min-height: 1lh;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid;
 }
@@ -57,7 +63,14 @@
   cursor: pointer;
 }
 
+/* Hard right whatever is beside it, including nothing at all: a bar with only
+   a close button in it must not drop it into the middle. Centred rather than
+   on the bar's baseline for the same reason — an empty bar has no baseline of
+   its own to sit on, and the button would rise a pixel or two on the way into
+   a category. */
 .close {
+  align-self: center;
+  margin-inline-start: auto;
   padding: 0 0.25rem;
   border: none;
   background: none;

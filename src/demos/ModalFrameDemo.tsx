@@ -17,11 +17,14 @@ export default function ModalFrameDemo() {
   const [dialogWidth, setDialogWidth] = useState(420)
   const [closes, setCloses] = useState(0)
   const [backs, setBacks] = useState(0)
-  const [aLevelDown, setALevelDown] = useState(false)
+  const [bar, setBar] = useState<'title' | 'back' | 'none'>('title')
 
-  const heading: ModalHeading = aLevelDown
-    ? { kind: 'back', label: 'Back', onBack: () => setBacks((n) => n + 1) }
-    : { kind: 'title', text: title }
+  const heading: ModalHeading | null =
+    bar === 'none'
+      ? null
+      : bar === 'back'
+        ? { kind: 'back', label: 'Back', onBack: () => setBacks((n) => n + 1) }
+        : { kind: 'title', text: title }
 
   return (
     <>
@@ -30,12 +33,15 @@ export default function ModalFrameDemo() {
       </label>
       <DeviceSelect value={device} onChange={setDevice} />
       <label>
-        <input
-          type="checkbox"
-          checked={aLevelDown}
-          onChange={(e) => setALevelDown(e.target.checked)}
-        />{' '}
-        A level down (title bar offers the way back)
+        Title bar{' '}
+        <select
+          value={bar}
+          onChange={(e) => setBar(e.target.value as 'title' | 'back' | 'none')}
+        >
+          <option value="title">The title</option>
+          <option value="back">The way back up a level</option>
+          <option value="none">Nothing — the screen names itself</option>
+        </select>
       </label>
       {device.size === 'desktop' && (
         <label>

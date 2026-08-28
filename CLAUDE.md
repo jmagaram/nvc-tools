@@ -147,7 +147,7 @@ straight from `src/` and adds nothing to it.
 
 - **The modal is the host.** `FeelingPickerHost` / `NeedPickerHost` are their
   demo pages with the controls taken off — same `useState`, same `reduce`, same
-  `chosen` on OK. Obsidian glue stays in the `*Modal` files beside them.
+  `chosen` on `Insert`. Obsidian glue stays in the `*Modal` files beside them.
 - **`ModalFrame` is not imported here.** It stands in for Obsidian's chrome so
   the gallery can preview the shape; the plugin has the real thing. The modals
   add `mod-scrollable-content` — Obsidian's own three-row modal — and draw the
@@ -222,9 +222,9 @@ straight from `src/` and adds nothing to it.
   `dismiss` is how the modal closes for real past the guard. The demo pages do
   the same through `ModalFrame`'s `onClose`.
 - **The chrome speaks for the screen on top.** Both bars follow the rule the `x`
-  already did. The button row changes with the screen: `Cancel` and `OK` speak
-  for the modal from the categories, **Ask me about each ›** and `Done` speak for
-  the category on a grid — up in the row rather than in the body, where a list of
+  already did. The button row changes with the screen: `Cancel` and `Insert`
+  speak for the modal from the categories, **Ask me about each ›** and `Done`
+  speak for the category on a grid — up in the row rather than in the body, where a list of
   28 would scroll them out of reach — and a walk is drawn with no button row at
   all, because it is one question and answering it is the only way to move.
 - **The title bar carries a control only where one is needed.** On a walk that is
@@ -239,7 +239,9 @@ straight from `src/` and adds nothing to it.
   inventory small and quiet over the category at full size. Obsidian floats the
   `x` over the bar rather than laying it out in one, so `.modal-title` holds its
   own height and does not follow its contents — otherwise an empty bar would drop
-  the `x` onto the heading.
+  the `x` onto the heading. `ModalFrame` takes a `null` heading for the same
+  screen and reserves the line by hand, which is what its `min-height: 1lh` and
+  the centred `x` are for.
 - **Nothing inside a category can throw work away.** The `x` is a synonym for
   leaving the screen showing, which is why losing everything stays one gesture
   but only from the categories, where all of it is on screen to lose.

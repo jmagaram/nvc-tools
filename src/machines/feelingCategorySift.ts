@@ -106,11 +106,6 @@ export function isMarked(
   return state.marked.includes(word)
 }
 
-/** How many are marked, for a host drawing `Done (3)`. */
-export function count(state: FeelingCategorySiftState): number {
-  return state.marked.length
-}
-
 /** The feeling the gloss strip is showing, or null before anything is touched. */
 export function gloss(state: FeelingCategorySiftState): Feeling | null {
   return state.words.find((feeling) => feeling.word === state.showing) ?? null

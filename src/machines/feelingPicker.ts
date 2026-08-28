@@ -284,11 +284,6 @@ export function visitCategory(state: FeelingPickerState): string | null {
   return state.visit?.sift.category ?? null
 }
 
-/** How many are marked in the open category, for its `Done (3)`. */
-export function visitCount(state: FeelingPickerState): number {
-  return state.visit ? feelingCategorySift.count(state.visit.sift) : 0
-}
-
 /**
  * The category a returning browse screen puts focus on — the one just closed,
  * so long as its tab is the one showing. Null before anything has been closed,

@@ -42,8 +42,8 @@ export default class NvcPlugin extends Plugin {
 
 /**
  * Put what was picked where the cursor is, as a block the plugin can redraw.
- * Pressing OK having picked nothing writes nothing — an empty line would be a
- * worse answer than none.
+ * Pressing `Insert` having picked nothing writes nothing — an empty line would
+ * be a worse answer than none.
  *
  * It always goes in as a list, the shape it had before there was a choice. Which
  * layout you want is a question about the note you are looking at, and it is

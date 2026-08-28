@@ -4,7 +4,9 @@ import styles from './ModalFrame.module.css'
 /**
  * What the title bar reads. A modal at the top of its stack names itself; one a
  * level down offers the way back instead, because what it is showing already
- * says where you are and the way out matters more than the name.
+ * says where you are and the way out matters more than the name. A screen that
+ * names itself in its own body, and whose button row already holds every way
+ * off it, passes `null` and gets a bar with nothing in it but the close button.
  *
  * The `label` on the way back names the screen it returns to rather than the
  * move — the title the level above is wearing, so that the two read as the
@@ -15,8 +17,8 @@ export type ModalHeading =
   | { kind: 'back'; label: string; onBack: () => void }
 
 type Props = {
-  /** The title, or the way back up a level. */
-  heading: ModalHeading
+  /** The title, the way back up a level, or null for a bar that says nothing. */
+  heading: ModalHeading | null
   /**
    * Called when the close button is pressed. It leaves whatever is on top,
    * which is the host's to decide: a screen a level down goes back up, and only
@@ -59,7 +61,9 @@ export default function ModalFrame({
   return (
     <div className={`${styles.frame} ${styles[size]}`}>
       <div className={styles.header}>
-        {heading.kind === 'title' ? (
+        {/* Nothing at all for a bar that says nothing. The bar reserves a
+            line either way, so it does not shrink here — see the stylesheet. */}
+        {heading === null ? null : heading.kind === 'title' ? (
           <h2 className={styles.title}>{heading.text}</h2>
         ) : (
           <button

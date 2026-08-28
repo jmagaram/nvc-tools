@@ -16,7 +16,6 @@ import {
   screen,
   screenKey,
   visitCategory,
-  visitCount,
 } from '../machines/needPicker.ts'
 import type {
   NeedPickerAction,
@@ -27,7 +26,7 @@ import type {
 /** What the modal is called, and so what the way out of a walk points back at. */
 const TITLE = 'Needs'
 
-/** How the modal was last dismissed, so OK and Cancel read as different. */
+/** How the modal was last dismissed, so Insert and Cancel read as different. */
 type LastClose =
   | { kind: 'open' }
   | { kind: 'cancelled' }
@@ -67,7 +66,8 @@ export default function NeedPickerDemo() {
   const total = count(state)
 
   /* Both bars speak for the screen on top, which is the same rule the close
-     button follows. Three screens, so three of each.
+     button follows. Three screens, and neither bar carries the same thing on
+     all three: a grid has no title, a walk has no button row.
 
      The way back is labelled with the screen it returns to rather than with the
      move — 'back' alone leaves open what becomes of the answers already given.
@@ -77,14 +77,20 @@ export default function NeedPickerDemo() {
 
   const leaveTop = () => dispatch({ type: 'close' })
 
-  const heading: ModalHeading =
+  /* A grid's bar is empty. `Done` and the close button both leave the category
+     keeping its marks, so a third control saying the same would be noise — and
+     a '‹ Feelings' the size of the heading below reads as two titles
+     disagreeing about which screen you are on. The grid names itself instead. */
+  const heading: ModalHeading | null =
     view === 'browse'
       ? { kind: 'title', text: TITLE }
-      : {
-          kind: 'back',
-          label: view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE),
-          onBack: leaveTop,
-        }
+      : view === 'walk'
+        ? {
+            kind: 'back',
+            label: visitCategory(state) ?? TITLE,
+            onBack: leaveTop,
+          }
+        : null
 
   /* A walk is still drawn with no button row at all: it is one question, and
      answering it is the only way to move. The grid has two ways on and they
@@ -96,16 +102,16 @@ export default function NeedPickerDemo() {
           Cancel
         </button>
         <button type="button" onClick={ok}>
-          OK ({total})
+          {total > 0 ? `Insert (${total})` : 'Insert'}
         </button>
       </>
     ) : view === 'sift' ? (
       <>
         <button type="button" onClick={() => dispatch({ type: 'walk' })}>
-          One at a time <span aria-hidden="true">&rsaquo;</span>
+          Ask me about each <span aria-hidden="true">&rsaquo;</span>
         </button>
         <button type="button" onClick={leaveTop}>
-          Done ({visitCount(state)})
+          Done
         </button>
       </>
     ) : null
@@ -186,23 +192,23 @@ export default function NeedPickerDemo() {
               bars do — same words, so what a host has to provide is plain. */}
           {state.visit && (
             <p>
-              <button type="button" onClick={leaveTop}>
-                <span aria-hidden="true">&lsaquo;</span>{' '}
-                {view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE)}
-              </button>
-              {view === 'sift' && (
+              {view === 'sift' ? (
                 <>
-                  {' '}
                   <button
                     type="button"
                     onClick={() => dispatch({ type: 'walk' })}
                   >
-                    One at a time <span aria-hidden="true">&rsaquo;</span>
+                    Ask me about each <span aria-hidden="true">&rsaquo;</span>
                   </button>{' '}
                   <button type="button" onClick={leaveTop}>
-                    Done ({visitCount(state)})
+                    Done
                   </button>
                 </>
+              ) : (
+                <button type="button" onClick={leaveTop}>
+                  <span aria-hidden="true">&lsaquo;</span>{' '}
+                  {visitCategory(state) ?? TITLE}
+                </button>
               )}
             </p>
           )}
@@ -239,11 +245,11 @@ export default function NeedPickerDemo() {
       <p>
         A category opens as all of its words at once, in the order the source
         lists them, with whatever was picked there before already marked.{' '}
-        <strong>One at a time</strong> goes through the whole category as cards
-        instead, marked words first, and hands its answers back to the grid —
-        so leaving a walk part way through keeps both what it decided and what
-        it never reached. Touch or hover a word to read its definition without
-        marking it.
+        <strong>Ask me about each ›</strong> goes through the whole category
+        as cards instead, marked words first, and hands its answers back to the
+        grid — so leaving a walk part way through keeps both what it decided and
+        what it never reached. Touch or hover a word to read its definition
+        without marking it.
       </p>
       <p>
         The category order is shuffled once when the page loads and never

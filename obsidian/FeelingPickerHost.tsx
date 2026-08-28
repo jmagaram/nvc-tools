@@ -44,8 +44,8 @@ type Props = {
  * through the machine, and decides what the two bars say.
  *
  * This is `FeelingPickerDemo` with the demo controls taken off. What is left is
- * the same contract — `init` on mount, `reduce` on every action, `chosen` on OK.
- * Everything Obsidian-shaped is next door in `FeelingPickerModal`.
+ * the same contract — `init` on mount, `reduce` on every action, `chosen` on
+ * `Insert`. Everything Obsidian-shaped is next door in `FeelingPickerModal`.
  *
  * Both bars are drawn through portals, because Obsidian owns where they go: the
  * title bar is its own element, and the button row has to be a sibling of the
@@ -115,7 +115,7 @@ export default function FeelingPickerHost({
              to bottom in a note, the order you visited them reads better. */
           onClick={() => onSubmit([...chosen(state)].reverse())}
         >
-          OK ({total})
+          {total > 0 ? `Insert (${total})` : 'Insert'}
         </button>
       </>
     ) : view === 'sift' ? (

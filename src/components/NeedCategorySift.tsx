@@ -20,7 +20,7 @@ const HINT = 'Touch a word to see what it means.'
  * One category, every word at once, marked or not.
  *
  * The ways on from here — `Done` and going through the words one at a time —
- * belong to the host, the same as `Cancel` and `OK` do: they speak for this
+ * belong to the host, the same as `Cancel` and `Insert` do: they speak for this
  * screen, and a modal keeps that sort of thing in its button row where a long
  * grid cannot scroll it out of reach.
  */
