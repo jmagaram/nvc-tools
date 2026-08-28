@@ -6,6 +6,14 @@ oddities in there are faithful to the source.
 
 ## Open
 
+### Miscellaneous
+
+In the Feelings picker, no reason to show a total like "3 of 6". Same with Needs picker.
+
+In the Feelings picker, when you select a feeling the description below changes, which is good. But some descriptions are shorter than others and it causes the dialog to resize vertically. Maybe better to allocate a minimum height of a couple lines, so it only resizes vertically if a very long description happens.
+
+In Obsidian, the "One at a time>" button looks a little weird. There is no space before the ">". The desktop browser DOES show a space, which is nice. Also, the two buttons side by side are a bit non-standard. One shows a count like "Done (4)" and the other has that symbol. What if one just said "Done" without a count. Is the count necessary? You can see how many are selected assuming no scrolling. And is there better wording for the other button? "One at a time" is more explicit as "Review each feeling one at a time" or "Focus on each individually" or "Step through each" or "Decide on each withotu distractions" or ...
+
 ### What is left of the picker redesign
 
 The sift landed (see _Settled_ below) and took the length problem with it. Three
@@ -106,8 +114,8 @@ whatever was picked there before, and marking is the answer.
 
 The pivotal decision was making `Done` primary and the walk secondary rather
 than offering them as peers. Once the grid can be a final answer, its question
-cannot be *which of these might apply* — you cannot write words into a note that
-someone only said might apply. It became *which of these apply*, and the walk
+cannot be _which of these might apply_ — you cannot write words into a note that
+someone only said might apply. It became _which of these apply_, and the walk
 stopped being a toll booth. That is also what dissolves the case that started
 this: marking 23 words costs 23 taps, which is irreducible; what made it a
 hassle was the 28 extra yes/no answers layered on top.
@@ -142,7 +150,7 @@ Now the grid's `marked` is the record and a walk hands its answers back through
 `fold`: what the walk asked about, it decides; what it never reached keeps what
 the grid said. So leaving a walk part way through keeps both halves. The fix is
 the second of the two options weighed here originally, and it stopped being
-optional — a walk is now something entered *after* marking, so bailing out of
+optional — a walk is now something entered _after_ marking, so bailing out of
 one had far more to lose.
 
 ### Source: the CNVC Feelings and Needs Inventory

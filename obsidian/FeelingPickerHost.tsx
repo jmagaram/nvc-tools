@@ -10,7 +10,6 @@ import {
   screen,
   screenKey,
   visitCategory,
-  visitCount,
 } from '../src/machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
@@ -93,12 +92,12 @@ export default function FeelingPickerHost({
   const heading =
     view === 'browse' ? (
       <>{TITLE}</>
-    ) : (
+    ) : view === 'walk' ? (
       <button type="button" className="nvc-back" onClick={leaveTop}>
         <span aria-hidden="true">&lsaquo;</span>{' '}
-        {view === 'sift' ? TITLE : (visitCategory(state) ?? TITLE)}
+        {visitCategory(state) ?? TITLE}
       </button>
-    )
+    ) : null
 
   /* A walk is still drawn with no button row at all: it is one question, and
      answering it is the only way to move. The grid has two ways on and they
@@ -121,11 +120,15 @@ export default function FeelingPickerHost({
       </>
     ) : view === 'sift' ? (
       <>
-        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
-          One at a time <span aria-hidden="true">&rsaquo;</span>
+        <button
+          type="button"
+          className="nvc-onward"
+          onClick={() => dispatch({ type: 'walk' })}
+        >
+          Ask me about each <span aria-hidden="true">&rsaquo;</span>
         </button>
         <button type="button" className="mod-cta" onClick={leaveTop}>
-          Done ({visitCount(state)})
+          Done
         </button>
       </>
     ) : null

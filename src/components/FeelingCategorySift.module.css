@@ -12,12 +12,15 @@
 
 .heading {
   margin: 0;
+  display: grid;
 }
 
-/* Reads as an aside to the category name rather than a second heading. */
-.count {
-  font-size: 0.85em;
+/* Small, unbolded and quiet, sitting right on top of the category — a label for
+   it rather than a line of its own. */
+.set {
+  font-size: 0.6em;
   font-weight: normal;
+  line-height: 1.2;
   opacity: 0.7;
 }
 
@@ -29,12 +32,20 @@
 
 /* Two lines' worth, held whether or not there is anything in it. A strip that
    collapsed when nothing was showing would move the grid every time the pointer
-   left it. */
+   left it — and every definition fits in two: measured across all 309 of them,
+   three lines happen twice, and only at the largest text size in the narrowest
+   modal.
+
+   `2lh` is two line boxes exactly, whichever line-height the host is using. The
+   `3em` below it says the same thing only where that is 1.5, which is why a
+   theme with a looser one could still make the strip grow under a definition
+   that had wrapped. It stays as the fallback for a webview too old for `lh`. */
 .gloss {
   margin: 0;
   padding-top: 0.5rem;
   border-top: 1px solid;
   min-height: 3em;
+  min-height: 2lh;
   font-size: 0.9em;
 }
 

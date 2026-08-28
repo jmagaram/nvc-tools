@@ -144,10 +144,10 @@ straight from `src/` and adds nothing to it.
   `*CategorySift` — every word in it at once, in source order, with whatever was
   picked there last time already marked. `Done` commits the marks as they
   stand, which is why the question is *which of these apply* and never *which
-  might*: nothing asks again afterwards. **One at a time** starts a walk through
-  the *whole* category with the marks first, so the walk keeps what it was for —
-  being asked about words you would never pick off a list — rather than becoming
-  a confirmation pass. A walk runs inside a visit and hands its answers back:
+  might*: nothing asks again afterwards. **Ask me about each ›** starts a walk
+  through the *whole* category with the marks first, so the walk keeps what it
+  was for — being asked about words you would never pick off a list — rather
+  than becoming a confirmation pass. A walk runs inside a visit and hands its answers back:
   what it asked about, it decides; what it never reached keeps whatever the grid
   said. That is why leaving a walk part way through cannot lose a mark, and it
   is the whole of `fold` in the two picker machines. The grid never shuffles —
@@ -190,18 +190,27 @@ straight from `src/` and adds nothing to it.
   `dismiss` is how the modal closes for real past the guard. The demo pages do
   the same through `ModalFrame`'s `onClose`.
 - **The chrome speaks for the screen on top.** Both bars follow the rule the `x`
-  already did. The title bar a level down carries the screen it returns to —
-  **‹ Feelings**, **‹ Needs**, or from a walk the category it started in, since
-  that is where its answers land — rather than *Back*, which left open what
-  became of the answers already given. The `x` is a synonym for it on purpose:
-  with both meaning one thing, nothing inside a category can throw work away,
-  and losing everything stays one gesture but only from the categories, where
-  all of it is on screen to lose. The button row changes with the screen too:
-  `Cancel` and `OK` speak for the modal from the categories, **One at a time**
-  and `Done` speak for the category on a grid — up in the row rather than in the
-  body, where a list of 28 would scroll them out of reach — and a walk is still
-  drawn with no button row at all, because it is one question and answering it
-  is the only way to move.
+  already did. The button row changes with the screen: `Cancel` and `OK` speak
+  for the modal from the categories, **Ask me about each ›** and `Done` speak for
+  the category on a grid — up in the row rather than in the body, where a list of
+  28 would scroll them out of reach — and a walk is drawn with no button row at
+  all, because it is one question and answering it is the only way to move.
+- **The title bar carries a control only where one is needed.** On a walk that is
+  **‹ Angry** — the category it started in, since that is where its answers land,
+  rather than *Back*, which left open what became of the answers already given —
+  and it is the only way off a screen with no button row. On the categories the
+  bar is the plain title. On a grid it is **empty**: `Done` and the `x` both leave
+  the category and keep its marks, and all three called the same `leaveTop`, so a
+  third control saying it was noise — and a **‹ Feelings** the size of the
+  category heading below read as two titles disagreeing about which screen you
+  were on. The grid names itself instead, in the sift's own heading: the
+  inventory small and quiet over the category at full size. Obsidian floats the
+  `x` over the bar rather than laying it out in one, so `.modal-title` holds its
+  own height and does not follow its contents — otherwise an empty bar would drop
+  the `x` onto the heading.
+- **Nothing inside a category can throw work away.** The `x` is a synonym for
+  leaving the screen showing, which is why losing everything stays one gesture
+  but only from the categories, where all of it is on screen to lose.
 - **Styles.** Component CSS modules use only `currentColor` and `inherit`, so an
   Obsidian theme reaches them untouched and they ship as they are.
   `obsidian/styles.css` holds only the plugin's own chrome, for the modal and

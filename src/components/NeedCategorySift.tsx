@@ -1,4 +1,4 @@
-import { count, gloss, isMarked } from '../machines/needCategorySift.ts'
+import { gloss, isMarked } from '../machines/needCategorySift.ts'
 import type {
   NeedCategorySiftAction,
   NeedCategorySiftState,
@@ -35,11 +35,13 @@ export default function NeedCategorySift({ state, onAction }: Props) {
        those answer a prompt, and here they would fight the browser's own way
        through a run of buttons. */
     <div className={styles.sift} tabIndex={-1} data-sift="">
+      {/* The inventory over the category, stacked tight enough to read as one
+          heading. It names what the words are without spending a line on it,
+          and without the chrome above having to hold a second title that says
+          the same thing at the same size. */}
       <h3 className={styles.heading}>
-        {state.category}{' '}
-        <span className={styles.count}>
-          {count(state)} of {state.words.length}
-        </span>
+        <span className={styles.set}>Needs</span>
+        {state.category}
       </h3>
 
       {/* On a touch screen there is no hover and the tap does both showing and
