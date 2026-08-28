@@ -217,6 +217,36 @@ straight from `src/` and adds nothing to it.
   rewrites the fence line, so the choice lives in the note and each block keeps
   its own. A block whose body does not parse is shown verbatim rather than
   half-swallowed.
+- **Editing reopens the picker on the block.** **Edit…**, first in the same
+  menu, seeds the picker with what the block already holds and writes the
+  answer back over the body, leaving the fence line — and so the layout — alone.
+  Both machines take an `initWith` for this, and it seeds `visited` and nothing
+  else: the cards, the counts and each sift's `alreadyPicked` all already follow
+  from that one field, which is why an edit and a fresh pick are the same
+  screens. The order is reversed on the way in and reversed again on the way
+  out, so an edit that changes nothing writes back the text it opened. Saving
+  with nothing marked deletes the block, since an empty fence is one that no
+  longer parses.
+- **The note never says which inventory a block is.** `obsidian/resolve.ts`
+  works it out from the words, and that same pass is the validation. No word and
+  no category name appears in both inventories, so a single bullet settles it and
+  no block can resolve against both. A marker in the fence — `nvc-feelings-list`
+  — would be a second source of truth for something the body already determines,
+  and there is no answer to a block whose marker disagrees with its words; it
+  would also double the languages and strand every block already written. The
+  same reasoning rules out a version stamp: the language *is* the version, and
+  an incompatible format would ship as a new one, which an older build renders
+  verbatim rather than mangling.
+- **Reading a block is all or nothing.** Case and spacing are forgiven —
+  `Irate` is `irate`, and saving writes it back in the source's own spelling and
+  order — but an unknown word, an unknown category, a word under a category that
+  does not hold it, two bullets for one category, and feelings mixed with needs
+  all come to the same answer: a notice saying the block can't be read. Half of
+  a block resolving means someone has typed in it, and guessing which half they
+  meant is worse than saying so. A block broken badly enough to fail
+  `parseBlock` never gets a menu at all — `render` shows it verbatim. Saving
+  re-reads the note and writes only over the picks the edit started from, so a
+  note changed behind the modal is left alone.
 - **There is a way out.** **Convert to Markdown**, in the same menu, replaces the
   whole fence with the layout on screen written as ordinary markdown — a real
   pipe table that Obsidian's own table editor can add columns to. One-way by

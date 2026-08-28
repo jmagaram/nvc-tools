@@ -73,6 +73,32 @@ export function init(
   }
 }
 
+/**
+ * Start browsing with `visited` already picked — what opening a block for
+ * editing needs. Everything downstream reads `visited` and nothing else, so
+ * seeding it is the whole of the difference between a fresh pick and an edit:
+ * the cards, the count, and `needCategorySift.init`'s `alreadyPicked` all
+ * follow from it.
+ *
+ * `visited` is in this machine's own order, most recently closed first, so a
+ * block comes back up in the arrangement it was left in rather than reversed.
+ * A category the inventory does not have is dropped rather than carried —
+ * there is no pill and no card that could draw it — though `resolve` has
+ * already refused any block containing one.
+ */
+export function initWith(
+  categories: readonly NeedCategory[],
+  visited: readonly Visited[],
+  rng: () => number = Math.random,
+): NeedPickerState {
+  const state = init(categories, rng)
+  const known = new Set(categories.map((c) => c.name))
+  return {
+    ...state,
+    visited: visited.filter((v) => known.has(v.category)),
+  }
+}
+
 /** What was picked in `category` last time it was open, if it was. */
 function wordsPicked(
   state: NeedPickerState,

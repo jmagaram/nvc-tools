@@ -83,6 +83,36 @@ export function init(
   }
 }
 
+/**
+ * Start browsing with `visited` already picked — what opening a block for
+ * editing needs. Everything downstream reads `visited` and nothing else, so
+ * seeding it is the whole of the difference between a fresh pick and an edit:
+ * the cards, the counts, and `feelingCategorySift.init`'s `alreadyPicked` all
+ * follow from it.
+ *
+ * `visited` is in this machine's own order, most recently closed first, so a
+ * block comes back up in the arrangement it was left in rather than reversed.
+ * A category the inventory does not have is dropped rather than carried —
+ * there is no pill and no card that could draw it — though `resolve` has
+ * already refused any block containing one.
+ */
+export function initWith(
+  categories: readonly FeelingCategory[],
+  visited: readonly Visited[],
+  rng: () => number = Math.random,
+): FeelingPickerState {
+  const state = init(categories, rng)
+  const known = new Set(categories.map((c) => c.name))
+  const kept = visited.filter((v) => known.has(v.category))
+  return {
+    ...state,
+    // The tab the most recent one is on, so the card `resumeAt` names is on
+    // screen rather than behind the other tab with focus left on nothing.
+    tab: kept[0]?.kind ?? state.tab,
+    visited: kept,
+  }
+}
+
 /** What was picked in `category` last time it was open, if it was. */
 function wordsPicked(
   state: FeelingPickerState,

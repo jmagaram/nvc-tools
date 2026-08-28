@@ -6,6 +6,7 @@ import {
   chosen,
   count,
   init,
+  initWith,
   reduce,
   screen,
   screenKey,
@@ -27,6 +28,13 @@ type Props = {
   titleEl: HTMLElement
   /** The button row. A sibling of the scrolling body, not part of it. */
   footerEl: HTMLElement
+  /**
+   * What a block already holds, in the order it reads in the note — present
+   * only when this is an edit. One prop rather than a seed and a flag: there
+   * is no such thing here as an edit of nothing, so the two could only ever
+   * disagree.
+   */
+  initial?: readonly Visited[]
   /** Called with what to insert. Cancelling never calls this. */
   onSubmit: (entries: Visited[]) => void
   /** Close, insert nothing. */
@@ -56,11 +64,17 @@ type Props = {
 export default function NeedPickerHost({
   titleEl,
   footerEl,
+  initial,
   onSubmit,
   onCancel,
   onLeaveTopChange,
 }: Props) {
-  const [state, setState] = useState<NeedPickerState>(() => init(categories))
+  /* Reversed on the way in and reversed again on the way out, so an edit that
+     changes nothing writes back the text it opened — see the `Insert` handler
+     below for the other half of the round trip. */
+  const [state, setState] = useState<NeedPickerState>(() =>
+    initial ? initWith(categories, [...initial].reverse()) : init(categories),
+  )
 
   const dispatch = (action: NeedPickerAction) =>
     setState((current) => reduce(current, action))
@@ -83,6 +97,10 @@ export default function NeedPickerHost({
   })
 
   const total = count(state)
+  /* An edit replaces a block that is already in the note, so the button is not
+     offering to put anything anywhere. Saving nothing is how a block is taken
+     back out, which is why the word has to hold with no count beside it. */
+  const commit = initial ? 'Save' : 'Insert'
 
   /* Both bars speak for the screen on top, which is the same rule the `x`
      follows. The way back is labelled with the screen it returns to rather than
@@ -115,7 +133,7 @@ export default function NeedPickerHost({
              to bottom in a note, the order you visited them reads better. */
           onClick={() => onSubmit([...chosen(state)].reverse())}
         >
-          {total > 0 ? `Insert (${total})` : 'Insert'}
+          {total > 0 ? `${commit} (${total})` : commit}
         </button>
       </>
     ) : view === 'sift' ? (

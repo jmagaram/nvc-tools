@@ -28,10 +28,17 @@ export default class FeelingPickerModal extends Modal {
   /** The way off the screen on top, unless it is the categories. See `close`. */
   private leaveTop: (() => void) | null = null
   private onSubmit: (entries: Visited[]) => void
+  /** What a block already holds, when this was opened to edit one. */
+  private initial: readonly Visited[] | undefined
 
-  constructor(app: App, onSubmit: (entries: Visited[]) => void) {
+  constructor(
+    app: App,
+    onSubmit: (entries: Visited[]) => void,
+    initial?: readonly Visited[],
+  ) {
     super(app)
     this.onSubmit = onSubmit
+    this.initial = initial
   }
 
   onOpen() {
@@ -49,6 +56,7 @@ export default class FeelingPickerModal extends Modal {
       <FeelingPickerHost
         titleEl={this.titleEl}
         footerEl={this.footerEl}
+        initial={this.initial}
         onLeaveTopChange={(leaveTop) => {
           this.leaveTop = leaveTop
         }}
