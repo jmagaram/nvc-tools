@@ -8,8 +8,6 @@ oddities in there are faithful to the source.
 
 ### Miscellaneous
 
-In the Feelings picker, no reason to show a total like "3 of 6". Same with Needs picker.
-
 In the Feelings picker, when you select a feeling the description below changes, which is good. But some descriptions are shorter than others and it causes the dialog to resize vertically. Maybe better to allocate a minimum height of a couple lines, so it only resizes vertically if a very long description happens.
 
 In Obsidian, the "One at a time>" button looks a little weird. There is no space before the ">". The desktop browser DOES show a space, which is nice. Also, the two buttons side by side are a bit non-standard. One shows a count like "Done (4)" and the other has that symbol. What if one just said "Done" without a count. Is the count necessary? You can see how many are selected assuming no scrolling. And is there better wording for the other button? "One at a time" is more explicit as "Review each feeling one at a time" or "Focus on each individually" or "Step through each" or "Decide on each withotu distractions" or ...

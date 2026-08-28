@@ -1,7 +1,7 @@
 {
   "id": "nvc-picker",
   "name": "NVC",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "minAppVersion": "1.5.0",
   "description": "Browse and insert feelings, emotions, and needs from the CNVC inventories.",
   "author": "Justin Magaram",
