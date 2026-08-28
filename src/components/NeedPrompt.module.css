@@ -1,4 +1,4 @@
-/* The padding is the ring's, below — room for it to sit clear of the dots and
+/* The padding is the ring's, below — room for it to sit clear of the card and
    the buttons without a host having to leave any. */
 .prompt {
   display: grid;
@@ -208,10 +208,14 @@
   }
 }
 
+/* The two answers split the card's width between them, so each is a target the
+   width of half the modal rather than a word to aim at. `margin-top` on top of
+   the grid's own 1rem is the design's 18px below the rule against 16px above
+   it: the rule belongs to the card it is measuring, not to the buttons. */
 .actions {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  margin-top: 2px;
 }
 
 /* A beat of air between a label and its arrow, so the arrow reads as the
@@ -221,8 +225,22 @@
    — so a directional margin has no way to tell them apart. `gap` is symmetric
    and needs no selector at all. In `em`, to track the button's own text. */
 .actions button {
+  flex: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Each label is pushed to the edge its arrow points at, so across the row the
+   two glyphs sit at the far left and the far right — pointing out of the
+   screen the way the card leaves it, and the way the arrow keys read. Centred
+   in a full-width button they would have floated in the middle, saying
+   nothing about direction. */
+.actions button:first-child {
+  justify-content: flex-start;
+}
+
+.actions button:last-child {
+  justify-content: flex-end;
 }

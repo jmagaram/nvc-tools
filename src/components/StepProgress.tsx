@@ -8,7 +8,7 @@ type Props = {
   past: readonly StepMark[]
   /** How many steps come after the one on screen. */
   upcoming: number
-  /** Describes the sequence to assistive tech, e.g. 'Feelings in Engaged'. */
+  /** Names the sequence to assistive tech, e.g. 'Feelings in Engaged'. */
   label: string
 }
 
@@ -21,16 +21,27 @@ export default function StepProgress({ past, upcoming, label }: Props) {
     'current',
     ...Array.from({ length: upcoming }, (): Status => 'upcoming'),
   ]
+  const kept = past.filter((mark) => mark === 'chosen').length
 
+  /* One element, not a list. The segments are a picture of a number, so they
+     are `aria-hidden` decoration and the number is spoken instead — a walk of
+     twenty would otherwise announce twenty list items on every card. */
   return (
-    <ol className={styles.steps} aria-label={label}>
+    <div
+      className={styles.rule}
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={statuses.length}
+      aria-valuenow={past.length}
+      aria-label={`${label}, ${past.length + 1} of ${statuses.length}, ${kept} kept`}
+    >
       {statuses.map((status, index) => (
-        <li
+        <span
           key={index}
-          className={styles[status]}
-          aria-current={status === 'current' ? 'step' : undefined}
+          className={`${styles.step} ${styles[status]}`}
+          aria-hidden="true"
         />
       ))}
-    </ol>
+    </div>
   )
 }

@@ -78,6 +78,38 @@ Both word pills take one `onShow` rather than an `onPointerEnter` and an
 `onFocus`, because to a host the two events mean the same thing: show what this
 word means. Reading a definition must not cost a mark.
 
+## The progress rule
+
+`StepProgress` is a segmented rule: one flexing segment per step, the full width
+of whatever holds it. It sits **between the card and the button row** in
+`FeelingPrompt` and `NeedPrompt` — never above the card, which would make it the
+first thing read on every question, and never inside it. Because the segments
+flex, a four-word category and a twenty-eight-word one draw the same silhouette;
+only the grain changes, so there is no responsive variant and no counter.
+
+It answers two questions at once. **How far along** is the cursor, one segment
+lifted from 2px to 6px; the container is held at 6px so the lift shifts nothing
+above or below it. **What was kept** is the segment's own fill, and a kept
+segment stays filled — a walk only runs forwards.
+
+The design this came from named a red for kept. It is drawn in washes of
+`currentColor` instead — kept at full strength, a step passed over at 45%, one
+not yet reached at 18%, all `color-mix`ed against `transparent`. A colour of its
+own would be the only one in any component besides `--nvc-ring`, and would read
+wrong on a light ground; weight carries the difference in both themes and under
+any Obsidian theme. The whole animation is the lift travelling one segment right
+and the fill coming up under it, and `prefers-reduced-motion` drops both.
+
+The segments are `aria-hidden` decoration on one `role="progressbar"`, which is
+spoken as a number — a walk of twenty-eight would otherwise announce
+twenty-eight list items on every card.
+
+Under the rule the two answers split the width between them rather than sitting
+centred, so each is a target half the modal wide. Each label is pushed to the
+edge its arrow points at, which puts the two glyphs at the far left and the far
+right of the row — pointing out of the screen the way the card leaves it, and
+the way the arrow keys read.
+
 ## Adding a component
 
 1. `src/components/Foo.tsx` — presentational, typed props, default export,

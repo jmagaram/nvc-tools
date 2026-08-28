@@ -1,39 +1,60 @@
-.steps {
+/* A segmented rule: one flexing segment per step, the full width of whatever
+   holds it. Because the segments flex, a four-word category and a twenty-word
+   one draw the same silhouette — only the grain changes. It answers two
+   questions in two pixels: how far along the walk is, and which words were
+   kept on the way.
+
+   The container is held at the tall segment's height so the cursor's lift does
+   not shift the card above it or the buttons below. */
+.rule {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 6px;
 }
 
-/* The states are told apart by fill and size alone, the same way the cards tell
-   met from unmet without colour. The `li` is kept in the state selectors so they
-   outrank this shared rule. */
-.steps li {
-  width: 0.6rem;
-  height: 0.6rem;
-  border: 1px solid;
-  border-radius: 0.1rem;
+.step {
+  flex: 1;
+  height: 2px;
+  /* The lift travels one segment to the right and a kept segment's fill comes
+     up under it. That is the whole animation — nothing sweeps, nothing
+     staggers. */
+  transition:
+    height 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Fill means kept, not asked, so the row counts the picks back as well as the
-   ground covered. */
-.steps li.chosen {
+/* Three washes of the one ink, so the bar follows the host's theme the way
+   everything else here does. The design named a red for kept; a colour of its
+   own would be the only one in any component, and would read wrong on a light
+   ground, so kept is the ink at full strength instead and the difference is
+   carried by weight. */
+.step.upcoming,
+.step.current {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+/* A step passed over stays visible but spent — darker than what is ahead,
+   lighter than what was kept. */
+.step.skipped {
+  background: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+/* Kept is the loudest thing on the rule and never reverts: the walk only runs
+   forwards. */
+.step.chosen {
   background: currentColor;
 }
 
-/* The cursor is filled like a chosen step but taller, so it reads as a caret
-   sitting between what is behind and what is ahead. */
-.steps li.current {
-  height: 1.4rem;
-  background: currentColor;
+/* The cursor lifts rather than changing colour — it is a position, not an
+   answer. It sits at the upcoming wash because the step on screen has not been
+   answered yet. */
+.step.current {
+  height: 6px;
 }
 
-/* A step passed over is drawn like one not yet reached — what tells them apart
-   is which side of the caret they sit on. */
-.steps li.skipped,
-.steps li.upcoming {
-  background: none;
+@media (prefers-reduced-motion: reduce) {
+  .step {
+    transition: none;
+  }
 }

@@ -84,12 +84,6 @@ export default function NeedPrompt({
       data-prompt=""
       onKeyDown={answerOnArrow}
     >
-      <StepProgress
-        past={past}
-        upcoming={upcoming}
-        label={`Needs in ${category}`}
-      />
-
       {/* Two cards at most: the one just answered tilting away, and the one
           rising into its place. The stage is a fixed height so neither of them
           jostles the buttons below, and it clips the flight at its edges. */}
@@ -120,6 +114,16 @@ export default function NeedPrompt({
           <NeedCard word={word} category={category} definition={definition} />
         </div>
       </div>
+
+      {/* The seam between the card and the answer: how far along the walk is,
+          and which words were kept on the way. Below the card so the card
+          stays the loudest thing on screen, and above the buttons so the count
+          it is keeping sits next to the gesture that changes it. */}
+      <StepProgress
+        past={past}
+        upcoming={upcoming}
+        label={`Needs in ${category}`}
+      />
 
       {/* The walk only runs forwards: answering is the only way to move. Each
           button sits on the side its arrow key points to. */}

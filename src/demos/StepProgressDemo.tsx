@@ -71,6 +71,11 @@ export default function StepProgressDemo() {
         upcoming={total - clamped - 1}
         label="Demo progress"
       />
+      <p>
+        The segments flex, so the bar is as wide as whatever holds it and a
+        five-step walk draws the same silhouette as a twenty-five-step one.
+        Move the cursor to watch the lift travel and a kept step fill under it.
+      </p>
 
       <h2>Edges</h2>
       <p>First step</p>
@@ -81,6 +86,8 @@ export default function StepProgressDemo() {
         upcoming={0}
         label="At the last step"
       />
+      <p>One step, which is the whole walk</p>
+      <StepProgress past={[]} upcoming={0} label="A walk of one" />
     </>
   )
 }
