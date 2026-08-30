@@ -18,6 +18,7 @@ import type {
   Visited,
 } from '../src/machines/needPicker.ts'
 import { useFocusScreen } from '../src/focusScreen.ts'
+import { submitShortcutLabel, useSubmitShortcut } from '../src/keyboard.ts'
 import Credit from './Credit.tsx'
 
 /** What the modal is called, and so what the way out of a walk points back at. */
@@ -102,6 +103,16 @@ export default function NeedPickerHost({
      back out, which is why the word has to hold with no count beside it. */
   const commit = initial ? 'Save' : 'Insert'
 
+  /* Newest-closed first is what puts the last card top-left. Read top to
+     bottom in a note, the order you visited them reads better. Shared by the
+     button and the shortcut so the two commit identically. */
+  const submit = () => onSubmit([...chosen(state)].reverse())
+
+  /* ⌘/Ctrl+Enter stands in for the commit button itself, so it only fires
+     while that button is the one on screen — a walk or a sift has no such
+     button to commit the modal early. */
+  useSubmitShortcut(view === 'browse', submit)
+
   /* Both bars speak for the screen on top, which is the same rule the `x`
      follows. The way back is labelled with the screen it returns to rather than
      with the move — 'back' alone leaves open what becomes of the answers
@@ -129,11 +140,12 @@ export default function NeedPickerHost({
         <button
           type="button"
           className="mod-cta"
+          title={`${commit} (${submitShortcutLabel})`}
           /* Newest-closed first is what puts the last card top-left. Read top
              to bottom in a note, the order you visited them reads better. */
-          onClick={() => onSubmit([...chosen(state)].reverse())}
+          onClick={submit}
         >
-          {total > 0 ? `${commit} (${total})` : commit}
+          {total > 0 ? `${commit} (${total})` : commit} {submitShortcutLabel}
         </button>
       </>
     ) : view === 'sift' ? (

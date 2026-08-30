@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import FeelingPicker from '../components/FeelingPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
+import { submitShortcutLabel, useSubmitShortcut } from '../keyboard.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -79,6 +80,11 @@ export default function FeelingPickerDemo() {
 
   const leaveTop = () => dispatch({ type: 'close' })
 
+  /* ⌘/Ctrl+Enter stands in for the button `Insert` itself would be, so it
+     only fires while that button is the one on screen — a walk or a sift has
+     no such button to commit the modal early. */
+  useSubmitShortcut(view === 'browse', ok)
+
   /* A grid's bar is empty. `Done` and the close button both leave the category
      keeping its marks, so a third control saying the same would be noise — and
      a '‹ Feelings' the size of the heading below reads as two titles
@@ -103,8 +109,8 @@ export default function FeelingPickerDemo() {
         <button type="button" onClick={cancel}>
           Cancel
         </button>
-        <button type="button" onClick={ok}>
-          {total > 0 ? `Insert (${total})` : 'Insert'}
+        <button type="button" onClick={ok} title={`Insert (${submitShortcutLabel})`}>
+          {total > 0 ? `Insert (${total})` : 'Insert'} {submitShortcutLabel}
         </button>
       </>
     ) : view === 'sift' ? (
