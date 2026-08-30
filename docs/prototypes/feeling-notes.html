@@ -654,7 +654,7 @@
         <caption>While the picker has focus</caption>
         <tbody>
           <tr><th><kbd>N</kbd></th><td>Write a note on this word, or open the one already there. Focus moves into the box.</td></tr>
-          <tr><th><kbd>Enter</kbd></th><td>Keep it. In the grid it marks the word and hands focus back to it; in the walk it answers <em>yes</em> and deals the next card.</td></tr>
+          <tr><th><kbd>Enter</kbd></th><td>Keep it. The drawer closes and the note is in the card, under the definition. In the grid that also marks the word; in the walk the card is still there, still unanswered.</td></tr>
           <tr><th><kbd>Shift</kbd> <kbd>Enter</kbd></th><td>A new line. The box grows under it, and the drawer climbs to make room.</td></tr>
           <tr><th><kbd>Enter</kbd> on empty</th><td>Deletes the note. Clearing the box <em>is</em> the delete; there is no second control for it.</td></tr>
           <tr><th><kbd>Esc</kbd> or <span class="mono">✕</span></th><td>Puts the box back the way it was found and closes the drawer. The drawer is the screen on top, so both leave it and neither leaves the category.</td></tr>
@@ -667,8 +667,11 @@
       <p>
         <strong>A note only exists on a word that is picked.</strong> There is nothing a note on an
         unpicked feeling could mean and nowhere for it to be written. So the rule runs both ways:
-        keeping a note marks the word, unmarking a word takes its note with it, and in the walk —
-        where every card is answered — keeping a note <em>is</em> the yes.
+        keeping a note marks the word in the grid, and unmarking a word takes its note with it. In
+        the walk, where the card is answered rather than marked, the note is part of the answer and
+        not a substitute for it: <kbd>Enter</kbd> puts it in the card and leaves the card where it
+        was, <kbd>→</kbd> keeps the word and the note together, and <kbd>←</kbd> discards the word
+        and everything written about it.
       </p>
     </div>
   </section>
@@ -757,6 +760,15 @@
         the progress rule and the two answers — it could belong to any of them. Inside, under the
         definition, there is nothing else it could be about. And it costs no height either way: every
         card in a walk can be noted, so the line is never empty and never reserved for nothing.
+      </p>
+      <p>
+        <strong>Which is also why keeping a note does not answer the card.</strong> It first did —
+        a note being a stronger yes than the <kbd>→</kbd> — and the card flew off the instant the
+        last word was typed, so the note was never once seen where it lives. Nothing on a card is
+        decided until it is answered: <kbd>Enter</kbd> means <em>keep these words</em>, the drawer
+        closes, and the note is sitting under the definition of the word it is about. Then the two
+        answers still mean what they say. A typo is still fixable, too, which it was not when the
+        card left with it.
       </p>
       <p>
         In the code that means <code>FeelingCard</code> and <code>NeedCard</code> take an optional
@@ -1282,7 +1294,7 @@
       arriving.classList.add('arriving')
     }
 
-    function answer(toward, announce = true) {
+    function answer(toward) {
       const feeling = current()
       const noted = state.notes.has(feeling.word)
       fly(toward)
@@ -1292,9 +1304,9 @@
       past[at] = toward === 'accept' ? 'chosen' : 'skipped'
       at = (at + 1) % WORDS.length
       if (at === 0) past.length = 0
-      if (announce) {
+      {
         say(host, toward === 'accept'
-          ? 'Kept ' + feeling.word + '.'
+          ? 'Kept ' + feeling.word + (noted ? ', and the note with it.' : '.')
           : 'Passed on ' + feeling.word + (noted ? ', and its note went with it.' : '.'))
       }
       render()
@@ -1314,13 +1326,14 @@
       state.editing = null
       if (commit && text) {
         state.notes.set(word, text)
-        // Keeping a note is the answer: there is no such thing as a note on a
-        // feeling that was passed over, so the card is answered and dealt on.
-        say(host, 'Kept ' + word + ' with a note, and dealt the next card.')
-        answer('accept', false)
-        return
-      }
-      if (commit && state.notes.has(word)) {
+        // The note is part of the answer, not a substitute for it. Keeping it
+        // puts it in the card, under the definition, where it will live — and
+        // leaves the card where it was, because nothing on a card is decided
+        // until it is answered. Answering yes keeps both; not this discards
+        // the word and everything written about it.
+        say(host, 'Note kept on ' + word + '. The card is still yours to answer.')
+      } else if (commit && state.notes.has(word)) {
+        // An emptied box is the delete, and the only one there is.
         state.notes.delete(word)
         say(host, 'Note on ' + word + ' deleted. The card is still unanswered.')
       }
@@ -1374,7 +1387,7 @@
     {
       build: buildPrompt, where: 'Walk · FeelingPrompt',
       title: 'Every card can be noted',
-      note: 'Press N, or click the line — a card is one word, so there is nothing to lose under the pointer. Keeping a note answers the card yes; ← passes and takes any note with it.',
+      note: 'Press N, or click the line — a card is one word, so there is nothing to lose under the pointer. Enter puts the note in the card and leaves the card unanswered; ← passes and takes the note with it.',
     },
   ]) {
     const status = el('p', { className: 'status' })
