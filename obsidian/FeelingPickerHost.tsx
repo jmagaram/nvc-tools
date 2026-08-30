@@ -18,11 +18,8 @@ import type {
   Visited,
 } from '../src/machines/feelingPicker.ts'
 import { useFocusScreen } from '../src/focusScreen.ts'
-import {
-  submitShortcutKeys,
-  submitShortcutLabel,
-  useSubmitShortcut,
-} from '../src/keyboard.ts'
+import { useSubmitShortcut } from '../src/keyboard.ts'
+import { submitShortcut } from './shortcut.ts'
 import Credit from './Credit.tsx'
 
 /** What the modal is called, and so what the way out of a walk points back at. */
@@ -114,7 +111,11 @@ export default function FeelingPickerHost({
 
   /* ⌘/Ctrl+Enter stands in for the primary button on the screen: the modal
      commit on the categories and `Done` on a grid. A walk has none. */
-  useSubmitShortcut(view !== 'walk', view === 'browse' ? submit : leaveTop)
+  useSubmitShortcut(
+    submitShortcut,
+    view !== 'walk',
+    view === 'browse' ? submit : leaveTop,
+  )
 
   /* Both bars speak for the screen on top, which is the same rule the `x`
      follows. The way back is labelled with the screen it returns to rather than
@@ -143,7 +144,7 @@ export default function FeelingPickerHost({
         <button
           type="button"
           className="mod-cta"
-          aria-keyshortcuts={submitShortcutKeys}
+          aria-keyshortcuts={submitShortcut.keys}
           /* Newest-closed first is what puts the last card top-left. Read top
              to bottom in a note, the order you visited them reads better. */
           onClick={submit}
@@ -155,7 +156,7 @@ export default function FeelingPickerHost({
               properly in `aria-keyshortcuts` above; printed into the label it
               was read out as part of the button's name. */}
           <span className="nvc-chord" aria-hidden="true">
-            {submitShortcutLabel}
+            {submitShortcut.label}
           </span>
         </button>
       </>
@@ -168,11 +169,11 @@ export default function FeelingPickerHost({
           type="button"
           className="mod-cta"
           onClick={leaveTop}
-          aria-keyshortcuts={submitShortcutKeys}
+          aria-keyshortcuts={submitShortcut.keys}
         >
           Done
           <span className="nvc-chord" aria-hidden="true">
-            {submitShortcutLabel}
+            {submitShortcut.label}
           </span>
         </button>
       </>

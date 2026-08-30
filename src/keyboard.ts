@@ -1,30 +1,49 @@
 import { useEffect } from 'react'
 
 /**
- * Whether this is running where the modifier key is Command rather than
- * Control — the one thing the shortcut's label needs to know. Checked once at
- * import time: the platform a session runs in does not change under it.
+ * A chord in the three forms a button needs it in: printed on itself, spoken,
+ * and recognised in a keypress. One value rather than three exports, so a host
+ * decides the platform once and everything that says the chord agrees.
  */
-const isMac =
-  typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
+export type SubmitShortcut = {
+  /**
+   * What the chord reads as on the button it shortcuts. Mac spells the modifier
+   * in the symbol its own menus use; everywhere else spells it out, because
+   * Windows and Linux have no glyph for Ctrl the way Mac has one. The return
+   * key keeps its glyph on both, because a hint printed on a button is a keycap
+   * and not a sentence — spelled out, `Ctrl+Enter` came to more width than the
+   * word it was hanging off, and the two platforms drew buttons of quite
+   * different shapes.
+   */
+  label: string
+  /**
+   * The same chord for `aria-keyshortcuts`, which has a spelling of its own and
+   * takes neither the glyphs nor the arrow. The label on screen is `aria-hidden`
+   * decoration on the button beside this: read out, it would put 'Ctrl Enter'
+   * into the name of every commit button.
+   */
+  keys: string
+  /** Whether a keypress is this chord. */
+  pressed: (e: KeyboardEvent) => boolean
+}
 
 /**
- * What `⌘Enter` reads as on the button it shortcuts. Mac spells the modifier in
- * the symbol its own menus use; everywhere else spells it out, because Windows
- * and Linux have no glyph for Ctrl the way Mac has one. The return key keeps
- * its glyph on both, because a hint printed on a button is a keycap and not a
- * sentence — spelled out, `Ctrl+Enter` came to more width than the word it was
- * hanging off, and the two platforms drew buttons of quite different shapes.
+ * Command/Ctrl+Enter, spelled for the platform the host says it is on.
+ *
+ * Which platform that is belongs to the host, not to this module. The plugin
+ * knows from Obsidian's own `Platform.isMacOS` — the answer the app itself uses
+ * to choose between command- and ctrl-based hotkeys, and the one the community
+ * scanner asks a plugin to use. The gallery is a web page with no such API and
+ * asks the user agent. Deciding it here would put one surface's answer in code
+ * the other one ships.
  */
-export const submitShortcutLabel = isMac ? '⌘⏎' : 'Ctrl+⏎'
-
-/**
- * The same chord for `aria-keyshortcuts`, which has a spelling of its own and
- * takes neither the glyphs nor the arrow. The label on screen is `aria-hidden`
- * decoration on the button beside this: read out, it would put 'Ctrl Enter'
- * into the name of every commit button.
- */
-export const submitShortcutKeys = isMac ? 'Meta+Enter' : 'Control+Enter'
+export function submitShortcutFor(isMac: boolean): SubmitShortcut {
+  return {
+    label: isMac ? '⌘⏎' : 'Ctrl+⏎',
+    keys: isMac ? 'Meta+Enter' : 'Control+Enter',
+    pressed: (e) => e.key === 'Enter' && (isMac ? e.metaKey : e.ctrlKey),
+  }
+}
 
 /**
  * Command/Ctrl+Enter as a second way to press whichever button just committed
@@ -39,16 +58,19 @@ export const submitShortcutKeys = isMac ? 'Meta+Enter' : 'Control+Enter'
  * rather than gating inside the effect keeps one hook doing one thing: a host
  * decides when the shortcut applies by deciding when to turn it on.
  */
-export function useSubmitShortcut(enabled: boolean, onSubmit: () => void) {
+export function useSubmitShortcut(
+  shortcut: SubmitShortcut,
+  enabled: boolean,
+  onSubmit: () => void,
+) {
   useEffect(() => {
     if (!enabled) return
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter') return
-      if (!(isMac ? e.metaKey : e.ctrlKey)) return
+      if (!shortcut.pressed(e)) return
       e.preventDefault()
       onSubmit()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [enabled, onSubmit])
+  }, [shortcut, enabled, onSubmit])
 }

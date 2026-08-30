@@ -2,11 +2,8 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import FeelingPicker from '../components/FeelingPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
-import {
-  submitShortcutKeys,
-  submitShortcutLabel,
-  useSubmitShortcut,
-} from '../keyboard.ts'
+import { useSubmitShortcut } from '../keyboard.ts'
+import { submitShortcut } from './shortcut.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -86,7 +83,11 @@ export default function FeelingPickerDemo() {
 
   /* ⌘/Ctrl+Enter stands in for the primary button on the screen: `Insert` on
      the categories and `Done` on a grid. A walk has no button to stand in for. */
-  useSubmitShortcut(view !== 'walk', view === 'browse' ? ok : leaveTop)
+  useSubmitShortcut(
+    submitShortcut,
+    view !== 'walk',
+    view === 'browse' ? ok : leaveTop,
+  )
 
   /* A grid's bar is empty. `Done` and the close button both leave the category
      keeping its marks, so a third control saying the same would be noise — and
@@ -115,7 +116,7 @@ export default function FeelingPickerDemo() {
         <button
           type="button"
           onClick={ok}
-          aria-keyshortcuts={submitShortcutKeys}
+          aria-keyshortcuts={submitShortcut.keys}
         >
           {total > 0 ? `Insert (${total})` : 'Insert'}
           {/* The chord in its own element rather than in the label, so it can
@@ -124,7 +125,7 @@ export default function FeelingPickerDemo() {
               the same thing properly; printed into the label it was read out as
               part of the button's name. */}
           <small className={styles.chord} aria-hidden="true">
-            {submitShortcutLabel}
+            {submitShortcut.label}
           </small>
         </button>
       </>
@@ -136,11 +137,11 @@ export default function FeelingPickerDemo() {
         <button
           type="button"
           onClick={leaveTop}
-          aria-keyshortcuts={submitShortcutKeys}
+          aria-keyshortcuts={submitShortcut.keys}
         >
           Done
           <small className={styles.chord} aria-hidden="true">
-            {submitShortcutLabel}
+            {submitShortcut.label}
           </small>
         </button>
       </>
@@ -232,11 +233,11 @@ export default function FeelingPickerDemo() {
                   <button
                     type="button"
                     onClick={leaveTop}
-                    aria-keyshortcuts={submitShortcutKeys}
+                    aria-keyshortcuts={submitShortcut.keys}
                   >
                     Done
                     <small className={styles.chord} aria-hidden="true">
-                      {submitShortcutLabel}
+                      {submitShortcut.label}
                     </small>
                   </button>
                 </>

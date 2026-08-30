@@ -328,6 +328,18 @@ straight from `src/` and adds nothing to it.
   `body.is-phone` in the plugin, the device frame in the gallery — which has
   neither key. The shortcut itself stays registered there: a phone with a
   keyboard attached still answers it, and simply says nothing about itself.
+
+  **Which platform it is, the host says.** `src/keyboard.ts` spells the chord —
+  label, `aria-keyshortcuts`, and what counts as a press — from one `isMac` it
+  is handed, and asks nobody itself. The plugin answers with Obsidian's
+  `Platform.isMacOS` in `obsidian/shortcut.ts`, which is the app's own answer to
+  this exact question and true on iPhone and iPad too; the gallery, a web page
+  with no such API, asks the user agent in `src/demos/shortcut.ts`. Detecting it
+  in `src/keyboard.ts` put a browser's guess in code the plugin ships, which is
+  what `obsidianmd/platform` flags — and the plugin's rules cannot be disabled
+  in a comment, `eslint-comments/no-restricted-disable` being on. The gallery's
+  copy is the one finding `lint:obsidian` still has, in the demo folder it
+  already ignores.
 - **The title bar carries a control only where one is needed.** On a walk that is
   **‹ Angry** — the category it started in, since that is where its answers land,
   rather than *Back*, which left open what became of the answers already given —
