@@ -108,10 +108,9 @@ export default function FeelingPickerHost({
      button and the shortcut so the two commit identically. */
   const submit = () => onSubmit([...chosen(state)].reverse())
 
-  /* ⌘/Ctrl+Enter stands in for the commit button itself, so it only fires
-     while that button is the one on screen — a walk or a sift has no such
-     button to commit the modal early. */
-  useSubmitShortcut(view === 'browse', submit)
+  /* ⌘/Ctrl+Enter stands in for the primary button on the screen: the modal
+     commit on the categories and `Done` on a grid. A walk has none. */
+  useSubmitShortcut(view !== 'walk', view === 'browse' ? submit : leaveTop)
 
   /* Both bars speak for the screen on top, which is the same rule the `x`
      follows. The way back is labelled with the screen it returns to rather than
@@ -153,8 +152,13 @@ export default function FeelingPickerHost({
         <button type="button" onClick={() => dispatch({ type: 'walk' })}>
           Ask me about each
         </button>
-        <button type="button" className="mod-cta" onClick={leaveTop}>
-          Done
+        <button
+          type="button"
+          className="mod-cta"
+          onClick={leaveTop}
+          title={`Done (${submitShortcutLabel})`}
+        >
+          Done {submitShortcutLabel}
         </button>
       </>
     ) : null

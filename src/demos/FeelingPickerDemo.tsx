@@ -80,10 +80,9 @@ export default function FeelingPickerDemo() {
 
   const leaveTop = () => dispatch({ type: 'close' })
 
-  /* ⌘/Ctrl+Enter stands in for the button `Insert` itself would be, so it
-     only fires while that button is the one on screen — a walk or a sift has
-     no such button to commit the modal early. */
-  useSubmitShortcut(view === 'browse', ok)
+  /* ⌘/Ctrl+Enter stands in for the primary button on the screen: `Insert` on
+     the categories and `Done` on a grid. A walk has no button to stand in for. */
+  useSubmitShortcut(view !== 'walk', view === 'browse' ? ok : leaveTop)
 
   /* A grid's bar is empty. `Done` and the close button both leave the category
      keeping its marks, so a third control saying the same would be noise — and
@@ -118,8 +117,12 @@ export default function FeelingPickerDemo() {
         <button type="button" onClick={() => dispatch({ type: 'walk' })}>
           Ask me about each
         </button>
-        <button type="button" onClick={leaveTop}>
-          Done
+        <button
+          type="button"
+          onClick={leaveTop}
+          title={`Done (${submitShortcutLabel})`}
+        >
+          Done {submitShortcutLabel}
         </button>
       </>
     ) : null
@@ -207,8 +210,12 @@ export default function FeelingPickerDemo() {
                   >
                     Ask me about each
                   </button>{' '}
-                  <button type="button" onClick={leaveTop}>
-                    Done
+                  <button
+                    type="button"
+                    onClick={leaveTop}
+                    title={`Done (${submitShortcutLabel})`}
+                  >
+                    Done {submitShortcutLabel}
                   </button>
                 </>
               ) : (
