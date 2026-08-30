@@ -414,12 +414,16 @@ an update is only a new release.
   listing. So the value has to be at the top — what it does, then a screenshot —
   and the developer material lives in `CONTRIBUTING.md` instead.
 
-  The pane rewrites a relative `src` on an `img` or `video` into a raw URL, so a
-  relative image *would* work. A relative **link** is not rewritten: `[MIT](LICENSE)`
-  renders as a dead `href="LICENSE"`. That is why every link and image in the
-  README is absolute, pinned to `HEAD` rather than a branch name. `<picture>` and
-  `srcset` are never rewritten, and a Git LFS image comes back as its pointer
-  text, so neither belongs in there.
+  **Relative paths are the right form in there, for links and images alike**,
+  and the docs say so. The pane rewrites a relative `src` on an `img` or `video`
+  against the repo, and rewrites internal links too — Obsidian's parser counts a
+  link whose target is not a URL as internal, so `[MIT](LICENSE)` resolves. Only
+  genuinely external URLs are written out in full.
+
+  What the rewrite does not cover: `<picture>` and `srcset` are never touched,
+  and a Git LFS image comes back as its pointer text, so neither belongs in
+  there. And because the rewrite resolves against `HEAD`, an image has to be
+  committed on the **default branch** — attaching it to a release is not enough.
 - **A bump is a broadcast.** The root `manifest.json` version is what tells
   every installed copy there is an update. So a beta gets a tag and a release
   *without* a manifest bump, or it ships to everyone.
