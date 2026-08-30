@@ -404,10 +404,23 @@ an update is only a new release.
   and compares, so `build` has to be the plugin build — see **Commands**. It
   also reads `src/` as plugin source, which is why `lint:obsidian` is scoped to
   what ships and the gallery's demo pages are ignored.
-- **`minAppVersion` is a claim the linter checks.** `no-unsupported-api` rejects
-  any API newer than the number in the manifest, so it cannot be left low out of
-  optimism. Today it is `1.7.2`, for the deferred views `obsidian/block.tsx`
-  guards against.
+- **`minAppVersion` is the oldest app the plugin actually works on**, not the
+  oldest it has been run on and not the newest available. `no-unsupported-api`
+  rejects any API newer than the number in the manifest, so lowering it until
+  that rule fires is how the real floor is found. Today it is `1.5.7`, set by
+  `Vault.getFileByPath` in `obsidian/block.tsx` — the newest API the plugin
+  calls, per the `@since` tags in `obsidian.d.ts`. `Vault.process` is the only
+  other one above baseline, at 1.1.0.
+
+  The deferred-view guard in `editorFor` is *not* what sets it. Deferred views
+  arrived in 1.7.2, but `instanceof MarkdownView` is valid on every version and
+  an older app simply has none to skip, so guarding against them costs no
+  compatibility. Two other things the linter cannot see, both checked: every
+  Obsidian CSS variable used either predates 1.5.7 or carries a fallback
+  (`--dialog-max-height, 85vh`, `--dialog-width, 560px`,
+  `--background-modifier-border-focus, currentColor`), and the bundle's newest
+  syntax is logical assignment and `Array.at`, which the Chromium in 1.5.7
+  already had.
 - **The README is the shopfront, and it is rendered twice.** Obsidian's in-app
   plugin browser fetches it from `raw.githubusercontent.com/<repo>/HEAD/README.md`
   and renders it in the detail pane; the directory shows an excerpt on the web
