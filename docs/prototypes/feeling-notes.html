@@ -363,9 +363,28 @@
   }
 
   /* A coarse pointer has nothing to lose by touching it, and no key to press
-     instead — so there, and only there, the line in the grid is a target. */
-  [data-pointer='coarse'] .offer { pointer-events: auto; cursor: pointer; }
+     instead — so there, and only there, the line in the grid is a target, and
+     the one place a note can be reached at all. A finger never crosses the
+     words on its way here: it travels through the air, so the word the line is
+     about is the last one deliberately tapped and cannot drift.
+
+     It is drawn as a target too, which is the rule about not looking clickable
+     read the other way round: the affordance appears exactly where it can be
+     used. An empty field is the shape — a dashed rule under the invitation,
+     the same one the strip's own definition sits above.
+
+     And it is finger-sized. 1.7 lines is fine for a line of type to read at;
+     it is under the 44px a thumb wants, and this line is the only way in. The
+     two lines of definition above it are the buffer against the words — the
+     grid's last row is never adjacent to this. */
+  [data-pointer='coarse'] .offer {
+    pointer-events: auto;
+    cursor: pointer;
+    border-bottom: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+    padding-bottom: 0.15rem;
+  }
   [data-pointer='coarse'] .offer:active { opacity: 1; }
+  [data-pointer='coarse'] .noteSlot { min-height: 44px; }
 
   /* A card is one word, and nothing changes underneath the pointer on its way
      down it: the walk can afford a click the grid cannot. */
@@ -595,10 +614,25 @@
     <div class="demos" id="demos"></div>
     <div class="prose">
       <p>
+        <strong>On a phone the tap is the whole way in, so it is drawn as one.</strong> A finger
+        never crosses the words on its way to the line — it travels through the air — so the word
+        the line is about is the last one deliberately tapped and cannot drift under it. That is the
+        rule about not looking clickable read the other way round: the affordance appears exactly
+        where it can be used, as a dashed rule under the invitation, at a height a thumb can hit.
+        There is no other route to reach it — tapping a marked word again unmarks it, and would take
+        the note with it.
+      </p>
+      <p>
         <strong>The walk is the exception, and can afford the click.</strong> A card is one word: the
         pointer crosses nothing on its way down, so there the line opens the drawer on either
         pointer. Without it a mouse in a walk would have no way to a note at all — the two answers are
         the only other targets on the screen.
+      </p>
+      <p>
+        What touch still owes an answer is not the tap but the keyboard it summons: it comes up over
+        the bottom of the screen, which is exactly where the drawer is anchored. The drawer will have
+        to sit above it — the visual viewport, not the layout one, is what knows where it ends — and
+        that is a real piece of work, unlike the tap.
       </p>
       <p>
         Three things were tried and dropped. A <strong>pencil button</strong> at the end of the line
@@ -1172,7 +1206,7 @@
     {
       build: buildSift, where: 'Grid · FeelingCategorySift',
       title: 'Marking a word offers the note',
-      note: 'Mark a word: the line under the definition names the key. It is text, not a target — reaching for it would cost you the word you were pointing at. irate already carries a two-line note.',
+      note: 'Mark a word: the line under the definition names the key. It is text, not a target — reaching for it would cost you the word you were pointing at. Switch to Touch and it becomes one, because a finger crosses nothing on its way there.',
     },
     {
       build: buildPrompt, where: 'Walk · FeelingPrompt',
