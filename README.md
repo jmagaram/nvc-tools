@@ -1,9 +1,9 @@
-# NVC
+# Nonviolent Communication
 
 An Obsidian plugin for putting feelings and needs into a note.
 
-It adds two commands — **NVC: Insert feelings…** and **NVC: Insert needs…** —
-each opening a picker over the note you are in. Feelings are split the way the
+It adds two commands — **Insert feelings…** and **Insert needs…** — each
+opening a picker over the note you are in. Feelings are split the way the
 source splits them, by whether a need was met; a category you have answered
 shows what you kept.
 
@@ -38,7 +38,7 @@ Markdown** turns it into ordinary markdown for good.
 ## Install
 
 From inside Obsidian: Settings → Community plugins → **Browse**, search for
-**NVC**, then **Install** and **Enable**.
+**NVC** or **Nonviolent Communication**, then **Install** and **Enable**.
 
 ### Betas
 
@@ -48,7 +48,7 @@ To run what is on `main` ahead of a release, use
 1. Install **BRAT** from Settings → Community plugins.
 2. Open the command palette and run **BRAT: Add a beta plugin for testing**.
 3. Paste `jmagaram/nvc-tools` and click **Add Plugin**.
-4. Enable **NVC** under Settings → Community plugins.
+4. Enable **Nonviolent Communication** under Settings → Community plugins.
 
 BRAT checks for new releases on startup, so updates arrive on their own. Don't
 run both copies at once — disable whichever you are not testing.

@@ -197,8 +197,9 @@ versions.json        reads them from — see **Releasing** below
 
 ## The Obsidian plugin
 
-`obsidian/` is the second surface: two commands, `NVC: Insert feelings…` and
-`NVC: Insert needs…`, each opening a picker over the active note and inserting
+`obsidian/` is the second surface: two commands, `Insert feelings…` and
+`Insert needs…` — Obsidian prefixes the plugin's `name` to both in the palette,
+which is why neither says it itself — each opening a picker over the active note and inserting
 grouped bullets at the cursor, fenced as an `nvc-list` block. It imports
 straight from `src/` and adds nothing to it.
 
