@@ -408,6 +408,18 @@ an update is only a new release.
   any API newer than the number in the manifest, so it cannot be left low out of
   optimism. Today it is `1.7.2`, for the deferred views `obsidian/block.tsx`
   guards against.
+- **The README is the shopfront, and it is rendered twice.** Obsidian's in-app
+  plugin browser fetches it from `raw.githubusercontent.com/<repo>/HEAD/README.md`
+  and renders it in the detail pane; the directory shows an excerpt on the web
+  listing. So the value has to be at the top — what it does, then a screenshot —
+  and the developer material lives in `CONTRIBUTING.md` instead.
+
+  The pane rewrites a relative `src` on an `img` or `video` into a raw URL, so a
+  relative image *would* work. A relative **link** is not rewritten: `[MIT](LICENSE)`
+  renders as a dead `href="LICENSE"`. That is why every link and image in the
+  README is absolute, pinned to `HEAD` rather than a branch name. `<picture>` and
+  `srcset` are never rewritten, and a Git LFS image comes back as its pointer
+  text, so neither belongs in there.
 - **A bump is a broadcast.** The root `manifest.json` version is what tells
   every installed copy there is an update. So a beta gets a tag and a release
   *without* a manifest bump, or it ships to everyone.
