@@ -178,6 +178,16 @@
   .picker .swatch:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
   .picker input { accent-color: var(--accent); margin: 0; }
   .picker .cost { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+  .pickers { display: grid; gap: 0.6rem; }
+  .pickerRow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+  .pickerLabel {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    min-width: 6.5rem;
+  }
 
   /* ── The modal stand-in ─────────────────────────────────────────────────
      Below this line the markup and CSS follow the real components as closely
@@ -272,7 +282,74 @@
   /* Walk --------------------------------------------------------------- */
   .prompt { display: grid; gap: 1rem; padding: 0.5rem; }
   .prompt:focus { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: -2px; }
-  .stage { min-height: 9.5rem; display: grid; align-content: start; }
+  /* Two cards at most: the one just answered tilting away, and the one rising
+     into its place. Clipped at the sides so the flight slides under the edge
+     of the stage rather than widening the modal. */
+  .stage {
+    position: relative;
+    min-height: 11.5rem;
+    display: grid;
+    align-content: start;
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  .leaving {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    animation-duration: 400ms;
+    animation-fill-mode: forwards;
+  }
+  .leaving.accept { --verdict: #1a7f37; animation-name: flyRight; }
+  .leaving.reject { --verdict: #b3261e; animation-name: flyLeft; }
+
+  .wash {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.25rem;
+    background: var(--verdict);
+    opacity: 0;
+    animation: wash 400ms forwards;
+  }
+
+  .stamp {
+    position: absolute;
+    inset: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--verdict);
+    color: white;
+    font-size: 2rem;
+    line-height: 1;
+    opacity: 0;
+    scale: 1.25;
+    animation: stamp 400ms forwards;
+  }
+
+  .arriving { animation: arrive 220ms ease-out 200ms both; }
+
+  @keyframes flyRight {
+    0% { rotate: 0deg; translate: 0 0; animation-timing-function: ease-out; }
+    35% { rotate: 4deg; translate: 2% -1%; opacity: 1; animation-timing-function: ease-in; }
+    60% { opacity: 0.9; }
+    100% { rotate: 14deg; translate: 115% -12%; opacity: 0; }
+  }
+  @keyframes flyLeft {
+    0% { rotate: 0deg; translate: 0 0; animation-timing-function: ease-out; }
+    35% { rotate: -4deg; translate: -2% -1%; opacity: 1; animation-timing-function: ease-in; }
+    60% { opacity: 0.9; }
+    100% { rotate: -14deg; translate: -115% -12%; opacity: 0; }
+  }
+  @keyframes wash { 35% { opacity: 0.18; } to { opacity: 0.18; } }
+  @keyframes stamp { 35% { opacity: 1; scale: 1; } to { opacity: 1; scale: 1; } }
+  @keyframes arrive { from { transform: translateY(1.5rem) scale(0.97); opacity: 0; } }
 
   .card { display: grid; gap: 0.25rem; padding: 0.75rem 1rem; border: 1px solid; border-radius: 0.25rem; }
   .card.met { border-style: solid; }
@@ -346,13 +423,18 @@
     text-align: left;
     cursor: default;
     pointer-events: none;
-    opacity: 0.78;
   }
 
-  .offer .glyph { flex: none; opacity: 0.75; align-self: center; }
+  /* Two columns, and the key is the left one. Flushed right it read as chrome
+     belonging to the row rather than to the words beside it; anchored at the
+     left it is in the same place whether or not anything is written, so the
+     one thing on the line that looks like a button never moves. The note is
+     the darker of the two — it is what is being said, and the key is only how
+     to change it. */
+  .offer .glyph { flex: none; opacity: 0.55; align-self: center; }
+  .offer .said { flex: none; opacity: 0.55; white-space: nowrap; }
+  .offer .said.solo { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .offer .say { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .offer .say.empty { font-style: italic; }
-  .offer .said { flex: none; font-size: 0.88em; opacity: 0.72; white-space: nowrap; }
   .offer .said .key {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.9em;
@@ -387,9 +469,13 @@
   [data-pointer='coarse'] .noteSlot { min-height: 44px; }
 
   /* A card is one word, and nothing changes underneath the pointer on its way
-     down it: the walk can afford a click the grid cannot. */
-  .card .offer { pointer-events: auto; cursor: pointer; }
-  .card .offer:hover { opacity: 1; }
+     down it: the walk can afford a click the grid cannot. Keyed to the walk
+     rather than to the card, so it holds wherever the line is placed. */
+  [data-walk] .offer { pointer-events: auto; cursor: pointer; }
+  [data-walk] .offer:hover .said { opacity: 0.9; }
+
+  /* Under the card rather than in it — the placement switch below. */
+  .prompt > [data-walk] { margin-top: -0.25rem; padding: 0 1rem; }
 
   /* Everything behind the drawer is inert while it is open — the words, the
      answers, and the button row still in full view below it. Nothing there can
@@ -473,6 +559,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .lifted, .drawer, .step, .pill, .btnrow { transition: none; }
+    .leaving, .wash, .stamp, .arriving { animation-duration: 1ms; animation-delay: 0s; }
   }
 
   /* ── Saying a word carries a note ───────────────────────────────────────
@@ -610,7 +697,16 @@
         the switch below stands in for it.
       </p>
     </div>
-    <div class="picker" id="pointerPicker" role="radiogroup" aria-label="What kind of pointer"></div>
+    <div class="pickers">
+      <div class="pickerRow">
+        <span class="pickerLabel">Pointer</span>
+        <div class="picker" id="pointerPicker" role="radiogroup" aria-label="What kind of pointer"></div>
+      </div>
+      <div class="pickerRow">
+        <span class="pickerLabel">In the walk</span>
+        <div class="picker" id="placePicker" role="radiogroup" aria-label="Where the note sits on a card"></div>
+      </div>
+    </div>
     <div class="demos" id="demos"></div>
     <div class="prose">
       <p>
@@ -640,6 +736,33 @@
         shown once teaches the person who reads it that day and nobody who comes back in a month, and
         it needs somewhere to remember it has been shown. <strong>Nothing at all</strong> leaves the
         phone with no way in, which is the surface the drawer was for.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sectionHead">
+      <p class="eyebrow">Where it sits on a card</p>
+      <h2>The note belongs in the card, because the card leaves</h2>
+      <p>
+        Answer a card and it tilts, takes a wash of the verdict, and is thrown off the side while the
+        next one deals into its place. Everything that belongs to the word has to go with it. A note
+        under the card is left sitting there while the word it was written about flies away — and for
+        a beat it reads as a note about the card arriving. Switch the demo to <em>under the card</em>
+        and answer one; the flight is the argument.
+      </p>
+      <p>
+        It is the same answer from the other side, too. The card is the only thing on the screen that
+        says which word is being asked about, so a line outside it is equidistant between the word,
+        the progress rule and the two answers — it could belong to any of them. Inside, under the
+        definition, there is nothing else it could be about. And it costs no height either way: every
+        card in a walk can be noted, so the line is never empty and never reserved for nothing.
+      </p>
+      <p>
+        In the code that means <code>FeelingCard</code> and <code>NeedCard</code> take an optional
+        note region rather than <code>FeelingPrompt</code> laying one out beside them — a small
+        change, and the only one that keeps the flight honest, since the leaving card is a copy of
+        the same component.
       </p>
     </div>
   </section>
@@ -726,6 +849,11 @@
     { key: 'coarse', label: 'Touch', cost: 'the line is a target' },
   ]
 
+  const PLACES = [
+    { key: 'in', label: 'Inside the card', cost: 'flies off with it' },
+    { key: 'under', label: 'Under the card', cost: 'left behind' },
+  ]
+
   const BADGES = [
     { key: 'icon', label: 'Pencil glyph', cost: 'grows the pill' },
     { key: 'dot', label: 'Dot in the corner', cost: 'no width' },
@@ -774,42 +902,48 @@
     const said = el('span', { className: 'said' })
 
     // A button, but never dressed as one, and never a tab stop — see the CSS.
+    // The key comes first and the note follows it, so the keycap sits in one
+    // place whether or not anything is written.
     const line = el('button', { type: 'button', className: 'offer', tabIndex: -1 }, [
-      glyph, say, more, said,
+      glyph, said, say, more,
     ])
     line.addEventListener('click', () => open())
 
     const slot = el('div', { className: 'noteSlot' }, [line])
 
     /** `offer` is whether this word may be noted at all. */
-    slot.show = ({ note, offer }) => {
+    slot.show = ({ note, offer, word }) => {
       const has = Boolean(note)
       line.hidden = !has && !offer
       if (line.hidden) return
 
       const lines = has ? note.split('\n') : []
       const touch = document.documentElement.dataset.pointer === 'coarse'
+      const key = () => el('span', { className: 'key', textContent: 'N' })
+      const press = (verb) => (touch ? ['Tap ' + verb] : ['Press ', key(), ' ' + verb])
 
-      // Empty, the line is one sentence and reads as an instruction. Written
-      // on, the note takes the sentence's place and the way to change it moves
-      // to the end — so the note lands exactly where the offer stood.
       say.replaceChildren()
-      say.classList.toggle('empty', !has)
+      said.replaceChildren()
       const rest = lines.length - 1
       more.textContent = rest > 0 ? '+' + rest + (rest === 1 ? ' line' : ' lines') : ''
-      said.replaceChildren()
+      // An empty span is still a flex child, and one that flexes would take
+      // half the line from the sentence beside it.
+      say.hidden = !has
+      more.hidden = !more.textContent
 
-      const key = () => el('span', { className: 'key', textContent: 'N' })
+      // Empty, the offer names the word it would be about — which is the whole
+      // line, so it may ellipsize like any other. Written on, the note takes
+      // the rest of the line and the offer shortens to the verb: the word is
+      // no longer in doubt once its own words are sitting there.
+      said.classList.toggle('solo', !has)
       if (has) {
+        said.append(...press('to edit'))
         say.append(lines[0])
-        if (touch) said.append('Tap to edit')
-        else said.append('Press ', key(), ' to edit')
-      } else if (touch) {
-        say.append('Tap to add a few words of your own')
       } else {
-        say.append('Press ', key(), ' to add a few words of your own')
+        said.append(...press('to add a few words about ' + word))
       }
-      line.setAttribute('aria-label', has ? 'Edit the note on this word: ' + note : 'Write a note on this word')
+      line.setAttribute('aria-label',
+        has ? 'Edit the note on ' + word + ': ' + note : 'Write a note about ' + word)
     }
     return slot
   }
@@ -968,6 +1102,7 @@
       }
 
       line.show({
+        word: showing?.word,
         note: showing ? state.notes.get(showing.word) : undefined,
         // Only a marked word can carry a note, so only a marked word is offered
         // one — which makes marking the thing that introduces the feature.
@@ -1044,12 +1179,23 @@
     const wordEl = el('h3', { className: 'word' })
     const definition = el('p', { className: 'definition' })
     const line = noteLine(() => open(current().word))
+    line.dataset.walk = ''
     const card = el('div', { className: 'card ' + KIND }, [
       el('p', { className: 'category', textContent: CATEGORY }),
       wordEl,
       definition,
-      line,
     ])
+    // The card is the word's object on screen, so what belongs to the word
+    // belongs in it — including on the way out. Under the card instead, the
+    // line is left behind by the flight, which is the switch below.
+    const arriving = el('div', { className: 'arriving' }, [card])
+    const stage = el('div', { className: 'stage' }, [arriving])
+
+    function placeLine() {
+      const inCard = document.documentElement.dataset.place !== 'under'
+      if (inCard && line.parentElement !== card) card.append(line)
+      if (!inCard && line.parentElement !== prompt) prompt.insertBefore(line, rule)
+    }
 
     const rule = el('div', { className: 'steprule', role: 'progressbar' })
     const actions = el('div', { className: 'actions' }, [
@@ -1060,11 +1206,7 @@
         'Yes', el('span', { textContent: '→', ariaHidden: 'true' }),
       ]),
     ])
-    const prompt = el('div', { className: 'prompt lifted', tabIndex: 0 }, [
-      el('div', { className: 'stage' }, [card]),
-      rule,
-      actions,
-    ])
+    const prompt = el('div', { className: 'prompt lifted', tabIndex: 0 }, [stage, rule, actions])
     prompt.dataset.prompt = ''
 
     const drawer = noteDrawer({ onKeep: () => close(true), onDrop: () => close(false) })
@@ -1099,10 +1241,12 @@
       wordEl.textContent = feeling.word
       definition.textContent = feeling.definition
       line.show({
+        word: feeling.word,
         note: state.notes.get(feeling.word),
         // Every card can be noted: keeping a note is the same yes → gives.
         offer: !state.editing,
       })
+      placeLine()
 
       rule.replaceChildren()
       WORDS.forEach((_, index) => {
@@ -1120,9 +1264,28 @@
       back.toggleAttribute('inert', editing)
     }
 
+    /** A copy of the card just answered, kept only until it has flown off. */
+    function fly(toward) {
+      const leaving = el('div', { className: 'leaving ' + toward }, [
+        card.cloneNode(true),
+        el('div', { className: 'wash' }),
+        el('p', { className: 'stamp', textContent: toward === 'accept' ? '✓' : '✕' }),
+      ])
+      leaving.setAttribute('aria-hidden', 'true')
+      leaving.addEventListener('animationend', (event) => {
+        if (event.target === event.currentTarget) leaving.remove()
+      })
+      stage.append(leaving)
+      // Restart the deal, so a second answer landing mid-flight still lands.
+      arriving.classList.remove('arriving')
+      void arriving.offsetWidth
+      arriving.classList.add('arriving')
+    }
+
     function answer(toward, announce = true) {
       const feeling = current()
       const noted = state.notes.has(feeling.word)
+      fly(toward)
       if (toward === 'accept') state.marked.add(feeling.word)
       // Passing on a word takes its note with it, the same as unmarking does.
       else state.notes.delete(feeling.word)
@@ -1228,9 +1391,14 @@
     slabs.push(frame.redraw)
   }
 
-  // The line reads the pointer as it draws, so switching is a redraw.
+  // The line reads both switches as it draws, so switching is a redraw.
   radios('pointerPicker', 'pointer', POINTERS, 'fine', (key) => {
     document.documentElement.dataset.pointer = key
+    rerender()
+  })
+
+  radios('placePicker', 'place', PLACES, 'in', (key) => {
+    document.documentElement.dataset.place = key
     rerender()
   })
 
