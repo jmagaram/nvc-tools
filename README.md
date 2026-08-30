@@ -30,19 +30,6 @@ and **Convert to Markdown** turns it into plain markdown for good.
 From inside Obsidian: Settings → Community plugins → **Browse**, search for
 **NVC** or **Nonviolent Communication**, then **Install** and **Enable**.
 
-### Betas
-
-To run what is on `main` ahead of a release, use
-[BRAT](https://tfthacker.com/BRAT):
-
-1. Install **BRAT** from Settings → Community plugins.
-2. Open the command palette and run **BRAT: Add a beta plugin for testing**.
-3. Paste `jmagaram/nvc-tools` and click **Add Plugin**.
-4. Enable **Nonviolent Communication** under Settings → Community plugins.
-
-BRAT checks for new releases on startup, so updates arrive on their own. Don't
-run both copies at once — disable whichever you are not testing.
-
 ## Attribution
 
 The feelings and needs word lists come from the Center for Nonviolent

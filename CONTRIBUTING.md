@@ -23,6 +23,22 @@ Reload plugin installed, Obsidian picks each build up on its own.
 `.env.local` is gitignored — the vault path is one machine's, not the
 project's.
 
+## Run a beta without building
+
+[BRAT](https://tfthacker.com/BRAT) installs a plugin from a repo's releases
+rather than from the directory, which is how a tester runs a version that is
+tagged but not yet listed — see **Releasing** below for why a beta gets a tag
+and a release without a manifest bump.
+
+1. Install **BRAT** from Settings → Community plugins.
+2. Open the command palette and run **BRAT: Add a beta plugin for testing**.
+3. Paste `jmagaram/nvc-tools` and click **Add Plugin**.
+4. Enable **Nonviolent Communication** under Settings → Community plugins.
+
+BRAT checks for new releases on startup, so updates arrive on their own. Don't
+run this and a build of your own at once — disable whichever you are not
+testing.
+
 ## The component gallery
 
 The gallery is where the components are developed: the home page lists every
