@@ -3,10 +3,10 @@
 # The tag must equal the `version` in manifest.json exactly — no `v` prefix.
 # `npm run version:bump <x.y.z>` sets that and prints the tag commands.
 #
-# The release is created as a draft so the notes can be written by hand, and as
-# a pre-release because the plugin is still in beta. Publish the draft to make
-# it visible; BRAT cannot see a draft. Drop `--prerelease` for the first public
-# release.
+# The release is created as a draft so the notes can be written by hand. It must
+# then be published: neither Obsidian's community directory nor BRAT can see a
+# draft, and the directory ignores a pre-release outright — which is why this no
+# longer passes `--prerelease`.
 
 name: Release Obsidian plugin
 
@@ -30,6 +30,18 @@ jobs:
 
       - run: npm ci
 
+      # The directory finds a release by looking for the tag named in
+      # manifest.json, so a mismatch ships nothing at all. Cheaper to fail here
+      # than to work out later why a published release is invisible.
+      - name: Check the tag matches manifest.json
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          version=$(node -p "require('./manifest.json').version")
+          if [ "$tag" != "$version" ]; then
+            echo "Tag $tag does not match manifest.json version $version." >&2
+            exit 1
+          fi
+
       # Typechecks, then writes main.js, manifest.json, styles.css and
       # versions.json into dist-plugin/.
       - run: npm run plugin:build
@@ -52,7 +64,6 @@ jobs:
           gh release create "$tag" \
             --title="$tag" \
             --draft \
-            --prerelease \
             dist-plugin/main.js \
             dist-plugin/manifest.json \
             dist-plugin/styles.css

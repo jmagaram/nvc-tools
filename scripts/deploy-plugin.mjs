@@ -4,7 +4,14 @@
 // vite.plugin.config.ts, which calls deployToVault() after every rebuild in
 // watch mode.
 
-import { copyFileSync, existsSync, mkdirSync, utimesSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  utimesSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -14,8 +21,14 @@ const built = join(root, 'dist-plugin')
 /** Everything a plugin folder holds. All of it comes out of the build. */
 const FILES = ['main.js', 'manifest.json', 'styles.css', 'versions.json']
 
-/** Must match the `id` in manifest.json — Obsidian expects the folder to. */
-const PLUGIN_ID = 'nvc-picker'
+/**
+ * Obsidian expects the folder to be named for the plugin's `id`, so read it
+ * from the manifest rather than restating it. A second copy of the id is a
+ * second thing to remember on the one day it ever changes.
+ */
+const PLUGIN_ID = JSON.parse(
+  readFileSync(join(root, 'manifest.json'), 'utf8'),
+).id
 
 function vaultPath() {
   // Kept out of git: the path is one person's machine, not the project's.

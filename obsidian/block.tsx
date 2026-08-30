@@ -1,9 +1,8 @@
-import { MarkdownRenderChild, Menu, Notice, setIcon } from "obsidian";
+import { MarkdownRenderChild, MarkdownView, Menu, Notice, setIcon } from "obsidian";
 import type {
   Editor,
   MarkdownPostProcessorContext,
   MarkdownSectionInformation,
-  MarkdownView,
   Plugin,
 } from "obsidian";
 import { createRoot } from "react-dom/client";
@@ -174,8 +173,15 @@ function edit(
     return;
   }
 
-  const save = (entries: readonly Picked[]) =>
-    saveEdit(plugin, ctx, el, opened, entries);
+  /* The modal wants a callback that returns nothing, and writing to the note
+     is asynchronous — so the promise is run out here rather than handed back.
+     A write that fails has to say so: swallowing it would lose the edit with
+     the modal already closed and nothing on screen to suggest it. */
+  const save = (entries: readonly Picked[]) => {
+    void saveEdit(plugin, ctx, el, opened, entries).catch(() => {
+      new Notice("This block couldn’t be saved.");
+    });
+  };
 
   if (opened.inventory === "feelings") {
     new FeelingPickerModal(plugin.app, save, opened.entries).open();
@@ -359,11 +365,22 @@ async function rewrite(
   return written;
 }
 
-/** The editor holding this note, if one is open on it. */
+/**
+ * The editor holding this note, if one is open on it.
+ *
+ * The `instanceof` is not a formality. Since Obsidian 1.7.2 a leaf restored at
+ * startup holds a *deferred* view until something needs it, and a deferred view
+ * has neither `file` nor `editor` — so a cast would hand back `undefined` as an
+ * `Editor` and throw on the first read. A note that has not been looked at yet
+ * has no editor to write through, which is what `null` already means here: the
+ * caller falls back to `vault.process`.
+ */
 function editorFor(plugin: Plugin, path: string): Editor | null {
   for (const leaf of plugin.app.workspace.getLeavesOfType("markdown")) {
-    const view = leaf.view as MarkdownView;
-    if (view.file?.path === path) return view.editor;
+    const view = leaf.view;
+    if (view instanceof MarkdownView && view.file?.path === path) {
+      return view.editor;
+    }
   }
   return null;
 }

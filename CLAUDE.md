@@ -34,7 +34,12 @@ Obsidian plugin — for now the gallery is the only surface.
   `src/components/FeelingCategoryWalk.tsx`.
 - Type props with an explicit `type Props = { ... }`.
 - **Terminology.** The domain noun is **feeling**, never *emotion* — that is what
-  `src/data/feelings.ts` and the CNVC source call it. A **category** is a named
+  `src/data/feelings.ts` and the CNVC source call it. The one exception is the
+  `description` in the root `manifest.json`, which says "emotions" on purpose:
+  `name`, `author` and `description` are the three fields the community
+  directory searches, and *emotions* is the word someone looking for this will
+  type. It is a search term, not a domain noun — it appears in no UI and no
+  code, and it should not be "corrected". A **category** is a named
   group of feelings with a `kind` of `'met' | 'unmet'`; needs have categories
   too, but no `kind`. Name a component for the scope it covers: `*Picker` covers
   every category, `*Sift` shows one category's words all at once, `*Walk` goes
@@ -345,8 +350,17 @@ straight from `src/` and adds nothing to it.
 ## Commands
 
 - `npm run dev` — dev server
-- `npm run build` — typecheck (`tsc -b`) and build
+- `npm run build` — the **plugin** build, not the gallery's. It is an alias for
+  `plugin:build`, and it is named `build` because the community directory's
+  scanner runs the first of `build`, `build:plugin` or `compile` it finds and
+  checks the output against the release assets. Note it is not `plugin:build`
+  the scanner looks for — the words are the other way round.
+- `npm run gallery:build` — typecheck (`tsc -b`) and build the gallery
 - `npm run lint` — **oxlint**, not ESLint. Config is `.oxlintrc.json`.
+- `npm run lint:obsidian` — the community directory's own review, run locally
+  via `eslint-plugin-obsidianmd`. Not the project's linter and not run on every
+  change; it answers one question, which is whether a release would pass the
+  scanner. Config is `eslint.obsidian.config.mjs`, scoped to what ships.
 - `npm run plugin:build` — typecheck and build the plugin into `dist-plugin/`
 - `npm run plugin:deploy` — build, then copy it into the vault named by
   `OBSIDIAN_VAULT` in `.env.local` (gitignored)
@@ -355,8 +369,16 @@ straight from `src/` and adds nothing to it.
 
 ## Releasing
 
-The plugin is not in the community directory yet. It goes out as a GitHub
-pre-release that testers install with BRAT, by repo path.
+The plugin goes out through the community directory. Testers can still run
+ahead of a release with BRAT, by repo path.
+
+**Submission is not a pull request.** Until May 2026 a plugin was listed by
+forking `obsidianmd/obsidian-releases` and adding itself to
+`community-plugins.json`; pull requests are now disabled on that repo. A plugin
+is submitted once, at `community.obsidian.md`, and reviewed by an automated
+scanner rather than a person. That file is still what Obsidian reads, but the
+directory writes it. After the first submission there is nothing to resubmit —
+an update is only a new release.
 
 - **The root is Obsidian's, not ours.** `manifest.json`, `versions.json`,
   `README.md` and `LICENSE` sit at the repo root because that is the only place
@@ -372,11 +394,24 @@ pre-release that testers install with BRAT, by repo path.
   git tag, which must equal the manifest's `version` exactly — no `v` prefix, no
   pre-release suffix. `npm run version:bump` writes the first two and prints the
   tag commands rather than running them.
-- **Pushing a tag cuts the release.** `.github/workflows/release.yml` builds and
-  opens a *draft* pre-release with `main.js`, `manifest.json` and `styles.css`
-  attached. The draft is deliberate — it is where the notes get written — but
-  BRAT cannot see one, so it has to be published.
-- **After the directory, a bump is a broadcast.** Once the plugin is listed,
-  the root `manifest.json` version is what tells every installed copy there is
-  an update. From then on a beta gets a tag and a release *without* a manifest
-  bump, or it ships to everyone.
+- **Pushing a tag cuts the release.** `.github/workflows/release.yml` checks the
+  tag against the manifest, builds, and opens a *draft* release with `main.js`,
+  `manifest.json` and `styles.css` attached. The draft is deliberate — it is
+  where the notes get written — but nothing can see one, so it has to be
+  published. It is not marked pre-release: the directory skips those, which is
+  why every 0.1.x release was invisible to it.
+- **The scanner runs `npm run build`.** It reproduces the release from source
+  and compares, so `build` has to be the plugin build — see **Commands**. It
+  also reads `src/` as plugin source, which is why `lint:obsidian` is scoped to
+  what ships and the gallery's demo pages are ignored.
+- **`minAppVersion` is a claim the linter checks.** `no-unsupported-api` rejects
+  any API newer than the number in the manifest, so it cannot be left low out of
+  optimism. Today it is `1.7.2`, for the deferred views `obsidian/block.tsx`
+  guards against.
+- **A bump is a broadcast.** The root `manifest.json` version is what tells
+  every installed copy there is an update. So a beta gets a tag and a release
+  *without* a manifest bump, or it ships to everyone.
+- **The `id` is permanent.** `nvc-tools` is the directory's key and the folder
+  name in a vault. Changing it after listing resets the download count and
+  strands every install, which is why it was moved off `nvc-picker` before the
+  first public release rather than after.
