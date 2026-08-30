@@ -3,6 +3,35 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid;
   border-radius: 0.25rem;
+  transition: transform 0.1s ease-out;
+}
+
+/* The click carries the whole card to the sift or the walk it opens, with no
+   frame in between — so this is the only feedback a tap gets before the
+   screen changes underneath it. `.card:active` rather than `:has`, which the
+   directory's CSS review flags for its invalidation cost — see the comment on
+   `:focus-within` above. `:active` on a button propagates to its ancestors on
+   its own, so the card catches the press without naming the button inside it.
+
+   `:active` alone leaves a keyboard Enter unfelt: that fires its `click` on
+   the same `keydown` that presses the key, with no gap left for `:active` to
+   paint before the click handler swaps the screen out from under it.
+   `[data-pressed]` is `usePressDelay`'s stand-in for that case — it holds the
+   press in state and calls the real handler a beat later, long enough for
+   this to show first regardless of what pressed the button. */
+.card:active,
+.card[data-pressed] {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:active,
+  .card[data-pressed] {
+    transform: none;
+  }
 }
 
 .met {
