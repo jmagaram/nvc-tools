@@ -1,39 +1,29 @@
 # Nonviolent Communication
 
-An Obsidian plugin for putting feelings and needs into a note.
+Pick feelings and needs to put into an Obsidian note. It adds two commands:
+**Insert feelings…** and **Insert needs…**
 
-It adds two commands — **Insert feelings…** and **Insert needs…** — each
-opening a picker over the note you are in. Feelings are split the way the
-source splits them, by whether a need was met; a category you have answered
-shows what you kept.
+![The feelings picker: needs unmet and needs met tabs, two answered categories, the rest as pills](docs/images/feelings-picker.png)
 
-![The feelings picker: met and unmet tabs, two answered categories, the rest as pills](docs/images/feelings-picker.png)
-
-Open a category and every word in it is there to mark at once. Or ask to be
-walked through it a word at a time, with a definition for each — which is how
-you find the words you would never have picked off a list.
+Open a category and mark every word in it at once — or ask to be walked through
+it a word at a time, with a definition for each, which is how you find the words
+you would never have picked off a list.
 
 ![One word of a walk — Afraid, frightened — with its definition and a progress rule](docs/images/feeling-card.png)
 
-Needs work the same way, as one undivided list.
+![The needs picker, one undivided list of categories](docs/images/needs-picker.png)
 
-![The needs picker](docs/images/needs-picker.png)
-
-What you picked lands at the cursor:
+What lands at the cursor is ordinary markdown, so the note still reads with the
+plugin turned off:
 
 ```md
 - Angry: incensed, indignant, outraged
 - Peaceful: calm, content
 ```
 
-The words come from the Center for Nonviolent Communication's Feelings and
-Needs Inventory. What goes in the note is a fenced block whose body is those
-same bullets, so the note still reads with the plugin turned off. With it on,
-the block can be redrawn as a list, a table, or one comma-separated line,
-**Edit…** reopens the picker on what it already holds, and **Convert to
-Markdown** turns it into ordinary markdown for good.
-
-![A block as it renders in a note](docs/images/inserted-feelings.png)
+With it on, that block can be redrawn as a list, a table, or one
+comma-separated line. **Edit…** reopens the picker on what it already holds,
+and **Convert to Markdown** turns it into plain markdown for good.
 
 ## Install
 
