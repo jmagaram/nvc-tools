@@ -9,6 +9,8 @@ Open a category and mark every word in it at once — or ask to be walked throug
 it a word at a time, with a definition for each, which is how you find the words
 you would never have picked off a list.
 
+![One category open — every word in Sad at once, three of them marked](docs/images/feeling-sift.png)
+
 ![One word of a walk — Afraid, frightened — with its definition and a progress rule](docs/images/feeling-card.png)
 
 ![The needs picker, one undivided list of categories](docs/images/needs-picker.png)
@@ -21,9 +23,9 @@ plugin turned off:
 - Peaceful: calm, content
 ```
 
-With it on, that block can be redrawn as a list, a table, or one
-comma-separated line. **Edit…** reopens the picker on what it already holds,
-and **Convert to Markdown** turns it into plain markdown for good.
+With the plugin on, that block can be redrawn as a list, a table, or one
+comma-separated line, reopened in the picker to change what it holds, or handed
+back to plain markdown for good.
 
 ## Install
 
