@@ -2,7 +2,11 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import NeedPicker from '../components/NeedPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
-import { submitShortcutLabel, useSubmitShortcut } from '../keyboard.ts'
+import {
+  submitShortcutKeys,
+  submitShortcutLabel,
+  useSubmitShortcut,
+} from '../keyboard.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -106,8 +110,20 @@ export default function NeedPickerDemo() {
         <button type="button" onClick={cancel}>
           Cancel
         </button>
-        <button type="button" onClick={ok} title={`Insert (${submitShortcutLabel})`}>
-          {total > 0 ? `Insert (${total})` : 'Insert'} {submitShortcutLabel}
+        <button
+          type="button"
+          onClick={ok}
+          aria-keyshortcuts={submitShortcutKeys}
+        >
+          {total > 0 ? `Insert (${total})` : 'Insert'}
+          {/* The chord in its own element rather than in the label, so it can
+              be drawn at a hint's weight and taken off a phone, which has
+              neither key. `aria-hidden` because `aria-keyshortcuts` above says
+              the same thing properly; printed into the label it was read out as
+              part of the button's name. */}
+          <small className={styles.chord} aria-hidden="true">
+            {submitShortcutLabel}
+          </small>
         </button>
       </>
     ) : view === 'sift' ? (
@@ -118,9 +134,12 @@ export default function NeedPickerDemo() {
         <button
           type="button"
           onClick={leaveTop}
-          title={`Done (${submitShortcutLabel})`}
+          aria-keyshortcuts={submitShortcutKeys}
         >
-          Done {submitShortcutLabel}
+          Done
+          <small className={styles.chord} aria-hidden="true">
+            {submitShortcutLabel}
+          </small>
         </button>
       </>
     ) : null
@@ -212,9 +231,12 @@ export default function NeedPickerDemo() {
                   <button
                     type="button"
                     onClick={leaveTop}
-                    title={`Done (${submitShortcutLabel})`}
+                    aria-keyshortcuts={submitShortcutKeys}
                   >
-                    Done {submitShortcutLabel}
+                    Done
+                    <small className={styles.chord} aria-hidden="true">
+                      {submitShortcutLabel}
+                    </small>
                   </button>
                 </>
               ) : (

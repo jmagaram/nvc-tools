@@ -38,3 +38,28 @@
   padding: 1rem 0;
   grid-template-rows: 85%;
 }
+
+/* The keyboard chord printed on the button it presses — `Insert ⌘⏎`.
+
+   A hint rather than a second label: the button's own word is what is read
+   first, and this sits beside it a size down and part way into the background,
+   the way a menu draws the shortcut beside the command. Written in `em` and in
+   `currentColor` so it follows whatever the button is drawn in — the gallery's
+   plain button here, an Obsidian theme's in the plugin, which spells the same
+   rule in its own tokens as `.nvc-chord`.
+
+   The margin cannot be a space in the markup: a space between two elements in
+   a button is trimmed wherever the button is laid out as a flex box, which is
+   what Obsidian does with its own. */
+.chord {
+  margin-left: 0.4em;
+  font-size: 0.85em;
+  opacity: 0.65;
+}
+
+/* A phone has neither key. Obsidian draws the same conclusion from its own
+   `body.is-phone`; here the device frame is the only thing that knows, which is
+   why the rule hangs off the screen rather than off the hint. */
+.screen.phone .chord {
+  display: none;
+}

@@ -18,7 +18,11 @@ import type {
   Visited,
 } from '../src/machines/feelingPicker.ts'
 import { useFocusScreen } from '../src/focusScreen.ts'
-import { submitShortcutLabel, useSubmitShortcut } from '../src/keyboard.ts'
+import {
+  submitShortcutKeys,
+  submitShortcutLabel,
+  useSubmitShortcut,
+} from '../src/keyboard.ts'
 import Credit from './Credit.tsx'
 
 /** What the modal is called, and so what the way out of a walk points back at. */
@@ -139,12 +143,20 @@ export default function FeelingPickerHost({
         <button
           type="button"
           className="mod-cta"
-          title={`${commit} (${submitShortcutLabel})`}
+          aria-keyshortcuts={submitShortcutKeys}
           /* Newest-closed first is what puts the last card top-left. Read top
              to bottom in a note, the order you visited them reads better. */
           onClick={submit}
         >
-          {total > 0 ? `${commit} (${total})` : commit} {submitShortcutLabel}
+          {total > 0 ? `${commit} (${total})` : commit}
+          {/* The chord in its own element rather than in the label, so it can
+              be drawn at a hint's weight and taken off a phone, which has
+              neither key. `aria-hidden` because the button says the same thing
+              properly in `aria-keyshortcuts` above; printed into the label it
+              was read out as part of the button's name. */}
+          <span className="nvc-chord" aria-hidden="true">
+            {submitShortcutLabel}
+          </span>
         </button>
       </>
     ) : view === 'sift' ? (
@@ -156,9 +168,12 @@ export default function FeelingPickerHost({
           type="button"
           className="mod-cta"
           onClick={leaveTop}
-          title={`Done (${submitShortcutLabel})`}
+          aria-keyshortcuts={submitShortcutKeys}
         >
-          Done {submitShortcutLabel}
+          Done
+          <span className="nvc-chord" aria-hidden="true">
+            {submitShortcutLabel}
+          </span>
         </button>
       </>
     ) : null

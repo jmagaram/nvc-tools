@@ -315,6 +315,19 @@ straight from `src/` and adds nothing to it.
   speak for the category on a grid — up in the row rather than in the body, where a list of
   28 would scroll them out of reach — and a walk is drawn with no button row at
   all, because it is one question and answering it is the only way to move.
+- **The chord is drawn as a hint, not as a second label.** ⌘⏎ / Ctrl+⏎ presses
+  the primary button on the screen, and it is printed on that button — but a
+  size down and part way into the background, the way a menu draws a shortcut
+  beside its command, so the word is still what is read first. Written in `em`
+  and `currentColor` in the gallery and in Obsidian's own tokens in the plugin
+  (`.nvc-chord`), never in a colour of its own. The return key keeps its glyph
+  on both platforms: spelled out, `Ctrl+Enter` came to more width than the word
+  it hung off, and a Mac and a PC drew buttons of quite different shapes. It is
+  `aria-hidden` beside an `aria-keyshortcuts` on the button, or every commit
+  button would be named 'Insert Ctrl Enter', and it is taken off a phone —
+  `body.is-phone` in the plugin, the device frame in the gallery — which has
+  neither key. The shortcut itself stays registered there: a phone with a
+  keyboard attached still answers it, and simply says nothing about itself.
 - **The title bar carries a control only where one is needed.** On a walk that is
   **‹ Angry** — the category it started in, since that is where its answers land,
   rather than *Back*, which left open what became of the answers already given —

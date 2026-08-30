@@ -9,12 +9,22 @@ const isMac =
   typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 
 /**
- * What `⌘Enter` reads as on this platform, for printing on the button it
- * shortcuts. Mac spells it in the symbols its own menus use; everywhere else
- * spells it out, because Windows and Linux have no glyph for Ctrl the way Mac
- * has one for the two keys either side of a modal's return.
+ * What `⌘Enter` reads as on the button it shortcuts. Mac spells the modifier in
+ * the symbol its own menus use; everywhere else spells it out, because Windows
+ * and Linux have no glyph for Ctrl the way Mac has one. The return key keeps
+ * its glyph on both, because a hint printed on a button is a keycap and not a
+ * sentence — spelled out, `Ctrl+Enter` came to more width than the word it was
+ * hanging off, and the two platforms drew buttons of quite different shapes.
  */
-export const submitShortcutLabel = isMac ? '⌘⏎' : 'Ctrl+Enter'
+export const submitShortcutLabel = isMac ? '⌘⏎' : 'Ctrl+⏎'
+
+/**
+ * The same chord for `aria-keyshortcuts`, which has a spelling of its own and
+ * takes neither the glyphs nor the arrow. The label on screen is `aria-hidden`
+ * decoration on the button beside this: read out, it would put 'Ctrl Enter'
+ * into the name of every commit button.
+ */
+export const submitShortcutKeys = isMac ? 'Meta+Enter' : 'Control+Enter'
 
 /**
  * Command/Ctrl+Enter as a second way to press whichever button just committed
