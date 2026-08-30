@@ -20,6 +20,34 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
+  transition: transform 0.1s ease-out;
+}
+
+/* A press has to be felt before whatever it opens replaces it — a category
+   pill's tap is instantly followed by the sift or the walk it opens, so this
+   is the only acknowledgment a tap gets. Scale rather than a colour or the
+   marked wash above: it costs nothing in width or position, so a row cannot
+   reflow under the finger that just pressed it, the same invariant the marked
+   wash above keeps.
+
+   `[data-pressed]` alongside `:active` for the same reason
+   FeelingCategoryCard.module.css gives: a keyboard Enter leaves `:active` no
+   gap to paint in, and `usePressDelay` is the component-side stand-in. Only
+   the category pills, which open a screen, ever set it — a word pill marks
+   and stays put, so it has nothing to delay. */
+.pill.pill:active,
+.pill.pill[data-pressed] {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill.pill {
+    transition: none;
+  }
+  .pill.pill:active,
+  .pill.pill[data-pressed] {
+    transform: none;
+  }
 }
 
 /* Marked is drawn with a wash of the ink and a heavier border, never a colour

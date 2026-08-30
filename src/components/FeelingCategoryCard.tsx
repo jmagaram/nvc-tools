@@ -1,3 +1,4 @@
+import { usePressDelay } from '../usePressDelay.ts'
 import styles from './FeelingCategoryCard.module.css'
 
 type Props = {
@@ -27,14 +28,18 @@ export default function FeelingCategoryCard({
   onClick,
   resume,
 }: Props) {
+  const { pressed, onClick: press } = usePressDelay(onClick)
   return (
-    <div className={`${styles.card} ${styles[kind]}`}>
+    <div
+      className={`${styles.card} ${styles[kind]}`}
+      data-pressed={pressed ? '' : undefined}
+    >
       <h3 className={styles.category}>
         <button
           type="button"
           className={styles.button}
           data-browse={resume ? '' : undefined}
-          onClick={onClick}
+          onClick={press}
         >
           {category}
         </button>

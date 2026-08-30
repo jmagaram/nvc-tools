@@ -3,6 +3,25 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid;
   border-radius: 0.25rem;
+  transition: transform 0.1s ease-out;
+}
+
+/* See the matching comment in FeelingCategoryCard.module.css. `:active` fires
+   on its own for a mouse; `[data-pressed]` is `usePressDelay`'s stand-in for a
+   keyboard press, which leaves `:active` no gap to paint in. */
+.card:active,
+.card[data-pressed] {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:active,
+  .card[data-pressed] {
+    transform: none;
+  }
 }
 
 .category {

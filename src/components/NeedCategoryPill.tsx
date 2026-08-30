@@ -1,3 +1,4 @@
+import { usePressDelay } from '../usePressDelay.ts'
 import styles from './pill.module.css'
 
 type Props = {
@@ -13,8 +14,14 @@ type Props = {
  * words to show, and `NeedCategoryCard` is the shape for that.
  */
 export default function NeedCategoryPill({ category, onClick }: Props) {
+  const { pressed, onClick: press } = usePressDelay(onClick)
   return (
-    <button type="button" className={styles.pill} onClick={onClick}>
+    <button
+      type="button"
+      className={styles.pill}
+      data-pressed={pressed ? '' : undefined}
+      onClick={press}
+    >
       {category}
     </button>
   )

@@ -1,3 +1,4 @@
+import { usePressDelay } from '../usePressDelay.ts'
 import styles from './pill.module.css'
 
 type Props = {
@@ -19,11 +20,13 @@ export default function FeelingCategoryPill({
   kind,
   onClick,
 }: Props) {
+  const { pressed, onClick: press } = usePressDelay(onClick)
   return (
     <button
       type="button"
       className={`${styles.pill} ${styles[kind]}`}
-      onClick={onClick}
+      data-pressed={pressed ? '' : undefined}
+      onClick={press}
     >
       {category}
     </button>
