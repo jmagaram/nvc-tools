@@ -1,5 +1,5 @@
 /**
- * Copy dist-plugin into the vault named by OBSIDIAN_VAULT and return where it
+ * Copy build/ into the vault named by OBSIDIAN_VAULT and return where it
  * went. Throws if the variable is unset, the path is not a vault, or the build
  * output is missing.
  *

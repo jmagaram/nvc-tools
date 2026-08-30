@@ -37,9 +37,13 @@
    modal.
 
    `2lh` is two line boxes exactly, whichever line-height the host is using. The
-   `3em` below it says the same thing only where that is 1.5, which is why a
-   theme with a looser one could still make the strip grow under a definition
-   that had wrapped. It stays as the fallback for a webview too old for `lh`.
+   `3em` says the same thing only where that is 1.5, which is why a theme with a
+   looser one could still make the strip grow under a definition that had
+   wrapped. It stays as the fallback for a webview too old for `lh` — a mobile
+   vault on an old system webview, since `minAppVersion` reaches back further
+   than the unit does. The two are an `@supports` pair rather than two
+   `min-height` lines in one block, which is the older way to write a fallback
+   and which the directory's CSS review reads as a duplicated property.
 
    Content-box because the two lines are the text's and not the box's. Obsidian
    sets `* { box-sizing: border-box }` and the gallery sets nothing, so without
@@ -52,8 +56,13 @@
   padding-top: 0.5rem;
   border-top: 1px solid;
   min-height: 3em;
-  min-height: 2lh;
   font-size: 0.9em;
+}
+
+@supports (min-height: 1lh) {
+  .gloss {
+    min-height: 2lh;
+  }
 }
 
 .hint {

@@ -43,16 +43,16 @@ jobs:
           fi
 
       # Typechecks, then writes main.js, manifest.json, styles.css and
-      # versions.json into dist-plugin/.
+      # versions.json into build/.
       - run: npm run plugin:build
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: |
-            dist-plugin/main.js
-            dist-plugin/manifest.json
-            dist-plugin/styles.css
+            build/main.js
+            build/manifest.json
+            build/styles.css
 
       # Obsidian downloads these three by name off the release, so they go up
       # as individual assets rather than an archive.
@@ -64,6 +64,6 @@ jobs:
           gh release create "$tag" \
             --title="$tag" \
             --draft \
-            dist-plugin/main.js \
-            dist-plugin/manifest.json \
-            dist-plugin/styles.css
+            build/main.js \
+            build/manifest.json \
+            build/styles.css

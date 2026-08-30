@@ -59,8 +59,13 @@
 /* `--nvc-ring` is how a host puts its own focus colour here — the plugin points
    it at Obsidian's. Failing that, the text colour softened towards the
    background, which is quieter than the hard box undiluted `currentColor`
-   draws. */
-.card:has(.button:focus) {
+   draws.
+
+   `:focus-within` rather than `:has(.button:focus)`, which says the same thing
+   here — the heading button is the only focusable thing in a card — without the
+   invalidation cost the directory's CSS review flags `:has` for. It also keeps
+   working in a webview older than `:has`. */
+.card:focus-within {
   outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;
 }

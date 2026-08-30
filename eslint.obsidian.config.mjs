@@ -19,7 +19,7 @@ export default [
   {
     ignores: [
       'dist/',
-      'dist-plugin/',
+      'build/',
       'node_modules/',
       'src/demos/',
       'scripts/',

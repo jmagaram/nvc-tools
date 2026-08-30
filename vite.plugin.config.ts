@@ -5,8 +5,11 @@ import { defineConfig } from 'vite'
 import type { Plugin } from 'vite'
 import { deployToVault } from './scripts/deploy-plugin.mjs'
 
-// Not under dist/, which the gallery build empties on every `npm run build`.
-const OUT_DIR = 'dist-plugin'
+/* `build/`, not `dist/`, which is the gallery's, and not a name of our own:
+   the community directory's scanner reproduces the release from source and
+   looks for main.js at the repo root or in dist/, build/ or out/. A folder it
+   does not know about reads to it as a build that produced nothing. */
+const OUT_DIR = 'build'
 
 /**
  * The two files Obsidian wants alongside main.js that no bundler produces.

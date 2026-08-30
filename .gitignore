@@ -9,8 +9,11 @@ lerna-debug.log*
 
 node_modules
 dist
-dist-plugin
 dist-ssr
+
+# The plugin build. `build/` because that is one of the four places the
+# community directory's scanner looks for main.js — see CLAUDE.md.
+build
 *.local
 
 # .env.local names the Obsidian vault to deploy the plugin into — one machine's

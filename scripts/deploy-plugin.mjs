@@ -16,7 +16,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const built = join(root, 'dist-plugin')
+const built = join(root, 'build')
 
 /** Everything a plugin folder holds. All of it comes out of the build. */
 const FILES = ['main.js', 'manifest.json', 'styles.css', 'versions.json']
@@ -60,7 +60,7 @@ export function deployToVault() {
   for (const file of FILES) {
     const from = join(built, file)
     if (!existsSync(from)) {
-      throw new Error(`${file} is missing from dist-plugin — build first.`)
+      throw new Error(`${file} is missing from build/ — build first.`)
     }
     copyFileSync(from, join(destination, file))
   }

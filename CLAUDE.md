@@ -361,7 +361,7 @@ straight from `src/` and adds nothing to it.
   via `eslint-plugin-obsidianmd`. Not the project's linter and not run on every
   change; it answers one question, which is whether a release would pass the
   scanner. Config is `eslint.obsidian.config.mjs`, scoped to what ships.
-- `npm run plugin:build` — typecheck and build the plugin into `dist-plugin/`
+- `npm run plugin:build` — typecheck and build the plugin into `build/`
 - `npm run plugin:deploy` — build, then copy it into the vault named by
   `OBSIDIAN_VAULT` in `.env.local` (gitignored)
 - `npm run plugin:dev` — rebuild and redeploy on every change
@@ -385,11 +385,22 @@ an update is only a new release.
   the community directory looks — it reads the manifest at the HEAD of the
   default branch. Nothing else about the repo has to be plugin-shaped; the
   gallery stays where it is. `vite.plugin.config.ts` copies the two JSON files
-  from the root into `dist-plugin/`.
+  from the root into `build/`.
+- **The plugin builds into `build/`.** The scanner does not just run
+  `npm run build` — it then looks for the `main.js` it produced, and it looks in
+  four places: the repo root, `dist/`, `build/` and `out/`. A folder of our own
+  naming reads to it as a build that produced nothing, which is what
+  `dist-plugin/` did. `dist/` is the gallery's, so `build/` it is; the root
+  would work too but would put generated files beside the source they are
+  generated from.
 - **`main.js` is never committed.** It and `styles.css` are build output, and
-  `.gitignore` excludes `dist-plugin`. They reach people as assets attached to
-  a release. The gallery's own build lands in `dist/` with hashed names, so the
+  `.gitignore` excludes `build`. They reach people as assets attached to a
+  release. The gallery's own build lands in `dist/` with hashed names, so the
   two never collide.
+- **The manifest `name` is not an acronym.** The scanner rejects a name in all
+  caps, which `NVC` was. It is *Nonviolent Communication* spelled out; the
+  letters someone would actually search for stay in the `description`, which is
+  one of the three fields the directory searches — see **Terminology**.
 - **One version, three places.** Root `manifest.json`, `versions.json`, and the
   git tag, which must equal the manifest's `version` exactly — no `v` prefix, no
   pre-release suffix. `npm run version:bump` writes the first two and prints the
@@ -397,7 +408,8 @@ an update is only a new release.
 - **Pushing a tag cuts the release.** `.github/workflows/release.yml` checks the
   tag against the manifest, builds, and opens a *draft* release with `main.js`,
   `manifest.json` and `styles.css` attached. The draft is deliberate — it is
-  where the notes get written — but nothing can see one, so it has to be
+  where the notes get written, and the scanner asks for them — but nothing can
+  see a draft, so it has to be
   published. It is not marked pre-release: the directory skips those, which is
   why every 0.1.x release was invisible to it.
 - **The scanner runs `npm run build`.** It reproduces the release from source
