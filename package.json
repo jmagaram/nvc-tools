@@ -32,7 +32,7 @@
     "typescript-eslint": "^8.68.0",
     "vite": "^8.2.2"
   },
-  "description": "Browse and insert feelings, emotions, and needs from the CNVC inventories, in Obsidian.",
+  "description": "Pick feelings, emotions, and needs from a list to insert into your note. Based on the Center for Nonviolent Communication (NVC) word list.",
   "license": "MIT",
   "author": "Justin Magaram",
   "repository": {
