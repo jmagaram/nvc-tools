@@ -5,7 +5,7 @@
 <style>
   /* ── Tokens ──────────────────────────────────────────────────────────────
      Light is the bare :root. Dark is redefined twice — once behind the OS
-     preference (guarded so an explicit light choice still wins), once behind
+     preference, guarded so an explicit light choice still wins, and once behind
      the stamped attribute — and nothing but tokens lives in either block. */
   :root {
     --ground: #f3f3ef;
@@ -16,7 +16,6 @@
     --rule: #d7d6cd;
     --rule-soft: #e4e3db;
     --accent: #2b5f63;
-    --accent-ink: #ffffff;
     --accent-wash: #2b5f6314;
     --shadow: 0 1px 2px #191b1910, 0 8px 24px -12px #191b1926;
   }
@@ -31,7 +30,6 @@
       --rule: #2c302d;
       --rule-soft: #242725;
       --accent: #82b6b8;
-      --accent-ink: #0d0f0e;
       --accent-wash: #82b6b81f;
       --shadow: 0 1px 2px #00000059, 0 10px 28px -14px #00000080;
     }
@@ -46,7 +44,6 @@
     --rule: #2c302d;
     --rule-soft: #242725;
     --accent: #82b6b8;
-    --accent-ink: #0d0f0e;
     --accent-wash: #82b6b81f;
     --shadow: 0 1px 2px #00000059, 0 10px 28px -14px #00000080;
   }
@@ -120,13 +117,7 @@
     white-space: nowrap;
   }
 
-  /* ── Keymap ─────────────────────────────────────────────────────────── */
-  .keymap {
-    border-collapse: collapse;
-    width: 100%;
-    max-width: 44rem;
-    font-size: 0.94rem;
-  }
+  .keymap { border-collapse: collapse; width: 100%; max-width: 44rem; font-size: 0.94rem; }
   .keymap caption {
     text-align: left;
     font-family: 'IBM Plex Mono', ui-monospace, monospace;
@@ -137,7 +128,7 @@
     padding-bottom: 0.6rem;
   }
   .keymap th, .keymap td { text-align: left; padding: 0.55rem 0.9rem 0.55rem 0; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
-  .keymap th { font-weight: 500; width: 9rem; white-space: nowrap; }
+  .keymap th { font-weight: 500; width: 10rem; white-space: nowrap; }
   .keymap tbody tr:last-child th, .keymap tbody tr:last-child td { border-bottom: 0; }
   .scroller { overflow-x: auto; }
 
@@ -145,7 +136,7 @@
   .demos {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr));
     align-items: start;
   }
 
@@ -167,9 +158,26 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     color: var(--accent);
-    min-height: 1.2rem;
-    transition: opacity 200ms;
+    min-height: 2.4rem;
   }
+
+  /* The switchers — page chrome, not component. */
+  .picker { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  .picker .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem 0.35rem 0.6rem;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .picker .swatch:has(input:checked) { border-color: var(--accent); background: var(--accent-wash); }
+  .picker .swatch:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .picker input { accent-color: var(--accent); margin: 0; }
+  .picker .cost { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); }
 
   /* ── The modal stand-in ─────────────────────────────────────────────────
      Below this line the markup and CSS follow the real components as closely
@@ -202,12 +210,7 @@
 
   .body { padding: 0.9rem; position: relative; overflow: hidden; }
 
-  .btnrow {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.7rem 0.9rem;
-    border-top: 1px solid var(--rule-soft);
-  }
+  .btnrow { display: flex; gap: 0.5rem; padding: 0.7rem 0.9rem; border-top: 1px solid var(--rule-soft); }
   .btnrow button { flex: 1; }
 
   button.plain {
@@ -221,8 +224,9 @@
     cursor: pointer;
   }
   button.plain:focus-visible { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: 2px; }
+  button.quiet { border-color: transparent; }
 
-  /* Sift ------------------------------------------------------------- */
+  /* Grid --------------------------------------------------------------- */
   .sift { display: grid; gap: 0.75rem; }
   .sift:focus { outline: none; }
   .sift .heading { margin: 0; display: grid; font-family: Newsreader, Georgia, serif; font-size: 1.5rem; }
@@ -230,6 +234,7 @@
   .words { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
   .pill {
+    position: relative;
     display: inline-block;
     height: auto;
     padding: 0.1rem 0.6rem;
@@ -254,14 +259,224 @@
   .pill.unmet { border-style: dashed; }
   .pill:focus-visible { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: 2px; }
 
+  .gloss {
+    box-sizing: content-box;
+    margin: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid;
+    min-height: 2lh;
+    font-size: 0.9em;
+  }
+  .hint { opacity: 0.7; }
+
+  /* Walk --------------------------------------------------------------- */
+  .prompt { display: grid; gap: 1rem; padding: 0.5rem; }
+  .prompt:focus { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: -2px; }
+  .stage { min-height: 9.5rem; display: grid; align-content: start; }
+
+  .card { display: grid; gap: 0.25rem; padding: 0.75rem 1rem; border: 1px solid; border-radius: 0.25rem; }
+  .card.met { border-style: solid; }
+  .card.unmet { border-style: dashed; }
+  .card .category { margin: 0; font-size: 0.8em; }
+  .card .word { margin: 0; font-size: 2rem; line-height: 1.2; font-family: Newsreader, Georgia, serif; overflow-wrap: anywhere; }
+  .card .definition { margin: 0.25rem 0 0; font-size: 0.95rem; }
+
+  .steprule { display: flex; align-items: flex-end; gap: 2px; height: 6px; }
+  .step { flex: 1; height: 2px; transition: height 280ms cubic-bezier(0.2,0.8,0.2,1), background 300ms cubic-bezier(0.2,0.8,0.2,1); }
+  .step.upcoming, .step.current { background: color-mix(in srgb, currentColor 18%, transparent); }
+  .step.skipped { background: color-mix(in srgb, currentColor 45%, transparent); }
+  .step.chosen { background: currentColor; }
+  .step.current { height: 6px; }
+
+  .actions { display: flex; gap: 0.5rem; margin-top: 2px; }
+  .actions button { flex: 1; display: inline-flex; align-items: center; gap: 0.4em; padding: 0.5rem 0.75rem; }
+  .actions button:first-child { justify-content: flex-start; }
+  .actions button:last-child { justify-content: flex-end; }
+
+  /* ── The note line ──────────────────────────────────────────────────────
+     One reserved line, in the grid's gloss strip and in the walk's card, that
+     holds whichever of these applies: the note itself, ellipsized; the
+     invitation to write one; the pencil; a coach mark. The height is held
+     whether or not anything is in it, for the reason the gloss strip's own
+     two lines are: a line that came and went would move the modal's bottom
+     edge every time the pointer crossed a word. */
+  .noteSlot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 1.7lh;
+    font-size: 0.85em;
+  }
+  .card .noteSlot { margin-top: 0.35rem; font-size: 0.8em; }
+
+  .notePeek { display: flex; align-items: baseline; gap: 0.4rem; flex: 1; min-width: 0; margin: 0; }
+  .notePeek .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    flex: none;
+  }
+  .notePeek .text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  }
+  .notePeek .more { flex: none; opacity: 0.55; font-size: 0.85em; font-family: 'IBM Plex Mono', monospace; }
+
+  /* The invitation. It sits exactly where the note will sit and wears the same
+     shape, so what teaches the feature is a preview of its result. */
+  .invite {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0.1rem 0;
+    text-align: left;
+    cursor: text;
+    opacity: 0.62;
+  }
+  .invite:hover { opacity: 0.85; }
+  .invite .say { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: italic; }
+  .invite .key {
+    flex: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78em;
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 0 0.28em;
+    opacity: 0.8;
+  }
+  .invite:focus-visible { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: 2px; opacity: 1; }
+
+  /* The quiet variant: no words, just the tool. */
+  .pencilBtn {
+    flex: none;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font: inherit;
+    font-size: 0.95em;
+    color: inherit;
+    background: none;
+    border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+    border-radius: 999px;
+    box-shadow: none;
+    padding: 0.1rem 0.45rem;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+  .pencilBtn:hover { opacity: 1; }
+  .pencilBtn:focus-visible { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: 2px; opacity: 1; }
+
+  .coach {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 240ms;
+  }
+  .coach[data-on] { opacity: 0.75; }
+
+  [hidden] { display: none !important; }
+
+  /* ── Making room ────────────────────────────────────────────────────────
+     The screen parks itself — pushed up, faded, dissolved into the top edge —
+     and the drawer comes in off the bottom. The modal's own height never
+     changes, so nothing behind it moves; the drawer grows upwards as the note
+     runs on, which keeps the box where the thumbs already are. */
+  .lifted { transition: transform 240ms cubic-bezier(0.2,0.8,0.2,1), opacity 240ms; }
+  .body[data-lift='on'] .lifted {
+    transform: translateY(calc(-1 * var(--liftBy, 3rem))) scale(0.985);
+    opacity: 0.4;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.2rem);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 2.2rem);
+  }
+
+  .drawer {
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.9rem;
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid;
+    border-radius: 6px;
+    background: var(--surface);
+    transform: translateY(120%);
+    opacity: 0;
+    transition: transform 240ms cubic-bezier(0.2,0.8,0.2,1), opacity 180ms;
+    pointer-events: none;
+  }
+  .body[data-lift='on'] .drawer { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+  .drawer .who { margin: 0; font-size: 0.8rem; display: flex; align-items: baseline; gap: 0.4rem; }
+  .drawer .who b { font-weight: 600; }
+  .drawer .who .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  /* A textarea rather than an input, because a note is allowed to be a
+     sentence and then another one. It starts one line tall and grows with what
+     is typed, up to five — past that it scrolls, and the drawer stops climbing
+     into the screen it is parked over. */
+  .drawer textarea {
+    font: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-bottom: 1.5px solid currentColor;
+    padding: 0.2rem 0.1rem;
+    width: 100%;
+    resize: none;
+    overflow-y: auto;
+    max-height: 7.5lh;
+  }
+  .drawer textarea:focus { outline: none; border-bottom-color: var(--nvc-ring, currentColor); }
+  .drawer textarea::placeholder { color: inherit; opacity: 0.45; font-style: italic; }
+
+  .drawerRow { display: flex; align-items: center; gap: 0.4rem; }
+  .drawerRow .keyhint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    line-height: 1.3;
+    opacity: 0.6;
+    margin-right: auto;
+  }
+  .drawerRow .keyhint b { font-weight: 500; opacity: 0.9; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lifted, .drawer, .step, .pill, .coach { transition: none; }
+  }
+
   /* ── Saying a word carries a note ───────────────────────────────────────
      Three treatments, switched live from the study below. `dot` and `rule` are
-     paint inside the pill's own padding and cost no width, so a row cannot
-     reflow when a note is added — the invariant the marked wash keeps. `icon`
-     breaks that on purpose: it is a real glyph in the flow, and the pill grows
-     by about one character. */
-  .pill { position: relative; }
-
+     paint inside the pill's own padding and cost no width. `icon` breaks that
+     on purpose: a real glyph in the flow, and the pill grows by about one
+     character. */
   .noteMark { display: none; margin-left: 0.3em; vertical-align: -0.05em; }
   .noteMark svg { display: block; }
 
@@ -286,199 +501,21 @@
   [data-badge='icon'] .pill[data-note] .noteMark,
   [data-badge='icon'] .noted .noteMark { display: inline-block; }
 
-  /* The badge picker itself — page chrome, not component. */
-  .picker { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-  .picker .swatch {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    border: 1px solid var(--rule);
-    background: var(--surface);
-    border-radius: 999px;
-    padding: 0.35rem 0.8rem 0.35rem 0.6rem;
-    font-size: 0.88rem;
-    cursor: pointer;
-  }
-  .picker .swatch:has(input:checked) { border-color: var(--accent); background: var(--accent-wash); }
-  .picker .swatch:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .picker input { accent-color: var(--accent); margin: 0; }
-  .picker .cost { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); }
-
   /* Browse screen — FeelingCategoryCard, and the picked words listed in it. */
-  .catcard {
-    position: relative;
-    padding: 0.5rem 0.75rem;
-    border: 1px dashed;
-    border-radius: 0.25rem;
-  }
+  .catcard { position: relative; padding: 0.5rem 0.75rem; border: 1px dashed; border-radius: 0.25rem; }
   .catcard + .catcard, .catcard + .words { margin-top: 0.6rem; }
   .catcard .cat { margin: 0; font-size: 1rem; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; }
   .catcard ul { margin: 0; padding: 0; list-style: none; font-size: 0.85em; }
   .catcard li { display: inline; }
   .catcard li:not(:last-child)::after { content: ' · '; }
 
-  .gloss {
-    box-sizing: content-box;
-    margin: 0;
-    padding-top: 0.5rem;
-    border-top: 1px solid;
-    min-height: 2lh;
-    font-size: 0.9em;
-  }
-  .hint { opacity: 0.7; }
-
-  /* Prompt ------------------------------------------------------------ */
-  .prompt { display: grid; gap: 1rem; padding: 0.5rem; }
-  .prompt:focus { outline: 3px solid var(--nvc-ring, currentColor); outline-offset: -2px; }
-
-  .stage { min-height: 9.5rem; display: grid; align-content: start; }
-
-  .card {
-    display: grid;
-    gap: 0.25rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid;
-    border-radius: 0.25rem;
-  }
-  .card.met { border-style: solid; }
-  .card.unmet { border-style: dashed; }
-  .card .category { margin: 0; font-size: 0.8em; }
-  .card .word { margin: 0; font-size: 2rem; line-height: 1.2; font-family: Newsreader, Georgia, serif; overflow-wrap: anywhere; }
-  .card .definition { margin: 0.25rem 0 0; font-size: 0.95rem; }
-
-  .steprule { display: flex; align-items: flex-end; gap: 2px; height: 6px; }
-  .step { flex: 1; height: 2px; transition: height 280ms cubic-bezier(0.2,0.8,0.2,1), background 300ms cubic-bezier(0.2,0.8,0.2,1); }
-  .step.upcoming, .step.current { background: color-mix(in srgb, currentColor 18%, transparent); }
-  .step.skipped { background: color-mix(in srgb, currentColor 45%, transparent); }
-  .step.chosen { background: currentColor; }
-  .step.current { height: 6px; }
-
-  .actions { display: flex; gap: 0.5rem; margin-top: 2px; }
-  .actions button { flex: 1; display: inline-flex; align-items: center; gap: 0.4em; padding: 0.5rem 0.75rem; }
-  .actions button:first-child { justify-content: flex-start; }
-  .actions button:last-child { justify-content: flex-end; }
-
-  /* ── The note itself ────────────────────────────────────────────────────
-     One slot, two homes. `.notePeek` is the resting state — a note that is
-     there, on one line, ellipsized. `.noteEdit` is the same slot in the strip
-     option; `.drawer` is the lifted one. */
-  .notePeek {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    font-size: 0.85em;
-    min-width: 0;
-  }
-  .notePeek .tag {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72em;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    opacity: 0.6;
-    flex: none;
-  }
-  .notePeek .text {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent);
-  }
-  .card .notePeek { margin-top: 0.4rem; }
-
-  .noteEdit {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.35rem;
-  }
-  .noteEdit input {
-    flex: 1;
-    min-width: 0;
-    font: inherit;
-    font-size: 0.9rem;
-    color: inherit;
-    background: none;
-    border: 0;
-    border-bottom: 1.5px solid currentColor;
-    padding: 0.1rem 0.1rem 0.15rem;
-  }
-  .noteEdit input:focus { outline: none; border-bottom-color: var(--nvc-ring, currentColor); }
-  .noteEdit .keyhint {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    opacity: 0.6;
-    flex: none;
-  }
-  .noteEdit[hidden] { display: none; }
-
-  /* The lift. The content is parked — pushed up, faded, and left there — while
-     a drawer comes in off the bottom edge of the modal body. The frame's own
-     height never changes, so nothing outside the modal moves. */
-  .lifted { transition: transform 240ms cubic-bezier(0.2,0.8,0.2,1), opacity 240ms; }
-  .body[data-lift='on'] .lifted {
-    transform: translateY(calc(-1 * var(--liftBy, 3.5rem))) scale(0.985);
-    opacity: 0.45;
-    /* Parked content dissolves into the top edge rather than being sliced by
-       it — the modal's height is fixed, so something has to go, and a fade
-       says "still there, not your problem" where a cut looks like a bug. */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.2rem);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 2.2rem);
-  }
-
-  .drawer {
-    position: absolute;
-    left: 0.9rem;
-    right: 0.9rem;
-    bottom: 0.9rem;
-    display: grid;
-    gap: 0.5rem;
-    padding: 0.7rem 0.8rem;
-    border: 1px solid;
-    border-radius: 6px;
-    background: var(--surface);
-    transform: translateY(120%);
-    opacity: 0;
-    transition: transform 240ms cubic-bezier(0.2,0.8,0.2,1), opacity 180ms;
-    pointer-events: none;
-  }
-  .body[data-lift='on'] .drawer { transform: translateY(0); opacity: 1; pointer-events: auto; }
-
-  .drawer .who { margin: 0; font-size: 0.8rem; }
-  .drawer .who b { font-weight: 600; }
-  .drawer input {
-    font: inherit;
-    font-size: 0.95rem;
-    color: inherit;
-    background: none;
-    border: 0;
-    border-bottom: 1.5px solid currentColor;
-    padding: 0.2rem 0.1rem;
-    width: 100%;
-  }
-  .drawer input:focus { outline: none; border-bottom-color: var(--nvc-ring, currentColor); }
-  .drawer .drawerRow { display: flex; align-items: center; gap: 0.5rem; }
-  .drawer .drawerRow .keyhint { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; opacity: 0.6; margin-right: auto; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .lifted, .drawer, .step, .pill { transition: none; }
-  }
-
-  /* ── Comparison ─────────────────────────────────────────────────────── */
+  /* ── Editorial furniture ────────────────────────────────────────────── */
   .compare { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
   .compare th, .compare td { text-align: left; vertical-align: top; padding: 0.7rem 1rem 0.7rem 0; border-bottom: 1px solid var(--rule-soft); }
   .compare thead th { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
-  .compare tbody th { font-weight: 500; width: 11rem; }
+  .compare tbody th { font-weight: 500; width: 12rem; }
 
-  .verdict {
-    border-left: 3px solid var(--accent);
-    padding: 0.2rem 0 0.2rem 1.1rem;
-    display: grid;
-    gap: 0.75rem;
-    max-width: 40rem;
-  }
+  .verdict { border-left: 3px solid var(--accent); padding: 0.2rem 0 0.2rem 1.1rem; display: grid; gap: 0.75rem; max-width: 40rem; }
   .verdict p { margin: 0; }
 
   pre {
@@ -491,22 +528,12 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.84rem;
     line-height: 1.7;
+    max-width: 44rem;
   }
 
-  .srOnly {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
-  }
+  .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-  footer.colophon {
-    border-top: 1px solid var(--rule);
-    padding-top: 1.5rem;
-    color: var(--muted);
-    font-size: 0.88rem;
-    max-width: 40rem;
-  }
+  footer.colophon { border-top: 1px solid var(--rule); padding-top: 1.5rem; color: var(--muted); font-size: 0.88rem; max-width: 40rem; }
 </style>
 
 <div class="page">
@@ -514,21 +541,21 @@
     <p class="eyebrow">Prototype · feelings picker</p>
     <h1>Notes on a Feeling</h1>
     <p class="lede">
-      A few words of your own against a single feeling — <em>irate, but only about the meeting</em> —
-      typed without leaving the keyboard, and gone again the moment you clear the box.
-      Two placements, each shown in the grid and in the walk. Everything below is live: click into a
-      demo and use the keys.
+      A few words of your own against a single word — <em>only about the meeting, not about him</em> —
+      written in a drawer the screen makes room for, and gone again the moment you clear the box.
+      Shown in the grid and in the walk. Everything below is live: click into a demo and use the keys.
     </p>
   </header>
 
   <section>
     <div class="sectionHead">
-      <p class="eyebrow">The contract</p>
-      <h2>One key opens it, one key closes it</h2>
+      <p class="eyebrow">The drawer</p>
+      <h2>The screen parks and makes room</h2>
       <p>
-        The note attaches to whatever the screen is already about: the word under focus in the grid,
-        the word on the card in the walk. Nothing else on either screen changes meaning, so there is
-        one key to learn and it means the same thing in both places.
+        The picker pushes itself up, fades, and dissolves into the top edge; a drawer comes in off the
+        bottom carrying the word and a box that starts one line tall and grows to five. The modal's own
+        height never changes, so nothing behind it moves — and because the drawer grows upwards, the box
+        stays where the thumbs and the software keyboard already are.
       </p>
     </div>
     <div class="scroller">
@@ -536,72 +563,49 @@
         <caption>While the picker has focus</caption>
         <tbody>
           <tr><th><kbd>N</kbd></th><td>Write a note on this word, or open the one already there. Focus moves into the box.</td></tr>
-          <tr><th><kbd>Enter</kbd></th><td>Commit. In the grid it marks the word and hands focus back to it; in the walk it answers <em>yes</em> and deals the next card.</td></tr>
+          <tr><th><kbd>Enter</kbd></th><td>Keep it. In the grid it marks the word and hands focus back to it; in the walk it answers <em>yes</em> and deals the next card.</td></tr>
+          <tr><th><kbd>Shift</kbd> <kbd>Enter</kbd></th><td>A new line. The box grows under it, and the drawer climbs to make room.</td></tr>
           <tr><th><kbd>Enter</kbd> on empty</th><td>Deletes the note. Clearing the box <em>is</em> the delete; there is no second control for it.</td></tr>
-          <tr><th><kbd>Esc</kbd></th><td>Puts the box back the way it was found and closes it. Escape never leaves the screen while a note is open.</td></tr>
-          <tr><th><kbd>←</kbd> <kbd>→</kbd></th><td>In the walk they answer — except inside the box, where they are the caret. The box stops them at its edge.</td></tr>
+          <tr><th><kbd>Esc</kbd></th><td>Puts the box back the way it was found and closes the drawer. Escape never leaves the screen while a note is open.</td></tr>
+          <tr><th><kbd>←</kbd> <kbd>→</kbd></th><td>In the walk they answer — except inside the box, where they are the caret.</td></tr>
         </tbody>
       </table>
     </div>
     <div class="prose">
       <p>
         <strong>A note only exists on a word that is picked.</strong> There is nothing a note on an
-        unpicked feeling could mean and nowhere for it to be written — only marked words reach the
-        note in the vault. So the rule runs both ways: committing a note marks the word, and
-        unmarking a word takes its note with it. In the walk, where every card is answered, keeping
-        a note <em>is</em> the yes — <kbd>N</kbd>, type, <kbd>Enter</kbd> answers the card and deals
-        the next one, and <kbd>←</kbd> on a noted card drops the note along with the word.
+        unpicked feeling could mean and nowhere for it to be written. So the rule runs both ways:
+        keeping a note marks the word, unmarking a word takes its note with it, and in the walk —
+        where every card is answered — keeping a note <em>is</em> the yes.
+      </p>
     </div>
   </section>
 
   <section>
     <div class="sectionHead">
-      <p class="eyebrow">Option A</p>
-      <h2>In the strip</h2>
+      <p class="eyebrow">The open question</p>
+      <h2>How anyone finds out it is there</h2>
       <p>
-        The note is typed where the word is already being explained — under the definition in the
-        grid's gloss strip, under the definition on the card. Nothing moves except the one line the
-        box occupies, and in the grid nothing above it moves at all: the strip is the last thing in
-        the body, so it grows downwards, which is the direction the modal already grows in.
+        <kbd>N</kbd> is invisible, and on a phone there is no keyboard to press it with. Whatever
+        teaches it has to live in the one reserved line under the definition — the line the note
+        itself comes back on — because that is the only place on either screen that is about one
+        word. Four candidates, switched live; every demo on this page follows the choice.
       </p>
     </div>
-    <div class="demos" id="optionA"></div>
-  </section>
-
-  <section>
-    <div class="sectionHead">
-      <p class="eyebrow">Option B</p>
-      <h2>Make room</h2>
-      <p>
-        The screen parks itself — pushed up and faded — and a drawer comes in off the bottom edge
-        carrying the word and the box. On <strong>Ok</strong> it goes back down and the note is left
-        on the word, ellipsized to one line. The modal's own height never changes, so nothing behind
-        it moves either.
-      </p>
-    </div>
-    <div class="demos" id="optionB"></div>
-  </section>
-
-  <section>
-    <div class="sectionHead">
-      <p class="eyebrow">Which words carry one</p>
-      <h2>A badge that says there is writing here</h2>
-      <p>
-        A note is invisible until you land on the word, which is no good in a grid of twenty-eight
-        or in a category card that lists what you picked. Three ways to say it, switched live —
-        every demo on this page follows the choice.
-      </p>
-    </div>
-    <div class="picker" id="badgePicker" role="radiogroup" aria-label="How a noted word is marked"></div>
-    <div class="demos" id="badgeDemo"></div>
+    <div class="picker" id="teachPicker" role="radiogroup" aria-label="How the note is offered"></div>
+    <div class="demos" id="demos"></div>
     <div class="prose">
       <p>
-        <strong>The icon is the one worth the width.</strong> The dot and the rule are free — they
-        are paint inside padding the pill already has — but both read as a rendering artefact until
-        someone tells you what they mean. The glyph says <em>writing</em> on its own, and because a
-        noted word is always a marked one, the badge never appears on a word that was not already
-        drawn differently: a row can only grow when you add a note to it, by about one character,
-        and never under the finger that is tapping something else.
+        <strong>The invitation, and only on a marked word.</strong> It is the one candidate that is
+        both a target and a lesson: it sits exactly where the note will sit, wearing the same shape,
+        so what teaches the feature is a preview of its result — and the keycap on the right teaches
+        the shortcut the way a menu does. Showing it only once a word is marked ties it to the rule
+        that makes a note legal, so marking a word is what introduces notes, and sweeping the pointer
+        across twenty-eight unmarked words offers nothing.
+      </p>
+      <p>
+        In the walk the invitation is always there, because every card can be noted: keeping a note
+        is the same yes the <kbd>→</kbd> gives.
       </p>
     </div>
   </section>
@@ -609,57 +613,70 @@
   <section>
     <div class="sectionHead">
       <p class="eyebrow">Reading them against each other</p>
-      <h2>What each one costs</h2>
+      <h2>What each way of offering it costs</h2>
     </div>
     <div class="scroller">
       <table class="compare">
         <thead>
-          <tr><th scope="col"></th><th scope="col">A — In the strip</th><th scope="col">B — Make room</th></tr>
+          <tr><th scope="col"></th><th scope="col">Teaches the key</th><th scope="col">Works by touch</th><th scope="col">What it costs</th></tr>
         </thead>
         <tbody>
           <tr>
-            <th scope="row">Keystrokes</th>
-            <td colspan="2">Identical. <kbd>N</kbd>, type, <kbd>Enter</kbd>. The difference is entirely what the eye sees.</td>
+            <th scope="row">The invitation</th>
+            <td>Yes — the keycap sits on the line, the way a menu shows its shortcut.</td>
+            <td>Yes. The whole line is the target, and it is the width of the modal.</td>
+            <td>A line of quiet type under every marked word. The loudest of the four, which is the point.</td>
           </tr>
           <tr>
-            <th scope="row">What moves</th>
-            <td>One line appears below the definition. In the grid, no word above it shifts.</td>
-            <td>The whole screen travels and dims. Legible, but it is the biggest movement in the picker.</td>
+            <th scope="row">The pencil</th>
+            <td>No. It says a note is possible, never which key opens one.</td>
+            <td>Yes, but it is a small target at the end of a line.</td>
+            <td>Almost nothing, and it reads as chrome rather than as an offer.</td>
           </tr>
           <tr>
-            <th scope="row">Where the eye lands</th>
-            <td>Where it already was — the word is a few pixels above the box.</td>
-            <td>On the drawer, which names the word again because the grid behind it is now unreadable.</td>
+            <th scope="row">Coach once</th>
+            <td>Once, then never again — including for the person who comes back in a month.</td>
+            <td>No. It says a key that is not there to press.</td>
+            <td>Nothing permanent, but it needs somewhere to remember that it has been shown.</td>
           </tr>
           <tr>
-            <th scope="row">Room to type</th>
-            <td>Half a modal, sharing the line with the key hint.</td>
-            <td>Full width, and space for a second line later if a note ever wants one.</td>
-          </tr>
-          <tr>
-            <th scope="row">On a phone</th>
-            <td>The keyboard covers the bottom of the modal, and the box is at the bottom. It has to scroll into view.</td>
-            <td>The drawer is what the keyboard shoves up, and it is the only thing that needs to stay visible.</td>
-          </tr>
-          <tr>
-            <th scope="row">Fits the house rules</th>
-            <td>Yes as drawn: the grid never shuffles, the pill never changes width.</td>
-            <td>Yes, but it introduces a fourth screen state to the machines — browsing, sifting, walking, <em>and</em> writing.</td>
+            <th scope="row">Nothing but the key</th>
+            <td>No.</td>
+            <td>No — which rules it out on its own, phone being the surface this is for.</td>
+            <td>Nothing, and nobody finds it.</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="verdict">
       <p>
-        <strong>Ship A, keep B's drawer for the phone.</strong> A note is a handful of words, and the
-        strip is already the place the screen explains a word — putting the box there costs one line
-        and no new screen. B earns its animation only where the software keyboard makes the bottom of
-        the modal unusable, which is exactly the case A struggles with.
+        <strong>Ship the invitation; keep the pencil for the walk if the card gets crowded.</strong>
+        The two are the same control at two volumes, so the choice can be made per screen without
+        anything else changing — and both leave the same trace when a note is written, which is the
+        badge below.
       </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sectionHead">
+      <p class="eyebrow">Which words carry one</p>
+      <h2>A badge that says there is writing here</h2>
       <p>
-        Both draw the resting note the same way, and that is the part worth keeping either way: a
-        pencil rule painted inside the pill, which changes no width, and one ellipsized line wherever
-        the word is being explained in full.
+        A note is invisible until you land on the word, which is no good in a grid of twenty-eight or
+        in a category card that lists what you picked. Three ways to say it, switched live.
+      </p>
+    </div>
+    <div class="picker" id="badgePicker" role="radiogroup" aria-label="How a noted word is marked"></div>
+    <div class="demos" id="badgeDemo"></div>
+    <div class="prose">
+      <p>
+        <strong>The icon is the one worth the width.</strong> The dot and the rule are free — paint
+        inside padding the pill already has — but both read as a rendering artefact until someone
+        tells you what they mean. The glyph says <em>writing</em> on its own, and because a noted word
+        is always a marked one, the badge never appears on a word that was not already drawn
+        differently: a row can only grow when you add a note to it, by about one character, and never
+        under the finger that is tapping something else.
       </p>
     </div>
   </section>
@@ -670,17 +687,22 @@
       <h2>Where a note has to live</h2>
       <p>
         A note is picked state, so it belongs beside <code>visited</code> in the two picker machines
-        and has to survive the round trip through the fence in the note — which is where the real
-        design question is, not in the keystrokes.
+        and has to survive the round trip through the fence in the note — which is the real design
+        question here, not the keystrokes. Now that a note runs to several lines, it cannot ride in a
+        parenthesis on the category bullet.
       </p>
     </div>
-    <pre>- Angry: irate (still about the meeting), livid, resentful</pre>
+    <pre>- Angry: irate, livid
+    - irate: only about the meeting, not about him.
+      It ran an hour over and I never got to speak.</pre>
     <div class="prose">
       <p>
-        A parenthesis after the word keeps the bullet readable with the plugin off, and keeps
-        <code>resolve.ts</code>'s rule that the words alone say which inventory a block is. The cost
-        is that a note may not contain a closing parenthesis or a comma without an escape — worth
-        settling before any of this is built, because it is the part that ends up in someone's vault.
+        An indented bullet under the category, keyed by the word, with wrapped lines indented past
+        it. The block still reads with the plugin off, the category bullets are untouched — so
+        <code>resolve.ts</code> keeps working out the inventory from the words alone — and a note may
+        contain any character at all, which the parenthesis form could not offer. The cost is that
+        the parser gains a second kind of line, and a note whose word is not in the bullet above it
+        is one more way for a block to fail to read.
       </p>
     </div>
   </section>
@@ -710,26 +732,21 @@
   ]
 
   const HINT = 'Touch a word to see what it means.'
+  const INVITE = 'A few words of your own…'
+  const live = document.getElementById('live')
+
+  const TEACH = [
+    { key: 'invite', label: 'The invitation', cost: 'a line, on marked words' },
+    { key: 'pencil', label: 'The pencil', cost: 'a small button' },
+    { key: 'coach', label: 'Coach once', cost: 'shown, then gone' },
+    { key: 'none', label: 'Nothing but the key', cost: 'no touch way in' },
+  ]
+
   const BADGES = [
     { key: 'icon', label: 'Pencil glyph', cost: 'grows the pill' },
     { key: 'dot', label: 'Dot in the corner', cost: 'no width' },
     { key: 'rule', label: 'Rule under the word', cost: 'no width' },
   ]
-
-  /** The badge itself: a pencil, drawn in currentColor so a theme reaches it. */
-  const noteMark = () => {
-    const span = document.createElement('span')
-    span.className = 'noteMark'
-    span.innerHTML =
-      '<svg viewBox="0 0 16 16" width="0.72em" height="0.72em" aria-hidden="true" focusable="false">' +
-      '<path d="M11.2 1.9 14.1 4.8 5.5 13.4l-3.9 1 1-3.9z" fill="none" stroke="currentColor" ' +
-      'stroke-width="1.5" stroke-linejoin="round"/></svg>'
-    return span
-  }
-
-  /** Spoken, since none of the three badges is text. */
-  const noteSaid = () => el('span', { className: 'srOnly', textContent: ' — has a note' })
-  const live = document.getElementById('live')
 
   const el = (tag, props = {}, children = []) => {
     const node = Object.assign(document.createElement(tag), props)
@@ -739,28 +756,137 @@
     return node
   }
 
-  /** Shared by every demo: what is marked, what is written, and what is open. */
-  const makeState = (seed) => ({
-    marked: new Set(seed.marked ?? []),
-    notes: new Map(Object.entries(seed.notes ?? {})),
-    showing: seed.showing ?? null,
-    editing: null,
-  })
+  const pencilSvg = (size = '0.72em') =>
+    '<svg viewBox="0 0 16 16" width="' + size + '" height="' + size + '" aria-hidden="true" ' +
+    'focusable="false"><path d="M11.2 1.9 14.1 4.8 5.5 13.4l-3.9 1 1-3.9z" fill="none" ' +
+    'stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>'
+
+  const noteMark = () => {
+    const span = el('span', { className: 'noteMark' })
+    span.innerHTML = pencilSvg()
+    return span
+  }
+
+  /** Spoken, since none of the three badges is text. */
+  const noteSaid = () => el('span', { className: 'srOnly', textContent: ' — has a note' })
+
+  const teachIs = (key) => document.documentElement.dataset.teach === key
 
   const say = (host, text) => {
     host.status.textContent = text
     live.textContent = text
     clearTimeout(host.statusTimer)
-    host.statusTimer = setTimeout(() => { host.status.textContent = '' }, 2600)
+    host.statusTimer = setTimeout(() => { host.status.textContent = '' }, 4000)
+  }
+
+  /**
+   * The reserved line under the definition. It holds the note when there is
+   * one, and whatever is teaching the note when there is not.
+   */
+  function noteLine(open) {
+    const peek = el('p', { className: 'notePeek' }, [
+      el('span', { className: 'tag', textContent: 'Note' }),
+      el('span', { className: 'text' }),
+      el('span', { className: 'more' }),
+    ])
+
+    const invite = el('button', { type: 'button', className: 'invite' }, [
+      (() => { const s = el('span'); s.innerHTML = pencilSvg('0.85em'); return s })(),
+      el('span', { className: 'say', textContent: INVITE }),
+      el('span', { className: 'key', textContent: 'N' }),
+    ])
+    invite.addEventListener('click', () => open())
+
+    const pencil = el('button', { type: 'button', className: 'pencilBtn', title: 'Write a note (N)' })
+    pencil.innerHTML = pencilSvg('0.9em')
+    pencil.append(el('span', { className: 'srOnly', textContent: 'Write a note' }))
+    pencil.addEventListener('click', () => open())
+
+    const coach = el('p', { className: 'coach' }, [
+      el('span', { textContent: 'Press' }),
+      el('span', { className: 'key mono', textContent: 'N' }),
+      el('span', { textContent: 'to write a note on it.' }),
+    ])
+
+    const slot = el('div', { className: 'noteSlot' }, [peek, invite, pencil, coach])
+
+    /** `offer` is whether this word may be noted at all. */
+    slot.show = ({ note, offer, coaching }) => {
+      const has = Boolean(note)
+      peek.hidden = !has
+      if (has) {
+        const lines = note.split('\n')
+        peek.querySelector('.text').textContent = lines[0]
+        peek.querySelector('.more').textContent = lines.length > 1 ? '+' + (lines.length - 1) : ''
+      }
+      invite.hidden = has || !offer || !teachIs('invite')
+      pencil.hidden = has || !offer || !teachIs('pencil')
+      coach.hidden = !teachIs('coach')
+      if (teachIs('coach')) {
+        if (coaching && !has) coach.dataset.on = ''
+        else delete coach.dataset.on
+      }
+    }
+    return slot
+  }
+
+  /** The drawer: the word it is about, a box that grows, and the way out. */
+  function noteDrawer({ onKeep, onDrop }) {
+    const who = el('p', { className: 'who' }, [
+      el('span', { className: 'tag', textContent: 'Note on' }),
+      el('b'),
+    ])
+    const box = el('textarea', { rows: 1, placeholder: INVITE })
+    const cancel = el('button', { type: 'button', className: 'plain quiet', textContent: 'Cancel' })
+    const ok = el('button', { type: 'button', className: 'plain', textContent: 'Ok' })
+    const hint = el('span', { className: 'keyhint' })
+    hint.innerHTML = '<b>Enter</b> keeps · <b>Shift Enter</b> new line<br><b>Esc</b> drops · empty deletes'
+
+    const drawer = el('div', { className: 'drawer' }, [
+      who,
+      box,
+      el('div', { className: 'drawerRow' }, [hint, cancel, ok]),
+    ])
+
+    cancel.addEventListener('click', () => onDrop())
+    ok.addEventListener('click', () => onKeep())
+
+    // The box grows with what is typed and the drawer climbs with it, so the
+    // line being written stays put while everything above it moves away.
+    const grow = () => {
+      box.style.height = 'auto'
+      box.style.height = box.scrollHeight + 'px'
+      drawer.onResize?.()
+    }
+    box.addEventListener('input', grow)
+
+    drawer.box = box
+    drawer.open = (word, text) => {
+      who.querySelector('b').textContent = word
+      box.value = text
+      requestAnimationFrame(() => { grow(); box.focus(); box.select() })
+    }
+    return drawer
+  }
+
+  /** Enter keeps, Shift+Enter is a new line, Escape drops. */
+  const boxKeys = (drawer, keep, drop) => (event) => {
+    if (event.target !== drawer.box) return false
+    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); keep(); return true }
+    if (event.key === 'Escape') { event.preventDefault(); drop(); return true }
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') event.stopPropagation()
+    return true
   }
 
   /* ── The grid ─────────────────────────────────────────────────────────── */
-  function buildSift(slot, mode) {
-    const state = makeState({
-      marked: ['irate'],
-      notes: { irate: 'still about the meeting on Tuesday' },
+  function buildSift(slot) {
+    const state = {
+      marked: new Set(['irate']),
+      notes: new Map([['irate', 'only about the meeting, not about him.\nIt ran an hour over and I never got to speak.']]),
       showing: 'irate',
-    })
+      editing: null,
+      coaching: null,
+    }
 
     const words = el('div', { className: 'words' })
     const pills = new Map()
@@ -779,8 +905,11 @@
           if (state.notes.delete(feeling.word)) {
             say(host, 'Unmarked ' + feeling.word + ', and its note went with it.')
           }
+          if (state.coaching === feeling.word) state.coaching = null
         } else {
           state.marked.add(feeling.word)
+          // Coach on the first word marked here, and never again.
+          if (!state.coached) { state.coached = true; armCoach(feeling.word) }
         }
         state.showing = feeling.word
         render()
@@ -793,17 +922,8 @@
     }
 
     const glossText = el('span')
-    const peek = el('p', { className: 'notePeek' }, [
-      el('span', { className: 'tag', textContent: 'Note' }),
-      el('span', { className: 'text' }),
-    ])
     const gloss = el('p', { className: 'gloss' }, [glossText])
-
-    const input = el('input', { type: 'text', placeholder: 'A few words of your own…' })
-    const editRow = el('div', { className: 'noteEdit', hidden: true }, [
-      input,
-      el('span', { className: 'keyhint', textContent: 'Enter to keep · Esc to drop' }),
-    ])
+    const line = noteLine(() => open(state.showing))
 
     const sift = el('div', { className: 'sift lifted', tabIndex: -1 }, [
       el('h3', { className: 'heading' }, [
@@ -812,24 +932,12 @@
       ]),
       words,
       gloss,
+      line,
     ])
     sift.dataset.sift = ''
-    if (mode === 'strip') gloss.append(peek, editRow)
-    else gloss.append(peek)
 
-    const drawerWho = el('p', { className: 'who' })
-    const drawerInput = el('input', { type: 'text', placeholder: 'A few words of your own…' })
-    const drawerOk = el('button', { type: 'button', className: 'plain', textContent: 'Ok' })
-    const drawer = el('div', { className: 'drawer' }, [
-      drawerWho,
-      drawerInput,
-      el('div', { className: 'drawerRow' }, [
-        el('span', { className: 'keyhint', textContent: 'Enter to keep · Esc to drop · empty deletes' }),
-        drawerOk,
-      ]),
-    ])
-
-    const body = el('div', { className: 'body' }, mode === 'lift' ? [sift, drawer] : [sift])
+    const drawer = noteDrawer({ onKeep: () => close(true), onDrop: () => close(false) })
+    const body = el('div', { className: 'body' }, [sift, drawer])
     const frame = el('div', { className: 'frame' }, [
       el('div', { className: 'bar' }, [
         el('span', { className: 'title' }),
@@ -843,7 +951,19 @@
     ])
 
     const host = { status: slot.status }
-    const field = () => (mode === 'strip' ? input : drawerInput)
+    drawer.onResize = () => {
+      body.style.setProperty('--liftBy', Math.round(drawer.offsetHeight * 0.55) + 'px')
+    }
+
+    /* The coach mark says its piece and goes. It is the one variant that has to
+       be re-armed when the switcher picks it, or there would be nothing to
+       look at. */
+    let coachTimer
+    function armCoach(word) {
+      state.coaching = word ?? state.showing
+      clearTimeout(coachTimer)
+      coachTimer = setTimeout(() => { state.coaching = null; render() }, 4500)
+    }
 
     function render() {
       for (const feeling of WORDS) {
@@ -864,37 +984,34 @@
         glossText.append(el('span', { className: 'hint', textContent: HINT }))
       }
 
-      const note = showing ? state.notes.get(showing.word) : undefined
-      const editingHere = mode === 'strip' && state.editing
-      peek.hidden = !note || Boolean(editingHere)
-      if (note) peek.querySelector('.text').textContent = note
-      if (mode === 'strip') editRow.hidden = !state.editing
+      line.show({
+        note: showing ? state.notes.get(showing.word) : undefined,
+        // Only a marked word can carry a note, so only a marked word is offered
+        // one — which makes marking the thing that introduces the feature.
+        offer: Boolean(showing) && state.marked.has(showing.word) && !state.editing,
+        coaching: showing && state.coaching === showing.word,
+      })
 
-      if (mode === 'lift') {
-        body.dataset.lift = state.editing ? 'on' : 'off'
-        if (state.editing) {
-          drawerWho.replaceChildren('A note on ', el('b', { textContent: state.editing }))
-        }
-      }
+      body.dataset.lift = state.editing ? 'on' : 'off'
     }
 
     function open(word) {
+      if (!word) return
       state.editing = word
-      const box = field()
-      box.value = state.notes.get(word) ?? ''
       render()
-      requestAnimationFrame(() => { box.focus(); box.select() })
+      drawer.open(word, state.notes.get(word) ?? '')
+      requestAnimationFrame(() => drawer.onResize())
     }
 
     function close(commit) {
       const word = state.editing
       if (!word) return
       if (commit) {
-        const text = field().value.trim()
+        const text = drawer.box.value.trim()
         if (text) {
           state.notes.set(word, text)
           state.marked.add(word)
-          say(host, 'Note kept on ' + word + ' — and ' + word + ' is now marked.')
+          say(host, 'Kept the note on ' + word + '. ' + word + ' is marked.')
         } else if (state.notes.has(word)) {
           state.notes.delete(word)
           say(host, 'Note on ' + word + ' deleted.')
@@ -902,50 +1019,55 @@
       }
       state.editing = null
       state.showing = word
+      state.coaching = null
       render()
       pills.get(word)?.focus()
     }
 
+    frame.redraw = (picked) => {
+      if (picked && teachIs('coach')) armCoach(state.showing)
+      render()
+    }
+
     frame.addEventListener('keydown', (event) => {
-      const box = field()
-      if (event.target === box) {
-        if (event.key === 'Enter') { event.preventDefault(); close(true) }
-        else if (event.key === 'Escape') { event.preventDefault(); close(false) }
-        return
-      }
+      if (boxKeys(drawer, () => close(true), () => close(false))(event)) return
       if ((event.key === 'n' || event.key === 'N') && !state.editing) {
-        const word = [...pills].find(([, pill]) => pill === document.activeElement)?.[0] ?? state.showing
-        if (word) { event.preventDefault(); open(word) }
+        const focused = [...pills].find(([, pill]) => pill === document.activeElement)?.[0]
+        const word = focused ?? state.showing
+        if (!word) return
+        event.preventDefault()
+        if (!state.marked.has(word)) {
+          say(host, word + ' is not picked, so there is nothing to note. Mark it first.')
+          return
+        }
+        open(word)
       }
     })
-    drawerOk.addEventListener('click', () => close(true))
 
     render()
     return frame
   }
 
   /* ── The walk ─────────────────────────────────────────────────────────── */
-  function buildPrompt(slot, mode) {
-    const state = makeState({ notes: { irate: 'only about the meeting, not about him' } })
+  function buildPrompt(slot) {
+    const state = {
+      marked: new Set(),
+      notes: new Map([['irate', 'only about the meeting, not about him']]),
+      editing: null,
+    }
     let at = 4
     const past = ['chosen', 'skipped', 'skipped', 'chosen']
 
-    const category = el('p', { className: 'category', textContent: CATEGORY })
     const wordEl = el('h3', { className: 'word' })
     const definition = el('p', { className: 'definition' })
-    const peek = el('p', { className: 'notePeek' }, [
-      el('span', { className: 'tag', textContent: 'Note' }),
-      el('span', { className: 'text' }),
+    const line = noteLine(() => open(current().word))
+    const card = el('div', { className: 'card ' + KIND }, [
+      el('p', { className: 'category', textContent: CATEGORY }),
+      wordEl,
+      definition,
+      line,
     ])
-    const input = el('input', { type: 'text', placeholder: 'A few words of your own…' })
-    const editRow = el('div', { className: 'noteEdit', hidden: true }, [
-      input,
-      el('span', { className: 'keyhint', textContent: 'Enter · Esc' }),
-    ])
-    const card = el('div', { className: 'card ' + KIND }, [category, wordEl, definition, peek])
-    if (mode === 'strip') card.append(editRow)
 
-    const stage = el('div', { className: 'stage' }, [card])
     const rule = el('div', { className: 'steprule', role: 'progressbar' })
     const actions = el('div', { className: 'actions' }, [
       el('button', { type: 'button', className: 'plain' }, [
@@ -955,24 +1077,15 @@
         'Yes', el('span', { textContent: '→', ariaHidden: 'true' }),
       ]),
     ])
-    const answerRow = el('div', {}, [])
-    const prompt = el('div', { className: 'prompt lifted', tabIndex: 0 }, [stage, rule, actions])
+    const prompt = el('div', { className: 'prompt lifted', tabIndex: 0 }, [
+      el('div', { className: 'stage' }, [card]),
+      rule,
+      actions,
+    ])
     prompt.dataset.prompt = ''
 
-    const drawerWho = el('p', { className: 'who' })
-    const drawerInput = el('input', { type: 'text', placeholder: 'A few words of your own…' })
-    const drawerOk = el('button', { type: 'button', className: 'plain', textContent: 'Ok' })
-    const drawer = el('div', { className: 'drawer' }, [
-      drawerWho,
-      drawerInput,
-      el('div', { className: 'drawerRow' }, [
-        el('span', { className: 'keyhint', textContent: 'Enter to keep · Esc to drop · empty deletes' }),
-        drawerOk,
-      ]),
-    ])
-
-    const body = el('div', { className: 'body' }, mode === 'lift' ? [prompt, drawer] : [prompt])
-    if (mode === 'lift') body.style.setProperty('--liftBy', '2.5rem')
+    const drawer = noteDrawer({ onKeep: () => close(true), onDrop: () => close(false) })
+    const body = el('div', { className: 'body' }, [prompt, drawer])
     const frame = el('div', { className: 'frame' }, [
       el('div', { className: 'bar' }, [
         el('button', { type: 'button', className: 'back', textContent: '‹ ' + CATEGORY }),
@@ -982,20 +1095,28 @@
     ])
 
     const host = { status: slot.status }
-    const field = () => (mode === 'strip' ? input : drawerInput)
     const current = () => WORDS[at]
+    drawer.onResize = () => {
+      body.style.setProperty('--liftBy', Math.round(drawer.offsetHeight * 0.5) + 'px')
+    }
+
+    let coachTimer
+    function armCoach() {
+      state.coaching = true
+      clearTimeout(coachTimer)
+      coachTimer = setTimeout(() => { state.coaching = false; render() }, 4500)
+    }
 
     function render() {
       const feeling = current()
       wordEl.textContent = feeling.word
       definition.textContent = feeling.definition
-      card.className = 'card ' + KIND
-
-      const note = state.notes.get(feeling.word)
-      const editingHere = mode === 'strip' && state.editing
-      peek.hidden = !note || Boolean(editingHere)
-      if (note) peek.querySelector('.text').textContent = note
-      if (mode === 'strip') editRow.hidden = !state.editing
+      line.show({
+        note: state.notes.get(feeling.word),
+        // Every card can be noted: keeping a note is the same yes → gives.
+        offer: !state.editing,
+        coaching: state.coaching,
+      })
 
       rule.replaceChildren()
       WORDS.forEach((_, index) => {
@@ -1007,25 +1128,22 @@
       rule.setAttribute('aria-valuemax', String(WORDS.length))
       rule.setAttribute('aria-label', 'Feelings in ' + CATEGORY)
 
-      if (mode === 'lift') {
-        body.dataset.lift = state.editing ? 'on' : 'off'
-        if (state.editing) drawerWho.replaceChildren('A note on ', el('b', { textContent: state.editing }))
-      }
+      body.dataset.lift = state.editing ? 'on' : 'off'
     }
 
     function answer(toward, announce = true) {
       const feeling = current()
-      const note = state.notes.has(feeling.word)
+      const noted = state.notes.has(feeling.word)
       if (toward === 'accept') state.marked.add(feeling.word)
       // Passing on a word takes its note with it, the same as unmarking does.
       else state.notes.delete(feeling.word)
       past[at] = toward === 'accept' ? 'chosen' : 'skipped'
       at = (at + 1) % WORDS.length
-      if (at === 0) { past.length = 0 }
+      if (at === 0) past.length = 0
       if (announce) {
         say(host, toward === 'accept'
           ? 'Kept ' + feeling.word + '.'
-          : 'Passed on ' + feeling.word + (note ? ', and its note went with it.' : '.'))
+          : 'Passed on ' + feeling.word + (noted ? ', and its note went with it.' : '.'))
       }
       render()
       prompt.focus()
@@ -1033,16 +1151,14 @@
 
     function open(word) {
       state.editing = word
-      const box = field()
-      box.value = state.notes.get(word) ?? ''
       render()
-      requestAnimationFrame(() => { box.focus(); box.select() })
+      drawer.open(word, state.notes.get(word) ?? '')
+      requestAnimationFrame(() => drawer.onResize())
     }
 
     function close(commit) {
       const word = state.editing
-      if (!word) return
-      const text = commit ? field().value.trim() : ''
+      const text = commit ? drawer.box.value.trim() : ''
       state.editing = null
       if (commit && text) {
         state.notes.set(word, text)
@@ -1060,18 +1176,16 @@
       prompt.focus()
     }
 
+    frame.redraw = (picked) => {
+      if (picked && teachIs('coach')) armCoach()
+      render()
+    }
+
     actions.children[0].addEventListener('click', () => answer('reject'))
     actions.children[1].addEventListener('click', () => answer('accept'))
-    drawerOk.addEventListener('click', () => close(true))
 
     frame.addEventListener('keydown', (event) => {
-      const box = field()
-      if (event.target === box) {
-        if (event.key === 'Enter') { event.preventDefault(); close(true) }
-        else if (event.key === 'Escape') { event.preventDefault(); close(false) }
-        else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') event.stopPropagation()
-        return
-      }
+      if (boxKeys(drawer, () => close(true), () => close(false))(event)) return
       if (state.editing) return
       if (event.key === 'ArrowRight') { event.preventDefault(); answer('accept') }
       else if (event.key === 'ArrowLeft') { event.preventDefault(); answer('reject') }
@@ -1082,88 +1196,96 @@
     return frame
   }
 
+  /* ── Switchers ────────────────────────────────────────────────────────── */
+  function radios(into, name, options, initial, onPick) {
+    const host = document.getElementById(into)
+    for (const option of options) {
+      const input = el('input', { type: 'radio', name, value: option.key })
+      input.checked = option.key === initial
+      input.addEventListener('change', () => onPick(option.key))
+      host.append(el('label', { className: 'swatch' }, [
+        input,
+        option.label,
+        el('span', { className: 'cost', textContent: option.cost }),
+      ]))
+    }
+    onPick(initial)
+  }
+
+  const slabs = []
+  const rerender = () => { for (const redraw of slabs) redraw(true) }
+
   /* ── Slabs ────────────────────────────────────────────────────────────── */
-  const DEMOS = [
+  for (const demo of [
     {
-      into: 'optionA', mode: 'strip', build: buildSift,
-      title: 'The note goes under the definition', where: 'Grid · FeelingCategorySift',
-      note: 'Focus a word and press N. irate already carries one — the pencil rule under it is the only thing that says so, and it costs no width.',
+      build: buildSift, where: 'Grid · FeelingCategorySift',
+      title: 'Marking a word offers the note',
+      note: 'Mark a word and the line under the definition offers one. irate already carries a two-line note — the badge on the pill is what says so.',
     },
     {
-      into: 'optionA', mode: 'strip', build: buildPrompt,
-      title: 'The note goes inside the card', where: 'Walk · FeelingPrompt',
-      note: 'Press N on the card, ← and → still answer. Inside the box they are the caret instead.',
+      build: buildPrompt, where: 'Walk · FeelingPrompt',
+      title: 'Every card can be noted',
+      note: 'Press N, or use the line under the definition. Keeping a note answers the card yes; ← passes and takes any note with it.',
     },
-    {
-      into: 'optionB', mode: 'lift', build: buildSift,
-      title: 'The grid parks and a drawer arrives', where: 'Grid · FeelingCategorySift',
-      note: 'Same keys. The drawer names the word again, because the grid behind it is no longer readable.',
-    },
-    {
-      into: 'optionB', mode: 'lift', build: buildPrompt,
-      title: 'The card lifts over the answer row', where: 'Walk · FeelingPrompt',
-      note: 'The progress rule and the two answers go under the drawer — there is nothing to answer until the note is closed.',
-    },
-  ]
+  ]) {
+    const status = el('p', { className: 'status' })
+    const slab = el('div', { className: 'demo' }, [
+      el('div', { className: 'demoHead' }, [
+        el('h3', { textContent: demo.title }),
+        el('span', { className: 'where', textContent: demo.where }),
+      ]),
+      el('p', { className: 'demoNote', textContent: demo.note }),
+    ])
+    const frame = demo.build({ status })
+    slab.append(frame, status)
+    document.getElementById('demos').append(slab)
+    slabs.push(frame.redraw)
+  }
+
+  // The note line reads the variant as it draws, so switching is a redraw.
+  radios('teachPicker', 'teach', TEACH, 'invite', (key) => {
+    document.documentElement.dataset.teach = key
+    rerender()
+  })
 
   /* ── The badge study ──────────────────────────────────────────────────── */
-  const picker = document.getElementById('badgePicker')
-  for (const badge of BADGES) {
-    const input = el('input', { type: 'radio', name: 'badge', value: badge.key })
-    input.checked = badge.key === 'icon'
-    input.addEventListener('change', () => {
-      document.documentElement.dataset.badge = badge.key
-    })
-    picker.append(el('label', { className: 'swatch' }, [
-      input,
-      badge.label,
-      el('span', { className: 'cost', textContent: badge.cost }),
-    ]))
-  }
-  document.documentElement.dataset.badge = 'icon'
-
-  /** A row of the same words in every state at once, to compare the badges. */
   function badgeRow() {
     const marked = new Set(['irate', 'livid'])
     const noted = new Set(['irate'])
     const words = el('div', { className: 'words' })
     for (const feeling of WORDS) {
-      const pill = el('button', { type: 'button', className: 'pill ' + KIND }, [
-        feeling.word,
-        noteMark(),
-      ])
+      const pill = el('button', { type: 'button', className: 'pill ' + KIND }, [feeling.word, noteMark()])
       pill.setAttribute('aria-pressed', String(marked.has(feeling.word)))
-      if (noted.has(feeling.word)) {
-        pill.dataset.note = ''
-        pill.append(noteSaid())
-      }
+      if (noted.has(feeling.word)) { pill.dataset.note = ''; pill.append(noteSaid()) }
       words.append(pill)
     }
     const gloss = el('p', { className: 'gloss' }, [
       el('b', { textContent: 'irate' }), ' — Loudly worked up at being brushed aside.',
     ])
-    gloss.append(el('p', { className: 'notePeek' }, [
-      el('span', { className: 'tag', textContent: 'Note' }),
-      el('span', { className: 'text', textContent: 'still about the meeting on Tuesday' }),
-    ]))
-    const sift = el('div', { className: 'sift' }, [
-      el('h3', { className: 'heading' }, [
-        el('span', { className: 'set', textContent: 'Feelings' }),
-        CATEGORY,
+    const slot = el('div', { className: 'noteSlot' }, [
+      el('p', { className: 'notePeek' }, [
+        el('span', { className: 'tag', textContent: 'Note' }),
+        el('span', { className: 'text', textContent: 'only about the meeting, not about him.' }),
+        el('span', { className: 'more', textContent: '+1' }),
       ]),
-      words,
-      gloss,
     ])
     return el('div', { className: 'frame' }, [
       el('div', { className: 'bar' }, [
         el('span', { className: 'title' }),
         el('button', { className: 'x', type: 'button', textContent: '✕' }),
       ]),
-      el('div', { className: 'body' }, [sift]),
+      el('div', { className: 'body' }, [
+        el('div', { className: 'sift' }, [
+          el('h3', { className: 'heading' }, [
+            el('span', { className: 'set', textContent: 'Feelings' }),
+            CATEGORY,
+          ]),
+          words, gloss, slot,
+        ]),
+      ]),
     ])
   }
 
-  /** The browse screen: the badge has to survive being listed in a card. */
   function browseRow() {
     const listed = (words) => {
       const list = el('ul')
@@ -1174,7 +1296,6 @@
       }
       return list
     }
-
     const afraid = el('div', { className: 'catcard' }, [
       el('h3', { className: 'cat', textContent: 'Afraid' }),
       listed([['apprehensive', false], ['frightened', true], ['mistrustful', false]]),
@@ -1185,18 +1306,14 @@
     ])
     const rest = el('div', { className: 'words' })
     for (const name of ['Annoyed', 'Confused', 'Disconnected', 'Embarrassed']) {
-      const pill = el('button', { type: 'button', className: 'pill unmet', textContent: name })
-      rest.append(pill)
+      rest.append(el('button', { type: 'button', className: 'pill unmet', textContent: name }))
     }
-
     return el('div', { className: 'frame' }, [
       el('div', { className: 'bar' }, [
         el('span', { className: 'title', textContent: 'Feelings' }),
         el('button', { className: 'x', type: 'button', textContent: '✕' }),
       ]),
-      el('div', { className: 'body' }, [
-        el('div', { className: 'sift' }, [afraid, angry, rest]),
-      ]),
+      el('div', { className: 'body' }, [el('div', { className: 'sift' }, [afraid, angry, rest])]),
       el('div', { className: 'btnrow' }, [
         el('button', { type: 'button', className: 'plain', textContent: 'Cancel' }),
         el('button', { type: 'button', className: 'plain', textContent: 'Insert' }),
@@ -1206,37 +1323,25 @@
 
   for (const study of [
     {
-      build: badgeRow,
-      title: 'In the grid', where: 'FeelingCategorySift',
+      build: badgeRow, title: 'In the grid', where: 'FeelingCategorySift',
       note: 'irate is marked and noted; livid is marked only. Watch the row: the pencil is the one treatment that moves the words after it.',
     },
     {
-      build: browseRow,
-      title: 'On the way back out', where: 'FeelingCategoryCard',
+      build: browseRow, title: 'On the way back out', where: 'FeelingCategoryCard',
       note: 'The card lists what you picked, so the badge has to work at 0.85em in a run of words separated by dots.',
     },
   ]) {
-    const slab = el('div', { className: 'demo' }, [
+    document.getElementById('badgeDemo').append(el('div', { className: 'demo' }, [
       el('div', { className: 'demoHead' }, [
         el('h3', { textContent: study.title }),
         el('span', { className: 'where', textContent: study.where }),
       ]),
       el('p', { className: 'demoNote', textContent: study.note }),
       study.build(),
-    ])
-    document.getElementById('badgeDemo').append(slab)
+    ]))
   }
 
-  for (const demo of DEMOS) {
-    const status = el('p', { className: 'status' })
-    const slab = el('div', { className: 'demo' }, [
-      el('div', { className: 'demoHead' }, [
-        el('h3', { textContent: demo.title }),
-        el('span', { className: 'where', textContent: demo.where }),
-      ]),
-      el('p', { className: 'demoNote', textContent: demo.note }),
-    ])
-    slab.append(demo.build({ status }, demo.mode), status)
-    document.getElementById(demo.into).append(slab)
-  }
+  radios('badgePicker', 'badge', BADGES, 'icon', (key) => {
+    document.documentElement.dataset.badge = key
+  })
 </script>
