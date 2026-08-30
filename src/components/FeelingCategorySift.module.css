@@ -68,3 +68,12 @@
 .hint {
   opacity: 0.7;
 }
+
+/* The note's own line, under the gloss strip. Its height is held whether or not
+   there is anything to put in it: a line that appeared as the pointer crossed a
+   marked word would move the modal's bottom edge on every pass, and the strip
+   above holds its two lines for the same reason. */
+.note {
+  min-height: 1.7lh;
+  font-size: 0.85em;
+}

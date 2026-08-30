@@ -1,0 +1,177 @@
+/* The drawer and the parking are one shape doing one job, drawn over four
+   screens — the two grids and the two walks — so they live in one file the way
+   the pill does. A copy next to each would drift, and the point of the shape is
+   that writing a note looks the same wherever you are when you start. */
+.surface {
+  position: relative;
+}
+
+/* What the drawer comes up over. It travels, fades, and dissolves into the top
+   edge rather than being sliced by it: the surface keeps its height, so
+   something has to go, and a fade says 'still there, not your problem' where a
+   cut looks like a bug. */
+.parked {
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 240ms;
+}
+
+.parked[data-parked] {
+  transform: translateY(-3rem) scale(0.985);
+  opacity: 0.4;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.2rem);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 2.2rem);
+}
+
+/* Off the bottom edge, and anchored there: the box grows upwards as the note
+   runs on, so the line being written does not travel under a software
+   keyboard. Absolute, so the screen underneath keeps the height it had and a
+   modal hanging from a fixed line stays put. */
+.drawer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid;
+  border-radius: 0.25rem;
+  /* The one place a component here needs a surface of its own: the drawer
+     covers the screen it is parked over, and a transparent one would let that
+     show through. `--nvc-sheet` is how a host hands over its own — the plugin
+     points it at Obsidian's modal background — and `canvas` is the browser's
+     own paper for a gallery that hands over nothing. It is the second and last
+     colour a host may set, after `--nvc-ring`. */
+  background: var(--nvc-sheet, canvas);
+  transform: translateY(120%);
+  opacity: 0;
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 180ms;
+}
+
+.drawer[data-open] {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parked,
+  .drawer {
+    transition: none;
+  }
+}
+
+/* Which word this is about, since the screen that said so is parked and no
+   longer readable. */
+.who {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.85em;
+}
+
+.glyph {
+  align-self: center;
+  opacity: 0.55;
+}
+
+.about {
+  opacity: 0.65;
+}
+
+/* The box grows with what is typed, in CSS: the same text is rendered
+   underneath it, invisible, and the grid cell is as tall as the taller of the
+   two. The trailing space is what holds the line open while a new one is still
+   empty. Capped, past which it scrolls — the drawer has a screen above it that
+   it should not climb over. */
+.grow {
+  display: grid;
+  max-height: 7.5lh;
+  overflow-y: auto;
+}
+
+.grow::after {
+  content: attr(data-value) ' ';
+  white-space: pre-wrap;
+  visibility: hidden;
+}
+
+.grow > .box,
+.grow::after {
+  grid-area: 1 / 1;
+  padding: 0.2rem 0.1rem;
+  border-bottom: 1.5px solid transparent;
+  font: inherit;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.box {
+  height: auto;
+  border: none;
+  border-bottom-color: currentColor;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  resize: none;
+  overflow: hidden;
+}
+
+.box:focus {
+  outline: none;
+  border-bottom-color: var(--nvc-ring, currentColor);
+}
+
+.box::placeholder {
+  color: inherit;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* What the keys do, kept beside the buttons that do the same two things — the
+   drawer is where both are learned, and the only place there is room to say it. */
+.hint {
+  margin: 0;
+  margin-right: auto;
+  font-size: 0.7em;
+  line-height: 1.4;
+  opacity: 0.6;
+}
+
+.hint b {
+  font-weight: 500;
+}
+
+.row button {
+  height: auto;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  font-size: 0.9em;
+  color: inherit;
+  cursor: pointer;
+}
+
+.row button:focus-visible {
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline-offset: 2px;
+}
+
+/* Escape said out loud, for a pointer. Quieter than Ok, being the way back
+   rather than the way on. */
+.quiet {
+  border-color: transparent;
+}

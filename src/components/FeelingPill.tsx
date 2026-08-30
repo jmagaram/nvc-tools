@@ -1,3 +1,4 @@
+import NoteMark from './NoteMark.tsx'
 import styles from './pill.module.css'
 
 type Props = {
@@ -7,6 +8,20 @@ type Props = {
   kind: 'met' | 'unmet'
   /** Whether it is one of the feelings picked. */
   marked: boolean
+  /**
+   * Whether a few words of someone's own are written about it. Only ever true
+   * of a marked word — a note cannot outlive the mark under it — so the badge
+   * never turns up on a pill that was not already drawn differently, and the
+   * row can only grow when a note is added to it.
+   */
+  noted: boolean
+  /**
+   * Whether a closing note drawer hands focus back here — see
+   * `useFocusScreen`. At most one pill in a grid carries it: the word the last
+   * note was about, so writing one puts you back on the word you wrote about
+   * rather than on the grid as a whole.
+   */
+  resume: boolean
   /** Called to turn the mark on or off. */
   onClick: () => void
   /**
@@ -29,6 +44,8 @@ export default function FeelingPill({
   word,
   kind,
   marked,
+  noted,
+  resume,
   onClick,
   onShow,
 }: Props) {
@@ -37,11 +54,13 @@ export default function FeelingPill({
       type="button"
       className={`${styles.pill} ${styles[kind]}`}
       aria-pressed={marked}
+      data-sift={resume ? '' : undefined}
       onClick={onClick}
       onPointerEnter={onShow}
       onFocus={onShow}
     >
       {word}
+      {noted && <NoteMark />}
     </button>
   )
 }

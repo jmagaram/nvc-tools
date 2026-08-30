@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import NeedCard from './NeedCard.tsx'
+import NoteDrawer from './NoteDrawer.tsx'
+import type { Noting } from './NoteDrawer.tsx'
+import NoteLine from './NoteLine.tsx'
 import StepProgress from './StepProgress.tsx'
 import type { StepMark } from './StepProgress.tsx'
 import styles from './NeedPrompt.module.css'
@@ -13,6 +16,9 @@ type Leaving = {
   word: string
   category: string
   definition: string
+  /* What was written about it, so the note leaves with the word rather than
+     being left sitting under the card arriving behind it. */
+  note: string | null
   toward: Toward
 }
 
@@ -27,6 +33,23 @@ type Props = {
   past: readonly StepMark[]
   /** How many steps come after the one on screen. */
   upcoming: number
+  /** A few words of someone's own about this need, or null for none yet. */
+  note: string | null
+  /**
+   * The note being written, or null when the card is what is on top. Nothing
+   * on a card is decided until it is answered, so keeping a note leaves the
+   * card exactly where it was: what is written is part of the answer rather
+   * than a substitute for it.
+   */
+  noting: Noting | null
+  /** Write a note about the card on screen, or open the one already there. */
+  onNote: () => void
+  /** Called with what is in the box, on every keystroke. */
+  onDraft: (text: string) => void
+  /** Keep what is in the box. An emptied box deletes the note there was. */
+  onKeepNote: () => void
+  /** Close the drawer and leave the note as it was found. */
+  onDropNote: () => void
   /** Accept this need and move on. */
   onAccept: () => void
   /** Reject this need and move on. */
@@ -39,6 +62,12 @@ export default function NeedPrompt({
   definition,
   past,
   upcoming,
+  note,
+  noting,
+  onNote,
+  onDraft,
+  onKeepNote,
+  onDropNote,
   onAccept,
   onReject,
 }: Props) {
@@ -53,7 +82,7 @@ export default function NeedPrompt({
   const [dealt, setDealt] = useState(0)
 
   const answer = (toward: Toward) => {
-    setLeaving({ word, category, definition, toward })
+    setLeaving({ word, category, definition, note, toward })
     setDealt(dealt + 1)
     if (toward === 'accept') onAccept()
     else onReject()
@@ -71,72 +100,108 @@ export default function NeedPrompt({
     } else if (event.key === 'ArrowLeft') {
       event.preventDefault()
       answer('reject')
+    } else if (event.key === 'n' || event.key === 'N') {
+      // Writing is not answering: this opens the drawer and leaves the card
+      // where it is. The box is a sibling of this region rather than inside
+      // it, so an `n` typed into a note never arrives back here.
+      event.preventDefault()
+      onNote()
     }
   }
 
   return (
-    /* 'data-prompt' is how a host finds this region to focus it — see
-       useFocusScreen. Not an aria attribute on purpose: a role or a label here
-       becomes the region's accessible name and gets read out on every card. */
-    <div
-      className={styles.prompt}
-      tabIndex={0}
-      data-prompt=""
-      onKeyDown={answerOnArrow}
+    <NoteDrawer
+      noting={noting}
+      onDraft={onDraft}
+      onKeep={onKeepNote}
+      onDrop={onDropNote}
     >
-      {/* Two cards at most: the one just answered tilting away, and the one
-          rising into its place. The stage is a fixed height so neither of them
-          jostles the buttons below, and it clips the flight at its edges. */}
-      <div className={styles.stage}>
-        {leaving && (
-          <div
-            key={`leaving-${dealt}`}
-            className={`${styles.leaving} ${styles[leaving.toward]}`}
-            aria-hidden="true"
-            // The wash and the stamp animate too, and their events bubble
-            // here. Only the card's own flight ending means it is really gone.
-            onAnimationEnd={(event) => {
-              if (event.target === event.currentTarget) setLeaving(null)
-            }}
-          >
+      {/* 'data-prompt' is how a host finds this region to focus it — see
+          useFocusScreen. Not an aria attribute on purpose: a role or a label
+          here becomes the region's accessible name and gets read out on every
+          card. */}
+      <div
+        className={styles.prompt}
+        tabIndex={0}
+        data-prompt=""
+        onKeyDown={answerOnArrow}
+      >
+        {/* Two cards at most: the one just answered tilting away, and the one
+            rising into its place. The stage is a fixed height so neither of them
+            jostles the buttons below, and it clips the flight at its edges. */}
+        <div className={styles.stage}>
+          {leaving && (
+            <div
+              key={`leaving-${dealt}`}
+              className={`${styles.leaving} ${styles[leaving.toward]}`}
+              aria-hidden="true"
+              // The wash and the stamp animate too, and their events bubble
+              // here. Only the card's own flight ending means it is really gone.
+              onAnimationEnd={(event) => {
+                if (event.target === event.currentTarget) setLeaving(null)
+              }}
+            >
+              <NeedCard
+                word={leaving.word}
+                category={leaving.category}
+                definition={leaving.definition}
+                note={
+                  leaving.note === null ? null : (
+                    <NoteLine
+                      word={leaving.word}
+                      note={leaving.note}
+                      clickable={false}
+                      onOpen={() => {}}
+                    />
+                  )
+                }
+              />
+              <div className={styles.wash} />
+              <p className={styles.stamp}>
+                {leaving.toward === 'accept' ? '✓' : '✕'}
+              </p>
+            </div>
+          )}
+          <div key={`arriving-${dealt}`} className={styles.arriving}>
             <NeedCard
-              word={leaving.word}
-              category={leaving.category}
-              definition={leaving.definition}
+              word={word}
+              category={category}
+              definition={definition}
+              note={
+                <NoteLine
+                  word={word}
+                  note={note}
+                  clickable
+                  onOpen={onNote}
+                />
+              }
             />
-            <div className={styles.wash} />
-            <p className={styles.stamp}>
-              {leaving.toward === 'accept' ? '✓' : '✕'}
-            </p>
           </div>
-        )}
-        <div key={`arriving-${dealt}`} className={styles.arriving}>
-          <NeedCard word={word} category={category} definition={definition} />
+        </div>
+
+        {/* The seam between the card and the answer: how far along the walk is,
+            and which words were kept on the way. Below the card so the card
+            stays the loudest thing on screen, and above the buttons so the count
+            it is keeping sits next to the gesture that changes it. */}
+        <StepProgress
+          past={past}
+          upcoming={upcoming}
+          label={`Needs in ${category}`}
+        />
+
+        {/* The walk only runs forwards: answering is the only way to move. Each
+            button sits on the side its arrow key points to. */}
+        <div className={styles.actions}>
+          <button type="button" onClick={() => answer('reject')}>
+            <span aria-hidden="true">←</span>
+            Not this
+          </button>
+          <button type="button" onClick={() => answer('accept')}>
+            Yes
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
       </div>
-
-      {/* The seam between the card and the answer: how far along the walk is,
-          and which words were kept on the way. Below the card so the card
-          stays the loudest thing on screen, and above the buttons so the count
-          it is keeping sits next to the gesture that changes it. */}
-      <StepProgress
-        past={past}
-        upcoming={upcoming}
-        label={`Needs in ${category}`}
-      />
-
-      {/* The walk only runs forwards: answering is the only way to move. Each
-          button sits on the side its arrow key points to. */}
-      <div className={styles.actions}>
-        <button type="button" onClick={() => answer('reject')}>
-          <span aria-hidden="true">←</span>
-          Not this
-        </button>
-        <button type="button" onClick={() => answer('accept')}>
-          Yes
-          <span aria-hidden="true">→</span>
-        </button>
-      </div>
-    </div>
+    </NoteDrawer>
   )
 }

@@ -4,7 +4,7 @@ import FeelingCategoryCard from './FeelingCategoryCard.tsx'
 import FeelingCategoryPill from './FeelingCategoryPill.tsx'
 import FeelingCategorySift from './FeelingCategorySift.tsx'
 import FeelingCategoryWalk from './FeelingCategoryWalk.tsx'
-import { cards, counts, pills, resumeAt } from '../machines/feelingPicker.ts'
+import { cards, counts, noted, pills, resumeAt } from '../machines/feelingPicker.ts'
 import type {
   FeelingPickerAction,
   FeelingPickerState,
@@ -121,7 +121,7 @@ export default function FeelingPicker({ state, onAction }: Props) {
                 key={card.category}
                 category={card.category}
                 kind={card.kind}
-                feelings={[...card.words]}
+                feelings={noted(card)}
                 emptyText={EMPTY_TEXT}
                 resume={card.category === resume}
                 onClick={() =>

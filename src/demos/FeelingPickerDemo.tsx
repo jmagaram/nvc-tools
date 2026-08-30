@@ -13,6 +13,7 @@ import {
   chosen,
   counts,
   init,
+  isNoting,
   reduce,
   screen,
   screenKey,
@@ -77,6 +78,11 @@ export default function FeelingPickerDemo() {
      From a walk that is the category it started in, because that is where its
      answers land. */
   const view = screen(state)
+  /* While a note is being written, the drawer is the screen on top and this
+     row belongs to the one parked under it. Nothing here can be answered until
+     the note is kept or dropped — which the `x` and Escape both do, since they
+     mean whatever is on top. */
+  const noting = isNoting(state)
 
   const leaveTop = () => dispatch({ type: 'close' })
 
@@ -106,19 +112,28 @@ export default function FeelingPickerDemo() {
   const footer =
     view === 'browse' ? (
       <>
-        <button type="button" onClick={cancel}>
+        <button type="button" disabled={noting} onClick={cancel}>
           Cancel
         </button>
-        <button type="button" onClick={ok} title={`Insert (${submitShortcutLabel})`}>
+        <button
+          type="button"
+          disabled={noting}
+          onClick={ok}
+          title={`Insert (${submitShortcutLabel})`}
+        >
           {total > 0 ? `Insert (${total})` : 'Insert'} {submitShortcutLabel}
         </button>
       </>
     ) : view === 'sift' ? (
       <>
-        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
+        <button
+          type="button"
+          disabled={noting}
+          onClick={() => dispatch({ type: 'walk' })}
+        >
           Ask me about each
         </button>
-        <button type="button" onClick={leaveTop}>
+        <button type="button" disabled={noting} onClick={leaveTop}>
           Done
         </button>
       </>
@@ -203,16 +218,17 @@ export default function FeelingPickerDemo() {
                 <>
                   <button
                     type="button"
+                    disabled={noting}
                     onClick={() => dispatch({ type: 'walk' })}
                   >
                     Ask me about each
                   </button>{' '}
-                  <button type="button" onClick={leaveTop}>
+                  <button type="button" disabled={noting} onClick={leaveTop}>
                     Done
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={leaveTop}>
+                <button type="button" disabled={noting} onClick={leaveTop}>
                   <span aria-hidden="true">&lsaquo;</span>{' '}
                   {visitCategory(state) ?? TITLE}
                 </button>

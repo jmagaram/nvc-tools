@@ -2,7 +2,7 @@ import NeedCategoryCard from './NeedCategoryCard.tsx'
 import NeedCategoryPill from './NeedCategoryPill.tsx'
 import NeedCategorySift from './NeedCategorySift.tsx'
 import NeedCategoryWalk from './NeedCategoryWalk.tsx'
-import { cards, pills, resumeAt } from '../machines/needPicker.ts'
+import { cards, noted, pills, resumeAt } from '../machines/needPicker.ts'
 import type {
   NeedPickerAction,
   NeedPickerState,
@@ -90,7 +90,7 @@ export default function NeedPicker({ state, onAction }: Props) {
               <NeedCategoryCard
                 key={card.category}
                 category={card.category}
-                needs={[...card.words]}
+                needs={noted(card)}
                 emptyText={EMPTY_TEXT}
                 resume={card.category === resume}
                 onClick={() =>

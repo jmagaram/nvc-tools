@@ -9,6 +9,12 @@ export type Visited = {
   kind: 'met' | 'unmet'
   /** May be empty: the category was opened but nothing in it applied. */
   words: readonly string[]
+  /**
+   * A few words of someone's own about some of them. Only ever for a word in
+   * `words` — feelingCategorySift's normalising is what keeps that true — so
+   * anything reading `words` alone still sees the whole of what was picked.
+   */
+  notes: readonly feelingCategorySift.Note[]
 }
 
 /** A category as the browse view needs it — no feelings, just the label. */
@@ -56,7 +62,11 @@ export type FeelingPickerAction =
   | { type: 'sift'; action: feelingCategorySift.FeelingCategorySiftAction }
   /** Go through this category one word at a time instead. */
   | { type: 'walk' }
-  /** Answer the feeling the walk is showing. */
+  /**
+   * Whatever was just done to the card the walk is showing: answered, or
+   * written about. A note is part of an answer rather than one of its own, so
+   * it travels in the same envelope.
+   */
   | { type: 'answer'; answer: feelingCategoryWalk.FeelingCategoryWalkAction }
   /**
    * Leave whatever is on top: a walk goes back to the grid it started from, and
@@ -113,6 +123,14 @@ export function initWith(
   }
 }
 
+/** What was written in `category` last time it was open. */
+function notesWritten(
+  state: FeelingPickerState,
+  category: string,
+): readonly feelingCategorySift.Note[] {
+  return state.visited.find((v) => v.category === category)?.notes ?? []
+}
+
 /** What was picked in `category` last time it was open, if it was. */
 function wordsPicked(
   state: FeelingPickerState,
@@ -138,7 +156,15 @@ function fold(
   const asked = new Set(walk.progress.answered.map((a) => a.feeling.word))
   const answeredYes = feelingCategoryWalk.picked(walk).map((f) => f.word)
   const unasked = sift.marked.filter((word) => !asked.has(word))
-  return feelingCategorySift.withMarked(sift, [...answeredYes, ...unasked])
+  // Notes fold on the same rule as the marks, for the same reason: what the
+  // walk asked about, the walk decides. A note written on a card the walk has
+  // not reached yet is still the card's, and `withMarked` drops whatever is
+  // left over a word that ended up unmarked.
+  const written = [
+    ...walk.notes.filter((note) => asked.has(note.word)),
+    ...sift.notes.filter((note) => !asked.has(note.word)),
+  ]
+  return feelingCategorySift.withMarked(sift, [...answeredYes, ...unasked], written)
 }
 
 /**
@@ -154,6 +180,7 @@ function closeVisit(
     category: sift.category,
     kind: sift.kind,
     words: sift.marked,
+    notes: sift.notes,
   }
   return {
     ...state,
@@ -191,6 +218,7 @@ export function reduce(
           sift: feelingCategorySift.init(
             category,
             wordsPicked(state, category.name),
+            notesWritten(state, category.name),
           ),
         },
       }
@@ -210,13 +238,18 @@ export function reduce(
 
     case 'walk': {
       if (state.visit?.phase !== 'sift') return state
+      // Not while a note is open over the grid: the drawer is the screen on
+      // top, and starting a walk under it would carry a half-written note into
+      // a screen that cannot show it. The hosts take this button out of reach
+      // as well, so this is the belt to their braces.
+      if (isNoting(state)) return state
       const { sift } = state.visit
       const category = state.categories.find((c) => c.name === sift.category)
       if (!category) return state
       // Marked first, which `feelingCategoryWalk.init` already does with
       // whatever it is handed — so this reads as 'confirm these, then meet the
       // rest' and discovery survives being able to skip the walk entirely.
-      const walk = feelingCategoryWalk.init(category, sift.marked, rng)
+      const walk = feelingCategoryWalk.init(category, sift.marked, sift.notes, rng)
       // A category with nothing to ask has no walk screen to show, so stay.
       return feelingCategoryWalk.isDone(walk)
         ? state
@@ -236,6 +269,18 @@ export function reduce(
 
     case 'close': {
       if (!state.visit) return state
+      // The drawer is a screen like any other, and this action means whatever
+      // is on top — so a note being written is the first thing it leaves, and
+      // leaves as it was found.
+      if (isNoting(state)) {
+        return reduce(
+          state,
+          state.visit.phase === 'walk'
+            ? { type: 'answer', answer: { type: 'dropNote' } }
+            : { type: 'sift', action: { type: 'dropNote' } },
+          rng,
+        )
+      }
       if (state.visit.phase === 'walk') {
         const { sift, walk } = state.visit
         return { ...state, visit: { phase: 'sift', sift: fold(sift, walk) } }
@@ -258,6 +303,19 @@ function shownAsCard(state: FeelingPickerState): Set<string> {
   const last = state.visited[0]
   if (last) shown.add(last.category)
   return shown
+}
+
+/**
+ * A visited category's words with what is written about them, for a card to
+ * draw. One list rather than two: `notes` is normalised against `words` on
+ * every write, so this can only ever pair a note with a word that was picked.
+ */
+export function noted(visited: Visited): { word: string; note?: string }[] {
+  const written = new Map(visited.notes.map((note) => [note.word, note.text]))
+  return visited.words.map((word) => {
+    const text = written.get(word)
+    return text === undefined ? { word } : { word, note: text }
+  })
 }
 
 /** Cards for the current tab, most recently closed first. */
@@ -307,6 +365,20 @@ export function chosen(state: FeelingPickerState): Visited[] {
  */
 export function screen(state: FeelingPickerState): 'browse' | 'sift' | 'walk' {
   return state.visit ? state.visit.phase : 'browse'
+}
+
+/**
+ * Whether a note is being written over whichever screen is showing. Hosts read
+ * this to take their own chrome out of reach: the button row belongs to the
+ * screen the drawer is parked over, and nothing there can be answered until
+ * the note is closed.
+ */
+export function isNoting(state: FeelingPickerState): boolean {
+  const visit = state.visit
+  if (!visit) return false
+  return visit.phase === 'walk'
+    ? feelingCategoryWalk.isNoting(visit.walk)
+    : feelingCategorySift.isNoting(visit.sift)
 }
 
 /** The category open right now — what a title bar a level down is named after. */

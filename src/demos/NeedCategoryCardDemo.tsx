@@ -91,7 +91,12 @@ export default function NeedCategoryCardDemo() {
       <div ref={bodyRef}>
         {picked.map((categoryIndex, slot) => {
           const category = categories[categoryIndex]
-          const words = category.needs.map((need) => need.word)
+          /* The second word in each category carries a few words of someone's
+             own, so the card shows what it says about one: a pencil, and
+             nothing more. */
+          const words = category.needs.map((need, at) =>
+            at === 1 ? { word: need.word, note: 'only at home' } : { word: need.word },
+          )
           const count = COUNTS[countIndexes[slot]]
           return (
             <div key={slot}>

@@ -25,6 +25,10 @@
      to the quiet grey on Cancel and Insert a few pixels below. Pointing this
      at the app's own focus colour puts them back in the same voice. */
   --nvc-ring: var(--background-modifier-border-focus, currentColor);
+  /* The note drawer's own surface, so it covers the screen it parks rather
+     than letting it show through. Obsidian's modal paper, so the drawer reads
+     as part of the same dialog. */
+  --nvc-sheet: var(--background-primary, canvas);
 }
 
 /* The modal hangs from a fixed line rather than sitting centred on one.

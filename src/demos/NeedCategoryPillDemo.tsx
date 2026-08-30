@@ -5,7 +5,10 @@ import { categories } from '../data/needs.ts'
 import styles from './NeedCategoryPillDemo.module.css'
 
 /** Enough for the card to have something to list. */
-const PICKED = ['closeness', 'empathy']
+/* One of them with a few words of someone's own about it, so the card shows
+   what a note looks like once it is back on the browse screen: the pencil, and
+   nothing else — the note itself belongs to the screen the word is on. */
+const PICKED = [{ word: 'closeness' }, { word: 'empathy', note: 'from anyone at all' }]
 
 export default function NeedCategoryPillDemo() {
   const [category, setCategory] = useState('Connection')

@@ -1,4 +1,6 @@
 import { usePressDelay } from '../usePressDelay.ts'
+import NoteMark from './NoteMark.tsx'
+import type { Noted } from './NoteMark.tsx'
 import styles from './FeelingCategoryCard.module.css'
 
 type Props = {
@@ -6,8 +8,13 @@ type Props = {
   category: string
   /** Which side of the NVC split this category sits on. */
   kind: 'met' | 'unmet'
-  /** The specific feelings picked within this category. May be empty. */
-  feelings: string[]
+  /**
+   * The specific feelings picked within this category, and what is written about
+   * any of them. May be empty. One list rather than the words and the notes
+   * side by side: a note belongs to a word, and two lists could disagree about
+   * which.
+   */
+  feelings: readonly Noted[]
   /** Shown in place of the feelings when `feelings` is empty. */
   emptyText: string
   /**
@@ -47,7 +54,10 @@ export default function FeelingCategoryCard({
       {feelings.length > 0 ? (
         <ul className={styles.feelings}>
           {feelings.map((feeling) => (
-            <li key={feeling}>{feeling}</li>
+            <li key={feeling.word}>
+              {feeling.word}
+              {feeling.note !== undefined && <NoteMark />}
+            </li>
           ))}
         </ul>
       ) : (

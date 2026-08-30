@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import FeelingPrompt from '../components/FeelingPrompt.tsx'
+import type { Noting } from '../components/NoteDrawer.tsx'
 import type { StepMark } from '../components/StepProgress.tsx'
 import { categories } from '../data/feelings.ts'
 
@@ -18,6 +19,22 @@ export default function FeelingPromptDemo() {
   const past: StepMark[] = Array.from({ length: clamped }, (_, at) =>
     at % 3 === 0 ? 'chosen' : 'skipped',
   )
+
+  /* The prompt is presentational, so writing a note is the host's to keep —
+     the same as answering is. In the picker this lives in the walk machine;
+     here it is the smallest thing that behaves the same way: opening seeds the
+     box from what is there, keeping trims it, and an emptied box deletes. */
+  const [notes, setNotes] = useState<Record<string, string>>({})
+  const [noting, setNoting] = useState<Noting | null>(null)
+
+  const keepNote = () => {
+    if (!noting) return
+    const text = noting.draft.trim()
+    setNotes(({ [noting.word]: _dropped, ...rest }) =>
+      text ? { ...rest, [noting.word]: text } : rest,
+    )
+    setNoting(null)
+  }
 
   return (
     <>
@@ -55,6 +72,14 @@ export default function FeelingPromptDemo() {
         kind={category.kind}
         past={past}
         upcoming={category.feelings.length - clamped - 1}
+        note={notes[feeling.word] ?? null}
+        noting={noting}
+        onNote={() =>
+          setNoting({ word: feeling.word, draft: notes[feeling.word] ?? '' })
+        }
+        onDraft={(text) => setNoting(noting && { ...noting, draft: text })}
+        onKeepNote={keepNote}
+        onDropNote={() => setNoting(null)}
         onAccept={() => setAccepted(accepted + 1)}
         onReject={() => setRejected(rejected + 1)}
       />
@@ -62,8 +87,12 @@ export default function FeelingPromptDemo() {
         Accepted {accepted} times, rejected {rejected} times
       </p>
       <p>
-        Click the prompt or Tab into it, then answer with → and ←. A host that
-        opens this in a modal would give it focus itself.
+        Click the prompt or Tab into it, then answer with → and ←, or press N
+        to write a few words of your own about the word on the card. This page
+        moves no focus of its own, so the box wants a Tab once the drawer is
+        open; a host with a machine behind it calls <code>useFocusScreen</code>,
+        which puts focus in the box as the drawer arrives and hands it back
+        when it closes.
       </p>
     </>
   )

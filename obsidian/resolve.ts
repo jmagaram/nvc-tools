@@ -86,9 +86,10 @@ const needs = index(
 function against<Kind>(
   inventory: Map<string, Indexed<Kind>>,
   entries: readonly Picked[],
-): { category: string; kind: Kind; words: string[] }[] | null {
+): { category: string; kind: Kind; words: string[]; notes: [] }[] | null {
   const seen = new Set<string>()
-  const resolved: { category: string; kind: Kind; words: string[] }[] = []
+  const resolved: { category: string; kind: Kind; words: string[]; notes: [] }[] =
+    []
 
   for (const entry of entries) {
     const category = inventory.get(key(entry.category))
@@ -112,6 +113,10 @@ function against<Kind>(
          a sift's `marked` goes through. Done here so a word written twice
          cannot inflate the count on the button. */
       words: category.words.filter((word) => wanted.has(word)),
+      /* Nothing in the note carries a note yet: the fence holds the words and
+         only the words, so a block read back is a block with none. What the
+         picker writes during a session lives as long as the modal does. */
+      notes: [],
     })
   }
 
@@ -136,7 +141,11 @@ export function resolve(entries: readonly Picked[] | null): Resolved | null {
   if (asNeeds) {
     return {
       inventory: 'needs',
-      entries: asNeeds.map(({ category, words }) => ({ category, words })),
+      entries: asNeeds.map(({ category, words, notes }) => ({
+        category,
+        words,
+        notes,
+      })),
     }
   }
 

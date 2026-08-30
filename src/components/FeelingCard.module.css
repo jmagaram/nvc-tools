@@ -48,3 +48,13 @@
 .definition {
   margin: 0.25rem 0 0;
 }
+
+/* The note's own line, under the definition and inside the card. Its height is
+   held whether or not there is anything written yet, because every card in a
+   walk can be written on and a line that came and went would move the answers
+   below it from one card to the next. */
+.note {
+  min-height: 1.7lh;
+  margin-top: 0.35rem;
+  font-size: 0.8em;
+}

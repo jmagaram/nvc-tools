@@ -6,6 +6,7 @@ import {
   chosen,
   counts,
   init,
+  isNoting,
   initWith,
   reduce,
   screen,
@@ -82,6 +83,11 @@ export default function FeelingPickerHost({
   const bodyRef = useFocusScreen(screenKey(state))
 
   const view = screen(state)
+  /* While a note is being written, the drawer is the screen on top and this
+     row belongs to the one parked under it. Nothing here can be answered until
+     the note is kept or dropped — which the `x` and Escape both do, since they
+     mean whatever is on top. */
+  const noting = isNoting(state)
 
   const leaveTop = () => dispatch({ type: 'close' })
 
@@ -122,7 +128,12 @@ export default function FeelingPickerHost({
     view === 'browse' ? (
       <>{TITLE}</>
     ) : view === 'walk' ? (
-      <button type="button" className="nvc-back" onClick={leaveTop}>
+      <button
+        type="button"
+        className="nvc-back"
+        disabled={noting}
+        onClick={leaveTop}
+      >
         <span aria-hidden="true">&lsaquo;</span>{' '}
         {visitCategory(state) ?? TITLE}
       </button>
@@ -134,12 +145,13 @@ export default function FeelingPickerHost({
   const buttons =
     view === 'browse' ? (
       <>
-        <button type="button" onClick={onCancel}>
+        <button type="button" disabled={noting} onClick={onCancel}>
           Cancel
         </button>
         <button
           type="button"
           className="mod-cta"
+          disabled={noting}
           title={`${commit} (${submitShortcutLabel})`}
           /* Newest-closed first is what puts the last card top-left. Read top
              to bottom in a note, the order you visited them reads better. */
@@ -150,10 +162,19 @@ export default function FeelingPickerHost({
       </>
     ) : view === 'sift' ? (
       <>
-        <button type="button" onClick={() => dispatch({ type: 'walk' })}>
+        <button
+          type="button"
+          disabled={noting}
+          onClick={() => dispatch({ type: 'walk' })}
+        >
           Ask me about each
         </button>
-        <button type="button" className="mod-cta" onClick={leaveTop}>
+        <button
+          type="button"
+          className="mod-cta"
+          disabled={noting}
+          onClick={leaveTop}
+        >
           Done
         </button>
       </>

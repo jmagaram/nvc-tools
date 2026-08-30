@@ -5,7 +5,7 @@ import { useFocusScreen } from '../focusScreen.ts'
 type Sample = {
   category: string
   kind: 'met' | 'unmet'
-  feelings: string[]
+  feelings: { word: string; note?: string }[]
 }
 
 const CATEGORIES: Sample[] = [
@@ -13,36 +13,36 @@ const CATEGORIES: Sample[] = [
     category: 'Engaged',
     kind: 'met',
     feelings: [
-      'curious',
-      'absorbed',
-      'alert',
-      'ardent',
-      'aroused',
-      'astonished',
-      'dazzled',
-      'eager',
-      'enchanted',
-      'engrossed',
-      'entranced',
-      'fascinated',
+      { word: 'curious', note: 'the way a child is' },
+      { word: 'absorbed' },
+      { word: 'alert' },
+      { word: 'ardent' },
+      { word: 'aroused' },
+      { word: 'astonished' },
+      { word: 'dazzled' },
+      { word: 'eager' },
+      { word: 'enchanted' },
+      { word: 'engrossed' },
+      { word: 'entranced' },
+      { word: 'fascinated' },
     ],
   },
   {
     category: 'Angry',
     kind: 'unmet',
     feelings: [
-      'enraged',
-      'furious',
-      'incensed',
-      'indignant',
-      'irate',
-      'livid',
-      'outraged',
-      'resentful',
-      'agitated',
-      'bitter',
-      'cross',
-      'exasperated',
+      { word: 'enraged' },
+      { word: 'furious' },
+      { word: 'incensed' },
+      { word: 'indignant' },
+      { word: 'irate', note: 'only about the meeting' },
+      { word: 'livid' },
+      { word: 'outraged' },
+      { word: 'resentful' },
+      { word: 'agitated' },
+      { word: 'bitter' },
+      { word: 'cross' },
+      { word: 'exasperated' },
     ],
   },
 ]
@@ -104,6 +104,11 @@ export default function FeelingCategoryCardDemo() {
         <code>useFocusScreen</code> looks for it. In a picker that is how coming
         back from a category lands on the one just left, rather than on nothing
         with the arrow keys dead.
+      </p>
+      <p>
+        Two of the words carry a few words of someone's own, which the card says
+        with a pencil and nothing more. The note itself belongs to the screen
+        the word is on; here it would be twelve of them at once.
       </p>
       <div ref={bodyRef}>
         {CATEGORIES.map((sample, index) => (

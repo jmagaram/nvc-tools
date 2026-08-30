@@ -13,6 +13,11 @@ const SAMPLE = categories.find((category) => category.name === 'Disquiet')!
 
 const MARKED = new Set(['agitated', 'discombobulated', 'startled', 'unnerved'])
 
+/* A note only ever sits on a marked word, so these are a subset of the above.
+   The badge is the only thing that says one is there — the note itself shows
+   on the one word a screen is about. */
+const NOTED = new Set(['agitated', 'startled'])
+
 export default function FeelingPillDemo() {
   const [word, setWord] = useState('fascinated')
   const [kind, setKind] = useState<'met' | 'unmet'>('met')
@@ -48,6 +53,8 @@ export default function FeelingPillDemo() {
             word={word}
             kind={kind}
             marked={marked}
+            noted={false}
+            resume={false}
             onClick={() => setClicks(clicks + 1)}
             onShow={() => setShows(shows + 1)}
           />
@@ -64,7 +71,9 @@ export default function FeelingPillDemo() {
       <p>
         {SAMPLE.name}, some of it marked. A wash of the text colour and a
         heavier border say so, and neither changes the pill's width, so marking
-        a word cannot shuffle the row under the finger that tapped it.
+        a word cannot shuffle the row under the finger that tapped it. Two of
+        them carry a note, which the pencil says — the one thing here that does
+        cost width, and only ever on a word that was already marked.
       </p>
       <div className={styles.row}>
         {SAMPLE.feelings.map((feeling) => (
@@ -73,6 +82,8 @@ export default function FeelingPillDemo() {
             word={feeling.word}
             kind={SAMPLE.kind}
             marked={MARKED.has(feeling.word)}
+            noted={NOTED.has(feeling.word)}
+            resume={false}
             onClick={() => {}}
             onShow={() => {}}
           />

@@ -83,6 +83,86 @@ Both word pills take one `onShow` rather than an `onPointerEnter` and an
 `onFocus`, because to a host the two events mean the same thing: show what this
 word means. Reading a definition must not cost a mark.
 
+## The note
+
+A few words of your own against one word — *only about the meeting, not about
+him* — written in a drawer the screen makes room for. `NoteLine`, `NoteDrawer`
+and `NoteMark` are the three pieces, and all four screens (both grids, both
+walks) use the same three.
+
+**A note only exists on a word that is picked.** There is nothing a note on an
+unpicked feeling could mean and nowhere for it to be written. The rule runs both
+ways and is enforced by normalising rather than by the type: every write to a
+sift's `marked` goes through `withMarked`, which runs `notesInSourceOrder` over
+the notes as well — so unmarking a word takes its note with it, and no host has
+to remember to. It is the same mechanism `inSourceOrder` already was for the
+marks, and the same reason: `words` is what leaves the picker, so notes ride
+beside it rather than inside it.
+
+**In a walk the note is part of the answer, not a substitute for it.** `Enter`
+keeps what is written and leaves the card exactly where it was — nothing on a
+card is decided until it is answered. The first version answered the card and
+dealt the next one, on the grounds that writing about a word is a stronger yes
+than the arrow; the card then flew off on the last keystroke and the note was
+never once seen where it lives, and a typo could not be fixed. So a walk carries
+its own `notes`, `fold` merges them on exactly the rule it already merges marks
+by — what the walk asked about, the walk decides — and `withMarked` drops
+whatever is left over a word that ended up unmarked. That is why passing on a
+card takes its note with it and no extra rule says so.
+
+**The drawer parks what it covers.** The screen is pushed up, faded and
+dissolved into the top edge; the drawer comes in off the bottom and grows
+upwards as the note runs on, so the line being written stays where the thumbs
+and the software keyboard are. Nothing outside changes height, so a modal
+hanging from a fixed line does not move. What it parks is `inert` — the words,
+the answers — and the host's button row reads `isNoting` and disables itself,
+because that row belongs to the screen underneath. The `x` and Escape both mean
+the drawer while it is open: `close` checks `isNoting` first, which is the same
+"leave whatever is on top" rule one level down.
+
+`--nvc-sheet` is the second and last colour a host may hand a component, after
+`--nvc-ring`: the drawer covers what it parks, so it needs a surface, and the
+plugin points it at Obsidian's modal background.
+
+**The offer is a line of text, not a target.** On a marked word the reserved line
+under the definition reads *Press `N` to add a few words about livid*, and once
+something is written, *Press `N` to edit* followed by the note, ellipsized. It
+must not look clickable in a grid: to reach a target down there the pointer has
+to sweep across the words above, and every word it crosses changes which word
+the line is about — so a click aimed at one would land on whichever the mouse
+passed last. Naming a key costs the pointer nothing. It stays a real button
+underneath for the two cases with nothing to lose: a coarse pointer, which has
+no hover and no key and is drawn a target because on a phone this line is the
+only way in, and a card, which is one word. `NoteLine`'s `clickable` prop is
+that distinction and nothing else.
+
+The key is at the left in both states so the one thing shaped like a button does
+not move when a note appears beside it. The height is reserved whether or not
+there is a line to draw, for the reason the gloss strip holds its two: a line
+that came and went would move the modal's bottom edge every time the pointer
+crossed a marked word.
+
+**The note goes inside the card.** In a walk the card is thrown off the side when
+it is answered, and everything belonging to the word has to leave with it — a
+line under the card is left sitting there while the word flies away, already
+offering a note about the card arriving behind it. `FeelingCard` and `NeedCard`
+take a `note` slot for this. It is also the only place unambiguous enough: a
+card is the one thing on that screen saying which word is being asked about.
+
+**A noted word says so with a pencil.** `NoteMark`, in the pill on the grid and
+beside the word listed in a category card. It is the one thing here that costs
+width — a pill grows by about a character — and that is the trade: a dot in the
+corner and a rule under the word are both free and both read as a rendering
+artefact until someone explains them. Nothing grows under the finger, because a
+noted word is always a marked one and the mark came first.
+
+**Nothing of this reaches the note in the vault yet.** `Visited.notes` is carried
+through the machines and drawn on every screen, but `insert.ts` writes the same
+fence it always did and `resolve.ts` reads a block back with `notes: []`. The
+format is the open question — an indented bullet under the category, keyed by
+the word, is the proposal in `docs/prototypes/feeling-notes.html` — and until it
+is settled a note lives as long as the modal does.
+
 ## The progress rule
 
 `StepProgress` is a segmented rule: one flexing segment per step, the full width

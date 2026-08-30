@@ -1,0 +1,101 @@
+/* Flat to the point of being invisible as a control: no border, no background,
+   no hover, no ring, and no pointer events unless the screen says it is safe
+   to have them — see the `clickable` prop. Everything a host's own button
+   chrome would put here is named, the way the pills and the tabs do it. */
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* A card is one word, so a pointer may open it there. A coarse pointer may
+   open it anywhere, having no hover to lose and no key to press — and there it
+   is drawn as a target too, as an empty field is, since on a phone this line is
+   the only way to a note. */
+.line[data-clickable] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+@media (pointer: coarse) {
+  .line {
+    pointer-events: auto;
+    cursor: pointer;
+    min-height: 44px;
+    border-bottom: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+  }
+}
+
+.glyph {
+  flex: none;
+  align-self: center;
+  opacity: 0.55;
+}
+
+/* How to change it, at the left in both states so the keycap never moves. */
+.action {
+  flex: none;
+  white-space: nowrap;
+  opacity: 0.6;
+}
+
+/* The whole line when there is nothing written on it, so it ellipsizes rather
+   than pushing the word it names off the end in a narrow modal. */
+.line:not(:has(.note)) .action {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Drawn as a key rather than said as a word: it is the one thing here that
+   looks like something to press, which is the whole of what the line teaches. */
+.key {
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 0 0.25em;
+  font-size: 0.9em;
+}
+
+/* One of the two is showing at any time, and never both. */
+.tap {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .press {
+    display: none;
+  }
+  .tap {
+    display: inline;
+  }
+}
+
+/* What was said. One line of it, at full strength, with the rest counted at the
+   end — the whole of it is a keystroke away, and this line's height is spent
+   the moment it grows to two. */
+.note {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.more {
+  flex: none;
+  font-size: 0.85em;
+  opacity: 0.55;
+}

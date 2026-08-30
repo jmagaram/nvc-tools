@@ -16,6 +16,11 @@ const MARKED = new Set([
   'to know and be known',
 ])
 
+/* A note only ever sits on a marked word, so these are a subset of the above.
+   The badge is the only thing that says one is there — the note itself shows
+   on the one word a screen is about. */
+const NOTED = new Set(['empathy'])
+
 export default function NeedPillDemo() {
   const [word, setWord] = useState('companionship')
   const [clicks, setClicks] = useState(0)
@@ -36,6 +41,8 @@ export default function NeedPillDemo() {
             key={String(marked)}
             word={word}
             marked={marked}
+            noted={false}
+            resume={false}
             onClick={() => setClicks(clicks + 1)}
             onShow={() => setShows(shows + 1)}
           />
@@ -60,6 +67,8 @@ export default function NeedPillDemo() {
             key={need.word}
             word={need.word}
             marked={MARKED.has(need.word)}
+            noted={NOTED.has(need.word)}
+            resume={false}
             onClick={() => {}}
             onShow={() => {}}
           />

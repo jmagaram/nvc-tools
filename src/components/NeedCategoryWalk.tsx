@@ -1,4 +1,5 @@
 import NeedPrompt from './NeedPrompt.tsx'
+import { noteFor } from '../machines/needCategoryWalk.ts'
 import type {
   NeedCategoryWalkAction,
   NeedCategoryWalkState,
@@ -7,7 +8,10 @@ import type {
 type Props = {
   /** Where the walk has got to. */
   state: NeedCategoryWalkState
-  /** Called with the answer the person gave to the need on screen. */
+  /**
+   * Called with whatever was just done to the need on screen — answered, or
+   * written about. A note is part of an answer rather than one of its own.
+   */
   onAction: (action: NeedCategoryWalkAction) => void
 }
 
@@ -25,6 +29,12 @@ export default function NeedCategoryWalk({ state, onAction }: Props) {
       definition={current.definition}
       past={answered.map((answer) => (answer.picked ? 'chosen' : 'skipped'))}
       upcoming={upcoming.length}
+      note={noteFor(state, current.word)}
+      noting={state.noting}
+      onNote={() => onAction({ type: 'note' })}
+      onDraft={(text) => onAction({ type: 'draft', text })}
+      onKeepNote={() => onAction({ type: 'keepNote' })}
+      onDropNote={() => onAction({ type: 'dropNote' })}
       onAccept={() => onAction({ type: 'accept' })}
       onReject={() => onAction({ type: 'reject' })}
     />

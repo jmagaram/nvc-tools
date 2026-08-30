@@ -1,11 +1,18 @@
 import { usePressDelay } from '../usePressDelay.ts'
+import NoteMark from './NoteMark.tsx'
+import type { Noted } from './NoteMark.tsx'
 import styles from './NeedCategoryCard.module.css'
 
 type Props = {
   /** The need category, e.g. 'Autonomy'. */
   category: string
-  /** The specific needs picked within this category. May be empty. */
-  needs: string[]
+  /**
+   * The specific needs picked within this category, and what is written about
+   * any of them. May be empty. One list rather than the words and the notes
+   * side by side: a note belongs to a word, and two lists could disagree about
+   * which.
+   */
+  needs: readonly Noted[]
   /** Shown in place of the needs when `needs` is empty. */
   emptyText: string
   /**
@@ -41,7 +48,10 @@ export default function NeedCategoryCard({
       {needs.length > 0 ? (
         <ul className={styles.needs}>
           {needs.map((need) => (
-            <li key={need}>{need}</li>
+            <li key={need.word}>
+              {need.word}
+              {need.note !== undefined && <NoteMark />}
+            </li>
           ))}
         </ul>
       ) : (
