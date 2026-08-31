@@ -235,13 +235,60 @@
    glyph leads one button and trails the other, and a lone <span> matches both
    :first-child and :last-child in either — a text node is not an element child
    — so a directional margin has no way to tell them apart. `gap` is symmetric
-   and needs no selector at all. In `em`, to track the button's own text. */
+   and needs no selector at all. In `em`, to track the button's own text.
+
+   Border, background and shadow are reset and redrawn here for the same
+   reason `.pill.pill` resets them: left alone, a host's own button chrome —
+   flat grey, an outset border — answers a hover and a click with nothing, and
+   a tap reads as though it landed on dead chrome. `currentColor` for the
+   border so it inherits the card's ink rather than naming a colour of its
+   own. */
 .actions button {
   flex: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
   padding: 0.5rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.1s ease-out, transform 0.1s ease-out;
+}
+
+/* A wash of the ink on hover, heavier while held — the same `color-mix`
+   against `transparent` the marked pill uses, so it lands on any theme
+   without naming a colour. The press also nudges the button down a touch, the
+   same acknowledgment `.card:active` gives a tap that is about to be replaced
+   by whatever it opens. */
+.actions button:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.actions button:active {
+  background: color-mix(in srgb, currentColor 20%, transparent);
+  transform: scale(0.98);
+}
+
+/* Spelled out because the reset above took the host's own focus ring away
+   with it — see the matching comment on `.pill.pill:focus-visible`.
+   `:focus-visible`, not `:focus`: unlike the region around the whole prompt,
+   a mouse click landing here is exactly the case this should stay quiet for. */
+.actions button:focus-visible {
+  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actions button {
+    transition: none;
+  }
+  .actions button:active {
+    transform: none;
+  }
 }
 
 /* Each label is pushed to the edge its arrow points at, so across the row the

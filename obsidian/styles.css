@@ -214,3 +214,30 @@ body:not(.is-phone) .nvc-modal {
 .nvc-block .nvc-block-menu:hover {
   color: var(--text-normal);
 }
+
+/* The keyboard chord printed on the button it presses — `Insert (3) ⌘⏎`.
+
+   A hint rather than a second label: the button's own word is read first and
+   this sits beside it a size down and part way into the background, the way a
+   menu draws the shortcut beside the command. Quieted with opacity rather than
+   with `--text-muted`, because the same span sits on `mod-cta`, which is filled
+   with the accent colour, and a muted grey is only right on the plain button
+   next to it.
+
+   The margin cannot be written as a space in the markup: Obsidian's button is
+   `display: inline-flex`, so the label and this are two flex items and the
+   whitespace between them is trimmed — the same reason `.nvc-back` above needs
+   a `gap` for its chevron. */
+.nvc-modal .nvc-chord {
+  margin-left: var(--size-2-2);
+  font-size: var(--font-smallest);
+  opacity: 0.65;
+}
+
+/* A phone has neither key, and the modal there is the one place with no room to
+   spare for something nobody can press. The shortcut itself is left registered:
+   a phone can have a keyboard attached, and then it works and simply says
+   nothing about itself. */
+body.is-phone .nvc-modal .nvc-chord {
+  display: none;
+}

@@ -2,11 +2,8 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import FeelingPicker from '../components/FeelingPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
-import {
-  submitShortcutLabel,
-  useNoteShortcut,
-  useSubmitShortcut,
-} from '../keyboard.ts'
+import { useNoteShortcut, useSubmitShortcut } from '../keyboard.ts'
+import { submitShortcut } from './shortcut.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -90,10 +87,13 @@ export default function FeelingPickerDemo() {
 
   const leaveTop = () => dispatch({ type: 'close' })
 
-  /* ⌘/Ctrl+Enter stands in for the button `Insert` itself would be, so it
-     only fires while that button is the one on screen — a walk or a sift has
-     no such button to commit the modal early. */
-  useSubmitShortcut(view === 'browse', ok)
+  /* ⌘/Ctrl+Enter stands in for the primary button on the screen: `Insert` on
+     the categories and `Done` on a grid. A walk has no button to stand in for. */
+  useSubmitShortcut(
+    submitShortcut,
+    view !== 'walk',
+    view === 'browse' ? ok : leaveTop,
+  )
 
   /* `n` belongs to the whole sift screen, not just the grid: `Ask me about
      each` and `Done` are in the button row, outside it. */
@@ -129,9 +129,17 @@ export default function FeelingPickerDemo() {
           type="button"
           disabled={noting}
           onClick={ok}
-          title={`Insert (${submitShortcutLabel})`}
+          aria-keyshortcuts={submitShortcut.keys}
         >
-          {total > 0 ? `Insert (${total})` : 'Insert'} {submitShortcutLabel}
+          {total > 0 ? `Insert (${total})` : 'Insert'}
+          {/* The chord in its own element rather than in the label, so it can
+              be drawn at a hint's weight and taken off a phone, which has
+              neither key. `aria-hidden` because `aria-keyshortcuts` above says
+              the same thing properly; printed into the label it was read out as
+              part of the button's name. */}
+          <small className={styles.chord} aria-hidden="true">
+            {submitShortcut.label}
+          </small>
         </button>
       </>
     ) : view === 'sift' ? (
@@ -143,8 +151,16 @@ export default function FeelingPickerDemo() {
         >
           Ask me about each
         </button>
-        <button type="button" disabled={noting} onClick={leaveTop}>
+        <button
+          type="button"
+          disabled={noting}
+          onClick={leaveTop}
+          aria-keyshortcuts={submitShortcut.keys}
+        >
           Done
+          <small className={styles.chord} aria-hidden="true">
+            {submitShortcut.label}
+          </small>
         </button>
       </>
     ) : null
@@ -233,8 +249,16 @@ export default function FeelingPickerDemo() {
                   >
                     Ask me about each
                   </button>{' '}
-                  <button type="button" disabled={noting} onClick={leaveTop}>
+                  <button
+                    type="button"
+                    disabled={noting}
+                    onClick={leaveTop}
+                    aria-keyshortcuts={submitShortcut.keys}
+                  >
                     Done
+                    <small className={styles.chord} aria-hidden="true">
+                      {submitShortcut.label}
+                    </small>
                   </button>
                 </>
               ) : (
