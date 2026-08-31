@@ -20,15 +20,22 @@
 /* --- shared: a run of words ------------------------------------------------
    The commas are drawn rather than written, so selecting the words does not
    pick them up. The exception is the inline layout, which uses real ones — see
-   the component. */
-.words {
+   the component.
+
+   The class is doubled, the same as `.pill.pill` and `.line.line` and for the
+   same reason: Obsidian styles rendered markdown through `.markdown-rendered ul`
+   and `.markdown-rendered li`, which are 0,1,1 and beat a single class. Undoubled
+   the words came out with several spaces between them, as though the line had
+   been justified — a list indent the app had put back after this file took it
+   away. It looked right in the gallery, where a bare `ul` has nothing to lose. */
+.words.words {
   display: inline;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.words li {
+.words.words li {
   display: inline;
   /* Zeroed because Obsidian gives a list item its own spacing, and an inline
      one spends it sideways: the words came out with three spaces between them,
@@ -41,7 +48,14 @@
   list-style: none;
 }
 
-.words li:not(:last-child)::after {
+/* A theme, or the app, may hang a box off a list item to draw its bullet with.
+   `list-style: none` does not touch one of those — it only removes the marker
+   the browser draws — so it is taken off by name. */
+.words.words li::before {
+  content: none;
+}
+
+.words.words li:not(:last-child)::after {
   content: ', ';
   color: var(--text-muted, color-mix(in srgb, currentColor 65%, transparent));
 }
