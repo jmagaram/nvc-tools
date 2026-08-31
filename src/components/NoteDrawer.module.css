@@ -70,6 +70,33 @@
   opacity: 1;
 }
 
+/* On a touch screen it comes down from the top instead.
+   The bottom edge is where the software keyboard arrives, and the keyboard does
+   not push a webview's layout up — it is drawn over it — so a drawer anchored
+   there ends up behind the thing being typed on, box and buttons both. Nothing
+   in the page can see that happen; the viewport it is laid out against has not
+   changed.
+
+   Anchoring to the top puts the box under the modal's own title, which is the
+   part of the screen a keyboard never reaches. The parked screen below it is
+   covered either way, so nothing is lost but the direction of travel.
+
+   This is the one place a phone and a desktop disagree about the drawer, and it
+   is worth saying why the original was the other way round: growing upward from
+   the bottom keeps a long note near the thumbs, which is right whenever the
+   keyboard is not in the way and wrong the whole time it is. */
+@media (pointer: coarse) {
+  .drawer {
+    top: 0;
+    bottom: auto;
+    transform: translateY(-120%);
+  }
+
+  .drawer[data-open] {
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .parked,
   .drawer {

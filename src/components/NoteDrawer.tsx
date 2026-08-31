@@ -32,8 +32,12 @@ type Props = {
  * The screen parks itself — pushed up, faded, dissolved into the top edge — and
  * the drawer comes in off the bottom. Nothing outside changes height, so a
  * modal that hangs from a fixed line does not move; and because the drawer
- * grows upwards as the note runs on, the line being written stays where the
- * thumbs and the software keyboard already are.
+ * grows upwards as the note runs on, the line being written stays near the
+ * thumbs.
+ *
+ * On a touch screen it comes down from the top instead, because that is where a
+ * software keyboard is not — see the module. Near the thumbs and behind the
+ * keyboard turn out to be the same place.
  *
  * What it parks is inert while it is open: the words, the answers, and the
  * host's button row, which reads `isNoting` for itself. There is nothing to do
