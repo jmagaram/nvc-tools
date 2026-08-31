@@ -1,7 +1,11 @@
+import { useId } from 'react'
 import type { KeyboardEvent, ReactNode } from 'react'
-import { NotePencil } from './NoteMark.tsx'
 import styles from './NoteDrawer.module.css'
 
+/* `Your words` rather than `Words of your own`, which read as an invitation to
+   supply words — and what somebody then supplies is words: `hurt, angry,
+   dismissed`, a second go at the inventory rather than a thought about the one
+   word already picked. */
 /** The word a note is being written about, and what is in the box. */
 export type Noting = {
   word: string
@@ -36,10 +40,20 @@ type Props = {
  * but finish the note or drop it, which is why the box needs no way in of its
  * own besides the one it already has.
  *
+ * The caption above the box is its label, and there is no placeholder: the two
+ * said the same thing, and only one of them was still there once you had typed
+ * a character. Whether it names the word as well is the screen's to say — see
+ * `namesWord`.
+ *
  * The box is a textarea, because a note is allowed to be a sentence and then
  * another one. `Enter` keeps it, `Shift Enter` is a new line, `Escape` puts it
  * back the way it was found, and an emptied box is the delete — there is no
  * second control for that.
+ *
+ * None of the four is printed. A note is a few words caught as they come, not
+ * a paragraph being composed, so the one rule anybody needed telling — that a
+ * new line takes Shift — is one almost nobody here will reach for; the box
+ * still answers it, and says nothing about itself.
  */
 export default function NoteDrawer({
   noting,
@@ -49,6 +63,11 @@ export default function NoteDrawer({
   children,
 }: Props) {
   const open = noting !== null
+  /* The caption is the box's label, which is what a placeholder was standing in
+     for and doing badly: it named the box only until the first keystroke, and
+     only ever on a note being written for the first time — an edit opens the
+     box full and never showed it at all. */
+  const boxId = useId()
 
   const boxKeys = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -71,44 +90,65 @@ export default function NoteDrawer({
 
   return (
     <div className={styles.surface}>
-      <div className={styles.parked} data-parked={open ? '' : undefined} inert={open}>
+      <div
+        className={styles.parked}
+        data-parked={open ? '' : undefined}
+        inert={open}
+      >
         {children}
       </div>
 
       {/* Kept in the DOM when closed so it can come and go with a transition,
           and inert so it is neither reachable nor read while it is off. */}
-      <div className={styles.drawer} data-open={open ? '' : undefined} inert={!open}>
-        <p className={styles.who}>
-          <span className={styles.glyph}>
-            <NotePencil />
-          </span>
-          <span className={styles.about}>Note on</span>{' '}
-          <b>{noting?.word}</b>
-        </p>
+      <div
+        className={styles.drawer}
+        data-open={open ? '' : undefined}
+        inert={!open}
+      >
+        {/* One caption doing the two jobs a heading and a placeholder were
+            splitting between them: naming the box, and saying whose words go
+            in it. It is a real label, so it survives the first keystroke and
+            is read out when the box takes focus.
 
-        {/* `data-value` is the same text again, and the CSS grows the box to
+            Where it names the word, the word keeps the source's own lowercase
+            rather than being capitalised or set in caps for looking like a
+            title. A feeling is spelled the way the inventory spells it
+            everywhere else here — the card sets it lowercase at heading size
+            and it reads fine — and the plugin's whole contract with a block is
+            that it writes a word back in the spelling it read it in. Title
+            case here would be the one place the app disagreed with itself
+            about what the word is. */}
+        <div className={styles.field}>
+          <label className={styles.who} htmlFor={boxId}>
+            {noting === null ? (
+              ''
+            ) : (
+              <>
+                Your words about <b>{noting.word}</b>
+              </>
+            )}
+          </label>
+
+          {/* `data-value` is the same text again, and the CSS grows the box to
             fit it — see the module. An effect measuring scrollHeight would say
             the same thing and would make this the one component here that
             reaches for the DOM. */}
-        <div className={styles.grow} data-value={noting?.draft ?? ''}>
-          <textarea
-            className={styles.box}
-            data-note=""
-            rows={1}
-            placeholder="A few words of your own…"
-            value={noting?.draft ?? ''}
-            onChange={(event) => onDraft(event.target.value)}
-            onKeyDown={boxKeys}
-          />
+          <div className={styles.grow} data-value={noting?.draft ?? ''}>
+            <textarea
+              className={styles.box}
+              data-note=""
+              id={boxId}
+              rows={1}
+              aria-keyshortcuts="Shift+Enter"
+              value={noting?.draft ?? ''}
+              onChange={(event) => onDraft(event.target.value)}
+              onKeyDown={boxKeys}
+            />
+          </div>
         </div>
 
         <div className={styles.row}>
-          <p className={styles.hint}>
-            <b>Enter</b> keeps · <b>Shift Enter</b> new line
-            <br />
-            <b>Esc</b> drops · empty deletes
-          </p>
-          <button type="button" className={styles.quiet} onClick={onDrop}>
+          <button type="button" onClick={onDrop}>
             Cancel
           </button>
           <button type="button" onClick={onKeep}>

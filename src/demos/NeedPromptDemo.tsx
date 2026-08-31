@@ -74,7 +74,10 @@ export default function NeedPromptDemo() {
         note={notes[need.word] ?? null}
         noting={noting}
         onNote={() =>
-          setNoting({ word: need.word, draft: notes[need.word] ?? '' })
+          setNoting({
+            word: need.word,
+            draft: notes[need.word] ?? '',
+          })
         }
         onDraft={(text) => setNoting(noting && { ...noting, draft: text })}
         onKeepNote={keepNote}
@@ -86,12 +89,12 @@ export default function NeedPromptDemo() {
         Accepted {accepted} times, rejected {rejected} times
       </p>
       <p>
-        Click the prompt or Tab into it, then answer with → and ←, or press N
-        to write a few words of your own about the word on the card. This page
+        Click the prompt or Tab into it, then answer with → and ←, or press N to
+        write a few words of your own about the word on the card. This page
         moves no focus of its own, so the box wants a Tab once the drawer is
         open; a host with a machine behind it calls <code>useFocusScreen</code>,
-        which puts focus in the box as the drawer arrives and hands it back
-        when it closes.
+        which puts focus in the box as the drawer arrives and hands it back when
+        it closes.
       </p>
     </>
   )

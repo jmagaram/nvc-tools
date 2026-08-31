@@ -25,7 +25,7 @@ export type Noted = {
  * grows under the finger, because a noted word is always a marked one and the
  * mark came first.
  */
-export function NotePencil() {
+function NotePencil() {
   return (
     <svg
       className={styles.pencil}

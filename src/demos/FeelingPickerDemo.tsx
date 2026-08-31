@@ -2,7 +2,11 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import FeelingPicker from '../components/FeelingPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
-import { submitShortcutLabel, useSubmitShortcut } from '../keyboard.ts'
+import {
+  submitShortcutLabel,
+  useNoteShortcut,
+  useSubmitShortcut,
+} from '../keyboard.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -90,6 +94,12 @@ export default function FeelingPickerDemo() {
      only fires while that button is the one on screen — a walk or a sift has
      no such button to commit the modal early. */
   useSubmitShortcut(view === 'browse', ok)
+
+  /* `n` belongs to the whole sift screen, not just the grid: `Ask me about
+     each` and `Done` are in the button row, outside it. */
+  useNoteShortcut(view === 'sift', () =>
+    dispatch({ type: 'sift', action: { type: 'noteShowing' } }),
+  )
 
   /* A grid's bar is empty. `Done` and the close button both leave the category
      keeping its marks, so a third control saying the same would be noise — and
@@ -261,9 +271,7 @@ export default function FeelingPickerDemo() {
           Inserted:{' '}
           {lastClose.entries.length === 0
             ? 'nothing was chosen'
-            : lastClose.entries
-                .flatMap((entry) => entry.words)
-                .join(', ')}
+            : lastClose.entries.flatMap((entry) => entry.words).join(', ')}
         </p>
       )}
 

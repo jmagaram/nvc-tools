@@ -1,8 +1,15 @@
 /* Flat to the point of being invisible as a control: no border, no background,
    no hover, no ring, and no pointer events unless the screen says it is safe
    to have them — see the `clickable` prop. Everything a host's own button
-   chrome would put here is named, the way the pills and the tabs do it. */
-.line {
+   chrome would put here is named, the way the pills and the tabs do it.
+
+   The class is doubled for the same reason `.pill.pill` is: Obsidian's own
+   `button:not(.clickable-icon)` is 0,1,1 and beats a single class, so a line
+   meant to be invisible came out wearing the filled, rounded chrome of a
+   button — a whole sentence of quiet instruction drawn as something to press.
+   Undoubled it looked right in the gallery, where a bare button has no chrome
+   to lose, and wrong in the only surface that ships. */
+.line.line {
   display: flex;
   align-items: baseline;
   gap: 0.45rem;
@@ -24,13 +31,13 @@
    open it anywhere, having no hover to lose and no key to press — and there it
    is drawn as a target too, as an empty field is, since on a phone this line is
    the only way to a note. */
-.line[data-clickable] {
+.line.line[data-clickable] {
   pointer-events: auto;
   cursor: pointer;
 }
 
 @media (pointer: coarse) {
-  .line {
+  .line.line {
     pointer-events: auto;
     cursor: pointer;
     min-height: 44px;
@@ -38,16 +45,19 @@
   }
 }
 
-.glyph {
-  flex: none;
-  align-self: center;
-  opacity: 0.55;
-}
+/* How to change it. Second on the line and last in the row, so what is written
+   holds the left edge; because the words here are the same length whichever
+   state the line is in, its left edge is the same too and reads as a column.
 
-/* How to change it, at the left in both states so the keycap never moves. */
+   Italic, which is the whole of what separates it from the definition sitting
+   directly above: the two are the same size and the same ink, and upright they
+   read as one paragraph — a second sentence about the word rather than an offer
+   to write one. The keycap stays upright inside it, being a key and not
+   prose. */
 .action {
   flex: none;
   white-space: nowrap;
+  font-style: italic;
   opacity: 0.6;
 }
 
@@ -63,6 +73,7 @@
 /* Drawn as a key rather than said as a word: it is the one thing here that
    looks like something to press, which is the whole of what the line teaches. */
 .key {
+  font-style: normal;
   border: 1px solid;
   border-radius: 3px;
   padding: 0 0.25em;
@@ -83,19 +94,47 @@
   }
 }
 
-/* What was said. One line of it, at full strength, with the rest counted at the
-   end — the whole of it is a keystroke away, and this line's height is spent
-   the moment it grows to two. */
+/* What was said, and the count of what would not fit, kept together as one
+   phrase.
+
+   It takes the room it needs and no more, so the instruction sits against its
+   right edge rather than out at the far side of the card: a two-word note left
+   the two ends of the line so far apart that they read as unrelated, and the
+   eye had to cross the card to find out that the words on the left could be
+   changed at all. */
+.said {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* As many of its own lines as the screen said it had room for, with anything
+   past that counted at the end — the whole of it is always a keystroke away.
+
+   `pre-wrap` so the lines someone wrote are the lines they get back, and the
+   clamp so a single long one cannot run the card past the modal. `--note-lines`
+   is the count, handed down by whoever drew the line: a grid says one, a card
+   says three.
+
+   Italic for the same reason the offer is, and it matters more here: this is
+   the one text on the card that nobody but the reader wrote, sitting directly
+   under a sentence from the inventory in the same size and the same ink. */
 .note {
-  flex: 1;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--note-lines, 1);
+  font-style: italic;
 }
 
 .more {
   flex: none;
   font-size: 0.85em;
+  font-style: italic;
   opacity: 0.55;
 }

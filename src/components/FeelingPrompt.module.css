@@ -26,17 +26,25 @@
    background: this ring frames a whole screen, so undiluted `currentColor`
    would draw a hard box around everything. */
 .prompt:focus {
-  outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline: 3px solid
+    var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: -2px;
 }
 
-/* Tall enough for the longest definition to wrap without moving the buttons
-   below it. A walk is twenty of these in a row, so the answer buttons have to
-   stay under the cursor — measured against the two-line case, which is where
-   about a fifth of the feelings land once the modal is narrow. */
+/* No floor of its own any more: the card holds one, pooled across its
+   definition and its note, and a second one here could only disagree with it.
+   The 10rem this used to reserve was set before notes existed and had been
+   quietly overshot ever since — a card with a one-line definition measured
+   172px against it, so the buttons moved between cards anyway, which is the
+   one thing it was there to prevent. */
 .stage {
   position: relative;
-  min-height: 10rem;
+  /* A grid item is `min-width: auto`, which means it refuses to be narrower
+     than its own contents — and a note is contents. One long note therefore
+     sized the card to the sentence in it, 822px inside a 381px modal, and the
+     whole prompt scrolled sideways. Nothing in a card should ever decide how
+     wide the card is; the modal decides, and the note clamps to what it gets. */
+  min-width: 0;
   display: grid;
   align-content: start;
   /* A card on its way out flies past the sides. Clip it there so it slides

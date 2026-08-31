@@ -78,6 +78,15 @@ export type FeelingCategorySiftAction =
    * word that is not marked: there would be nowhere to keep what was written.
    */
   | { type: 'note'; word: string }
+  /**
+   * Write about whatever the strip is showing, without naming it.
+   *
+   * The same move as `note`, for a caller that cannot see which word that is.
+   * The key belongs to the whole screen — it works with focus on the button
+   * row, which is outside the grid — and a host listening that far out knows
+   * only that it is looking at a sift.
+   */
+  | { type: 'noteShowing' }
   /** What is in the box now. */
   | { type: 'draft'; text: string }
   /** Keep what is in the box. An emptied box deletes the note there was. */
@@ -114,11 +123,16 @@ function notesInSourceOrder(
 ): Note[] {
   const wanted = new Set(marked)
   const written = new Map(
-    notes.filter((note) => note.text !== '').map((note) => [note.word, note.text]),
+    notes
+      .filter((note) => note.text !== '')
+      .map((note) => [note.word, note.text]),
   )
   return words
     .filter((feeling) => wanted.has(feeling.word) && written.has(feeling.word))
-    .map((feeling) => ({ word: feeling.word, text: written.get(feeling.word)! }))
+    .map((feeling) => ({
+      word: feeling.word,
+      text: written.get(feeling.word)!,
+    }))
 }
 
 /**
@@ -185,6 +199,12 @@ export function reduce(
         showing: action.word,
         noting: { word: action.word, draft: noteFor(state, action.word) ?? '' },
       }
+    }
+
+    case 'noteShowing': {
+      const showing = gloss(state)
+      if (showing === null) return state
+      return reduce(state, { type: 'note', word: showing.word })
     }
 
     case 'draft':

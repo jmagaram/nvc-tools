@@ -2,7 +2,11 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import NeedPicker from '../components/NeedPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
-import { submitShortcutLabel, useSubmitShortcut } from '../keyboard.ts'
+import {
+  submitShortcutLabel,
+  useNoteShortcut,
+  useSubmitShortcut,
+} from '../keyboard.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -88,6 +92,12 @@ export default function NeedPickerDemo() {
      only fires while that button is the one on screen — a walk or a sift has
      no such button to commit the modal early. */
   useSubmitShortcut(view === 'browse', ok)
+
+  /* `n` belongs to the whole sift screen, not just the grid: `Ask me about
+     each` and `Done` are in the button row, outside it. */
+  useNoteShortcut(view === 'sift', () =>
+    dispatch({ type: 'sift', action: { type: 'noteShowing' } }),
+  )
 
   /* A grid's bar is empty. `Done` and the close button both leave the category
      keeping its marks, so a third control saying the same would be noise — and
@@ -267,8 +277,8 @@ export default function NeedPickerDemo() {
       <p>
         A category opens as all of its words at once, in the order the source
         lists them, with whatever was picked there before already marked.{' '}
-        <strong>Ask me about each</strong> goes through the whole category
-        as cards instead, marked words first, and hands its answers back to the
+        <strong>Ask me about each</strong> goes through the whole category as
+        cards instead, marked words first, and hands its answers back to the
         grid — so leaving a walk part way through keeps both what it decided and
         what it never reached. Touch or hover a word to read its definition
         without marking it.

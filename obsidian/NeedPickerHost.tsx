@@ -19,7 +19,11 @@ import type {
   Visited,
 } from '../src/machines/needPicker.ts'
 import { useFocusScreen } from '../src/focusScreen.ts'
-import { submitShortcutLabel, useSubmitShortcut } from '../src/keyboard.ts'
+import {
+  submitShortcutLabel,
+  useNoteShortcut,
+  useSubmitShortcut,
+} from '../src/keyboard.ts'
 import Credit from './Credit.tsx'
 
 /** What the modal is called, and so what the way out of a walk points back at. */
@@ -119,6 +123,12 @@ export default function NeedPickerHost({
      button to commit the modal early. */
   useSubmitShortcut(view === 'browse', submit)
 
+  /* `n` belongs to the whole sift screen, not just the grid: `Ask me about
+     each` and `Done` are in the button row, outside it. */
+  useNoteShortcut(view === 'sift', () =>
+    dispatch({ type: 'sift', action: { type: 'noteShowing' } }),
+  )
+
   /* Both bars speak for the screen on top, which is the same rule the `x`
      follows. The way back is labelled with the screen it returns to rather than
      with the move — 'back' alone leaves open what becomes of the answers
@@ -134,8 +144,7 @@ export default function NeedPickerHost({
         disabled={noting}
         onClick={leaveTop}
       >
-        <span aria-hidden="true">&lsaquo;</span>{' '}
-        {visitCategory(state) ?? TITLE}
+        <span aria-hidden="true">&lsaquo;</span> {visitCategory(state) ?? TITLE}
       </button>
     ) : null
 

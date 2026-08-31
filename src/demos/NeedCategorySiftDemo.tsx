@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNoteShortcut } from '../keyboard.ts'
 import NeedCategorySift from '../components/NeedCategorySift.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
 import { categories } from '../data/needs.ts'
@@ -24,9 +25,17 @@ export default function NeedCategorySiftDemo() {
   const dispatch = (action: NeedCategorySiftAction) =>
     setState((current) => reduce(current, action))
 
+  /* This page is the host, so it owns the key — see `useNoteShortcut`. There is
+     no button row here to lose focus to, but a host that skipped this would
+     have a grid whose `n` worked only while the grid itself had focus. */
+  useNoteShortcut(true, () => dispatch({ type: 'noteShowing' }))
+
   /** Open another category, keeping what the one on screen marked. */
   const open = (index: number) => {
-    const remembered = { ...picksByCategory, [state.category]: [...state.marked] }
+    const remembered = {
+      ...picksByCategory,
+      [state.category]: [...state.marked],
+    }
     const category = categories[index]
     setPicksByCategory(remembered)
     setCategoryIndex(index)

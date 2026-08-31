@@ -34,8 +34,17 @@ export default function FeelingCard({
     <div className={`${styles.card} ${styles[kind]}`}>
       <p className={styles.category}>{category}</p>
       <h3 className={styles.word}>{word}</h3>
-      <p className={styles.definition}>{definition}</p>
-      {note !== undefined && <div className={styles.note}>{note}</div>}
+      {/* The definition and the note share one floor, for the reason the sift
+          gives: apart, a one-line definition left its spare line empty between
+          the two, and the note was clamped small beside it. Together the height
+          is the same on every card in a walk whatever is written on it, so the
+          progress rule and the two answers under it do not move from one
+          question to the next — which matters more here than anywhere, because
+          answering is a click in the same place twenty-eight times. */}
+      <div className={styles.body}>
+        <p className={styles.definition}>{definition}</p>
+        {note !== undefined && <div className={styles.note}>{note}</div>}
+      </div>
     </div>
   )
 }

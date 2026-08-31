@@ -155,6 +155,7 @@ export default function FeelingPrompt({
                       word={leaving.word}
                       note={leaving.note}
                       clickable={false}
+                      maxLines={3}
                       onOpen={() => {}}
                     />
                   )
@@ -178,6 +179,7 @@ export default function FeelingPrompt({
                   word={word}
                   note={note}
                   clickable
+                  maxLines={3}
                   onOpen={onNote}
                 />
               }

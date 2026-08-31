@@ -42,3 +42,40 @@ export function useSubmitShortcut(enabled: boolean, onSubmit: () => void) {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [enabled, onSubmit])
 }
+
+/**
+ * `n` as the way to write about the word a grid is showing.
+ *
+ * On the window rather than on the grid, because the grid is not where the
+ * focus necessarily is: the two ways on from a sift — `Ask me about each` and
+ * `Done` — live in the modal's button row, which is a sibling of the content
+ * and outside every region the picker draws. Tabbing to `Done` and pressing
+ * `n` did nothing, which is the sort of dead key nobody reports and everybody
+ * notices.
+ *
+ * Plain `n`, so anything being typed into has to be let through — the note box
+ * itself most of all, which is where the letter is most likely to be typed.
+ * A modifier means the keystroke belongs to the host, the same rule the grid
+ * used when it owned this.
+ *
+ * `enabled` is the screen this applies to, decided by the host the way
+ * `useSubmitShortcut` is: a walk answers `n` inside its own region, having no
+ * button row to lose focus to.
+ */
+export function useNoteShortcut(enabled: boolean, onNote: () => void) {
+  useEffect(() => {
+    if (!enabled) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'n' && e.key !== 'N') return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      const target = e.target as HTMLElement | null
+      if (target?.isContentEditable) return
+      const tag = target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      e.preventDefault()
+      onNote()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [enabled, onNote])
+}

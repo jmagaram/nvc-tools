@@ -111,6 +111,7 @@ export function init(
 }
 
 /** Answer the current feeling and move on. The walk only runs forwards. */
+
 export function reduce(
   state: FeelingCategoryWalkState,
   action: FeelingCategoryWalkAction,

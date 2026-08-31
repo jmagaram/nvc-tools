@@ -51,17 +51,48 @@
    sitting on top of them — 1.7 lines' worth in the plugin against 2 in the
    preview, and a 9px jump under the pointer every time a definition wrapped. */
 .gloss {
-  box-sizing: content-box;
   margin: 0;
-  padding-top: 0.5rem;
-  border-top: 1px solid;
-  min-height: 3em;
   font-size: 0.9em;
 }
 
-@supports (min-height: 1lh) {
-  .gloss {
-    min-height: 2lh;
+/* One floor for the definition and the note together — see the component for
+   why they pool it. 3.6 of the definition's line boxes: two for the longest
+   definition, and the rest for two lines of note, which are set smaller and so
+   come to less than a line each.
+
+   The `5.4em` says the same thing only where the host's line-height is 1.5. It
+   stays as the fallback for a webview too old for `lh`, and the two are an
+   `@supports` pair rather than two `min-height` lines in one block, which the
+   community directory's CSS review reads as a duplicated property. */
+.strip {
+  box-sizing: content-box;
+  display: grid;
+  /* The note takes what the definition leaves, rather than a fixed count of
+     lines. A clamp is an integer and has to be sized for the worst case — a
+     definition that wraps — so on the one-line definitions, which are most of
+     them, the freed line sat empty below an ellipsised note. `minmax(0, 1fr)`
+     means the row is whatever is left: three lines under a short definition,
+     two under a long one, and no gap under either.
+
+     The height is definite rather than a floor, and it has to be: `1fr` only
+     means 'what is left over' when there is a known total to take it from. As
+     a `min-height` the grid still sized itself to its contents, so a two-line
+     definition and a three-line note pushed the strip from 108px to 132px and
+     the button row moved — the one thing the reserve exists to stop.
+
+     Fixed, the leftover is always exactly what the definition did not use, and
+     a note longer than it is clipped rather than growing. `maxLines` caps it
+     at three besides, so a fourth line can never be half-drawn. */
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid;
+  height: 5.4em;
+}
+
+@supports (height: 1lh) {
+  .strip {
+    height: 3.6lh;
   }
 }
 
@@ -74,6 +105,19 @@
    marked word would move the modal's bottom edge on every pass, and the strip
    above holds its two lines for the same reason. */
 .note {
+  /* Free to be shorter than what is in it, which is the other half of the
+     row above: without this the note's own height would win and the strip
+     would grow after all. */
+  min-height: 0;
+  overflow: hidden;
+  /* A grid item is `min-width: auto` — it refuses to be narrower than its own
+     contents, and the instruction on the note line is one unbroken run of
+     `nowrap` text. Without this a long entry pushed the whole screen wider than
+     the modal holding it: `Press N to say more about “to understand and be
+     understood”` came to 444px inside a 442px frame, and the page scrolled
+     sideways. Nothing on this line decides how wide the screen is; the screen
+     decides, and the line ellipsises into what it gets. */
+  min-width: 0;
   min-height: 1.7lh;
   font-size: 0.85em;
 }

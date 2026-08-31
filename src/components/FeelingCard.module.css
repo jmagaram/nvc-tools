@@ -45,8 +45,30 @@
   hyphens: auto;
 }
 
+/* One floor for the definition and whatever is written under it. 4.6 of the
+   definition's own line boxes: two for the longest definition to wrap into,
+   and the rest for three lines of note, which are set smaller and so come to
+   less than a line each. Past three the note ellipsises — a scrollbar inside a
+   card is worse than an ellipsis, and the whole note is a keystroke away.
+
+   The `6.9em` is the same sum where the host's line-height is 1.5, kept as the
+   fallback for a webview too old for `lh`. */
+.body {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  min-height: 6.9em;
+}
+
+@supports (min-height: 1lh) {
+  .body {
+    min-height: 4.6lh;
+  }
+}
+
 .definition {
-  margin: 0.25rem 0 0;
+  margin: 0;
 }
 
 /* The note's own line, under the definition and inside the card. Its height is
@@ -54,7 +76,13 @@
    walk can be written on and a line that came and went would move the answers
    below it from one card to the next. */
 .note {
-  min-height: 1.7lh;
-  margin-top: 0.35rem;
+  /* A grid item is `min-width: auto` — it refuses to be narrower than its own
+     contents, and the instruction on the note line is one unbroken run of
+     `nowrap` text. Without this a long entry pushed the whole screen wider than
+     the modal holding it: `Press N to say more about “to understand and be
+     understood”` came to 444px inside a 442px frame, and the page scrolled
+     sideways. Nothing on this line decides how wide the screen is; the screen
+     decides, and the line ellipsises into what it gets. */
+  min-width: 0;
   font-size: 0.8em;
 }

@@ -1,4 +1,3 @@
-import type { KeyboardEvent } from 'react'
 import { gloss, isMarked, noteFor } from '../machines/feelingCategorySift.ts'
 import type {
   FeelingCategorySiftAction,
@@ -34,20 +33,6 @@ export default function FeelingCategorySift({ state, onAction }: Props) {
   // sweep across twenty-eight unmarked words offering nothing.
   const offered = showing !== null && isMarked(state, showing.word)
 
-  /* `n` writes about whatever the strip is showing, which is whatever the
-     pointer or Tab last landed on — the machine keeps `showing` in step with
-     both, so there is nothing to ask the DOM. A modifier means the keystroke
-     belongs to whoever is hosting this, the same as on the tabs. The drawer is
-     a sibling of this screen rather than a child, so typing an `n` into the box
-     never arrives here. */
-  const noteOnKey = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.ctrlKey || event.metaKey || event.altKey) return
-    if (event.key !== 'n' && event.key !== 'N') return
-    if (!showing) return
-    event.preventDefault()
-    onAction({ type: 'note', word: showing.word })
-  }
-
   return (
     <NoteDrawer
       noting={state.noting}
@@ -67,7 +52,6 @@ export default function FeelingCategorySift({ state, onAction }: Props) {
         className={styles.sift}
         tabIndex={-1}
         data-sift={state.resume === null ? '' : undefined}
-        onKeyDown={noteOnKey}
       >
         {/* The inventory over the category, stacked tight enough to read as one
             heading. It names what the words are without spending a line on it,
@@ -96,30 +80,45 @@ export default function FeelingCategorySift({ state, onAction }: Props) {
           ))}
         </div>
 
-        {/* Last, and at a height that does not change: a strip that grew and
-            shrank would shift the grid under the finger that just tapped it. */}
-        <p className={styles.gloss}>
-          {showing ? (
-            <>
-              <b>{showing.word}</b> — {showing.definition}
-            </>
-          ) : (
-            <span className={styles.hint}>{HINT}</span>
-          )}
-        </p>
+        {/* The definition and the note share one reserve rather than holding
+            a separate one each. Apart, a one-line definition left its second
+            reserved line empty *between* the two — a band of nothing that read
+            as a layout fault — while the note next to it was clamped to a
+            single line and ellipsised. Pooled, the same total height goes
+            wherever the content is: a short definition lends its spare line to
+            a longer note, and what is left over falls below both, where it
+            reads as room rather than as a gap.
 
-        {/* The line under the definition, and the room it takes whether or not
-            there is one to draw: a line that appeared as the pointer crossed a
-            marked word would move the modal's bottom edge on every pass. */}
-        <div className={styles.note}>
-          {offered && (
-            <NoteLine
-              word={showing.word}
-              note={noteFor(state, showing.word)}
-              clickable={false}
-              onOpen={() => onAction({ type: 'note', word: showing.word })}
-            />
-          )}
+            The total is what keeps the grid still. `showing` changes on every
+            pointer crossing, and without a floor the modal's bottom edge — and
+            the button row under it — would move on each one. */}
+        <div className={styles.strip}>
+          {/* Last, and at a height that does not change: a strip that grew and
+              shrank would shift the grid under the finger that just tapped it. */}
+          <p className={styles.gloss}>
+            {showing ? (
+              <>
+                <b>{showing.word}</b> — {showing.definition}
+              </>
+            ) : (
+              <span className={styles.hint}>{HINT}</span>
+            )}
+          </p>
+
+          {/* The line under the definition, and the room it takes whether or not
+              there is one to draw: a line that appeared as the pointer crossed a
+              marked word would move the modal's bottom edge on every pass. */}
+          <div className={styles.note}>
+            {offered && (
+              <NoteLine
+                word={showing.word}
+                note={noteFor(state, showing.word)}
+                clickable={false}
+                maxLines={3}
+                onOpen={() => onAction({ type: 'note', word: showing.word })}
+              />
+            )}
+          </div>
         </div>
       </div>
     </NoteDrawer>

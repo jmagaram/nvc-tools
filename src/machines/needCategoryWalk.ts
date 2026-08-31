@@ -108,6 +108,7 @@ export function init(
 }
 
 /** Answer the current need and move on. The walk only runs forwards. */
+
 export function reduce(
   state: NeedCategoryWalkState,
   action: NeedCategoryWalkAction,
