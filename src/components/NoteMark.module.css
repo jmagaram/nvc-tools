@@ -1,51 +1,101 @@
-/* Sits after the word, at a beat's distance, and rides the text's own colour
-   like everything else here.
-
-   Inert to the pointer by default, so the pill it sits in is one target: a
-   thumb aiming at a 0.72em glyph inside a pill that is already the right size
-   for a thumb would miss it more often than not, and a miss unmarks the word —
-   which takes the note with it. A phone has a way to the note already, the
-   note line below the grid going tappable on a coarse pointer.
-
-   A mouse can hit it, so a mouse is given it. This is the only way to a note
-   on the grid without the keyboard: the note line down there cannot be the
-   target, because reaching it means crossing the words above and each one
-   crossed changes which word the line is about. */
+/* Rides the text's own colour like everything else here, and never names one of
+   its own: the difference between 'there is a note' and 'you could write one'
+   is drawn in the strength of the ink, the way StepProgress draws kept against
+   passed. A colour would be the only one in any component besides `--nvc-ring`,
+   and would have to be chosen twice over, for a light ground and a dark one. */
 .mark {
-  position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+/* Over the pill's top-right corner, out of the pill's flow.
+   `position: absolute` is the whole reason a marked word can wear one at all.
+   In flow it cost the pill about a character, so it could only ever appear once
+   a note existed — otherwise a pointer crossing the row would have reflowed it.
+   Out of flow it costs nothing, which is what lets it be the offer as well as
+   the sign.
+
+   It overhangs upward and never sideways. `right: 0` holds it inside the pill's
+   own right edge, because a pill sitting against the end of a row with a glyph
+   hanging past it would widen the grid — the same failure `.note`'s
+   `min-width: 0` in the sift module records, where one long line pushed a 442px
+   modal into a sideways scroll. Upward there is nothing to hit: it lands in the
+   row gap, which `.words` widened to pay for it, or in the gap above the grid. */
+.badge {
+  position: absolute;
+  top: -0.5em;
+  right: 0;
+  /* A target everywhere, and the only one on a pill that does not toggle the
+     mark. Clicking the word itself unmarks it, so without this there is no way
+     to say more about a word picked a moment ago without first un-picking it —
+     which would take the note control away at the same time.
+
+     Visible at rest is the default, because that is what a screen with no
+     pointer needs: nothing can reveal it there. Where there *is* a hover it is
+     hidden again until the word is pointed at or focused, so a desktop grid is
+     not speckled with pencils. A word carrying a note keeps it at full strength
+     either way, being the only sign anywhere that there is something to read —
+     and never the only one, since the note itself shows in the control below. */
+  pointer-events: auto;
+  opacity: 0.55;
+  transition: opacity 0.1s ease-out;
+}
+
+.badge[data-noted] {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .badge:not([data-noted]) {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge {
+    transition: none;
+  }
+}
+
+/* In the card's run of picked words, after the word at a beat's distance. Only
+   ever drawn where there is a note, so it has nothing to reveal and nothing to
+   hide — and nothing to press either: a card lists what was picked, it does not
+   offer to change it. */
+.inline {
+  position: relative;
   margin-left: 0.3em;
   pointer-events: none;
 }
 
-@media (pointer: fine) {
-  .mark {
-    pointer-events: auto;
-  }
-
-  /* A target the size of a fingertip's worth of slack around a glyph that is
-     barely there. Drawn as a pseudo-element so the pill's width is untouched —
-     nothing about a note may reflow the row it is in. It overlaps the end of
-     the word on purpose: a click that falls between the two means the pencil,
-     because opening a note you did not mean to open is a cancel, and unmarking
-     a word you did not mean to unmark is a deletion. */
-  .mark::after {
-    content: '';
-    position: absolute;
-    inset: -0.35rem -0.3rem;
-  }
-
-  .mark:hover .pencil {
-    opacity: 1;
-  }
-}
-
-/* Quieted until it is pointed at, which is the only hint that it is a target
-   — it cannot say so in words without becoming part of the pill's name. */
 .pencil {
   display: block;
-  opacity: 0.75;
+}
+
+/* A target the size of a fingertip's worth of slack around a glyph that is
+   barely there. Drawn as a pseudo-element so nothing about it is laid out.
+
+   It grows up, down and to the left, and never to the right: `right: 0` above
+   keeps the badge inside the pill's own edge, and a hit box reaching past it
+   would widen the row it is in — the same failure the sift's `min-width: 0`
+   records, where one long line pushed a 442px modal into a sideways scroll.
+   Leftward it overlaps the end of the word on purpose. A click falling between
+   the two means the pencil: opening a note you did not mean to open is a
+   cancel, where unmarking a word you did not mean to unmark loses your place in
+   the row. */
+.badge::after {
+  content: '';
+  position: absolute;
+  inset: -0.35rem 0 -0.35rem -0.35rem;
+}
+
+/* Bigger for a thumb. It stays clear of the right edge for the reason above, so
+   what grows is the height and a little of the reach back over the word — and
+   a miss is cheap now in a way it was not: unmarking no longer destroys the
+   note under the mark, so the worst a fat finger does is cost one more tap. */
+@media (hover: none) {
+  .badge::after {
+    inset: -0.7rem 0 -0.7rem -0.7rem;
+  }
 }
 
 /* What the pencil says out loud. Off-screen rather than `display: none`, which

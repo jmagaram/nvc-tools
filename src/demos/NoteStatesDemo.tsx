@@ -62,9 +62,12 @@ function siftState(
     marked ? [word] : [],
     note === null ? [] : [{ word, text: note }],
   )
-  /* `init` leaves nothing showing, and the note line lives under the gloss
-     strip — so without this the specimens would all be the empty strip. */
-  return reduce(seeded, { type: 'show', word })
+  /* `init` leaves nothing anchored, and the button under the gloss strip names
+     the anchored word — so without this the specimens would all be the empty
+     strip over a disabled button. Anchoring rather than previewing, because the
+     anchor is what the button reads: a preview would fill the strip and leave
+     the button still saying there was nothing chosen. */
+  return reduce(seeded, { type: 'anchor', word })
 }
 
 /** The same, with the drawer open over it. */
@@ -162,11 +165,28 @@ export default function NoteStatesDemo() {
 
       <div className={styles.sheet}>
         <Specimen
+          label="Grid · nothing chosen"
+          note="no control at all until a word is picked; the reserve below holds its height anyway"
+        >
+          <FeelingCategorySift state={init(category)} onAction={() => {}} />
+        </Specimen>
+
+        <Specimen
           label="Grid · unmarked"
-          note="no line at all — a note belongs to a picked word"
+          note="nothing offered — there is nowhere to keep a note on a word nobody picked"
         >
           <FeelingCategorySift
             state={siftState(category, word, null, false)}
+            onAction={() => {}}
+          />
+        </Specimen>
+
+        <Specimen
+          label="Grid · unmarked, note kept"
+          note="the state that used to be impossible: unmarking hides what was written rather than deleting it, so marking again brings it back"
+        >
+          <FeelingCategorySift
+            state={siftState(category, word, written, false)}
             onAction={() => {}}
           />
         </Specimen>

@@ -154,7 +154,10 @@ export default function FeelingPrompt({
                     <NoteLine
                       word={leaving.word}
                       note={leaving.note}
-                      clickable={false}
+                      /* The card is flying off with the note it was answered
+                         with still legible on it. Nothing can reach it:
+                         `.leaving` is `pointer-events: none` and the whole
+                         ghost is `aria-hidden`. */
                       maxLines={3}
                       onOpen={() => {}}
                     />
@@ -178,7 +181,6 @@ export default function FeelingPrompt({
                 <NoteLine
                   word={word}
                   note={note}
-                  clickable
                   maxLines={3}
                   onOpen={onNote}
                 />

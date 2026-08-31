@@ -119,14 +119,18 @@ export default function NeedPickerHost({
      commit on the categories and `Done` on a grid. A walk has none. */
   useSubmitShortcut(
     submitShortcut,
-    view !== 'walk',
+    // Not while a note is open. The chord means 'commit the screen', and the
+    // screen on top is the drawer — where it landed on `leaveTop`, which for a
+    // drawer means `dropNote`, so the one chord that everywhere else keeps
+    // something was the one that threw a note away.
+    view !== 'walk' && !noting,
     view === 'browse' ? submit : leaveTop,
   )
 
   /* `n` belongs to the whole sift screen, not just the grid: `Ask me about
      each` and `Done` are in the button row, outside it. */
   useNoteShortcut(view === 'sift', () =>
-    dispatch({ type: 'sift', action: { type: 'noteShowing' } }),
+    dispatch({ type: 'sift', action: { type: 'noteAnchor' } }),
   )
 
   /* Both bars speak for the screen on top, which is the same rule the `x`

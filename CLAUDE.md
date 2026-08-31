@@ -20,11 +20,24 @@ Obsidian plugin — for now the gallery is the only surface.
   `src/components/pill.module.css` — see **The pill** below.
 - Components are **presentational only**: props in, JSX out. No state, no
   effects, no fetching, no globals, no awareness of routing. State belongs in
-  the demo page (and later, in the app). The one exception is **transient
-  animation state** — something that exists only for the length of a transition
-  and that no host could ever read back. `FeelingPrompt` and `NeedPrompt` keep
-  the card just answered so it has something to fly off with; putting that in a
-  machine would make every host own a timer just to end an animation.
+  the demo page (and later, in the app). The exceptions are all the same shape —
+  something that exists only for an instant and that no host could ever read
+  back — and each is kept in a hook of its own in `src/` rather than loose in a
+  component:
+  - **Transient animation state.** `FeelingPrompt` and `NeedPrompt` keep the
+    card just answered so it has something to fly off with; putting that in a
+    machine would make every host own a timer just to end an animation.
+  - **A timer that decides whether something happened at all.**
+    `usePressDelay` holds a press long enough to be seen; `useHoverIntent`
+    waits 150ms before calling a pointer resting on a word a request to read it.
+    Neither has a state a host could act on: what is pending is precisely what
+    has not happened yet.
+  - **A measurement taken in an event handler.** `rowNeighbor` decides which
+    pill is above or below another, which only the layout knows and only once it
+    has happened — a wrapped row of variable-width pills has no column to count.
+    The rule stays pure: `rowNeighbor` takes rectangles and imports nothing, and
+    the single `getBoundingClientRect` sweep lives in the sift's `onKeyDown`.
+    Nothing measures during render.
 - **Flow state lives in a machine.** When a component walks someone through
   several steps, put the state in `src/machines/` as a pure module — a state
   type, an action type, `init`, `reduce`, and selectors, with no React import.
@@ -65,7 +78,7 @@ CSS module in the project. Four copies of the shape would drift, and the point
 of the shape is that a word you can tap looks the same wherever it is.
 
 The four split two ways. A **word** pill (`FeelingPill`, `NeedPill`) can be
-marked and carries `aria-pressed`; marked is a wash of the ink, `color-mix`ed
+marked and carries `aria-selected`; marked is a wash of the ink, `color-mix`ed
 against `transparent` so it composites onto whatever the host's background is
 and needs no colour named. A **category** pill cannot be marked at all: once
 something is picked in a category, the picker draws it as a `*CategoryCard`
@@ -79,9 +92,28 @@ finger that just tapped it. This is why marked is not a tick: a tick either
 reserves room in every unmarked pill — three rows of a 28-word category at the
 width the modal opens at — or shuffles the row when it appears.
 
-Both word pills take one `onShow` rather than an `onPointerEnter` and an
-`onFocus`, because to a host the two events mean the same thing: show what this
-word means. Reading a definition must not cost a mark.
+The note badge keeps the same rule by leaving the flow altogether: it is
+absolutely positioned over the pill's top-right corner and costs no width at
+all. That is what lets it appear on *any* marked word rather than only on a
+noted one — in flow it cost about a character, so a badge that came and went
+with the pointer would have reflowed the row it was in. It overhangs upward and
+never sideways: `right: 0` keeps it inside the pill's own right edge, because a
+pill at the end of a row with a glyph hanging past it widens the grid, and a
+442px modal has no room to give. `.words` pays for the upward overhang with a
+taller row gap.
+
+The two word pills once took a single `onShow` for both `onPointerEnter` and
+`onFocus`, on the grounds that a host could not tell the two apart. It can, and
+it must: they are now `onPreview` and `onAnchor`, and they mean opposite things.
+Focus lands on a word deliberately, so it **anchors** — everything on the screen
+then applies to that word. A pointer crosses a word on its way somewhere else,
+so it only **previews** what the word means, and only after resting long enough
+to mean it. See **The anchor**. Reading a definition still costs no mark; it now
+costs no commitment of any kind.
+
+Only the word pills are ever selected, and they say so as `role="option"` with
+`aria-selected` — they sit in a listbox, where `aria-pressed` said nothing about
+being one choice among twenty-eight.
 
 ## The note
 
@@ -90,14 +122,29 @@ him* — written in a drawer the screen makes room for. `NoteLine`, `NoteDrawer`
 and `NoteMark` are the three pieces, and all four screens (both grids, both
 walks) use the same three.
 
-**A note only exists on a word that is picked.** There is nothing a note on an
-unpicked feeling could mean and nowhere for it to be written. The rule runs both
-ways and is enforced by normalising rather than by the type: every write to a
-sift's `marked` goes through `withMarked`, which runs `notesInSourceOrder` over
-the notes as well — so unmarking a word takes its note with it, and no host has
-to remember to. It is the same mechanism `inSourceOrder` already was for the
-marks, and the same reason: `words` is what leaves the picker, so notes ride
-beside it rather than inside it.
+**A note is only ever *shown* on a word that is picked — but unmarking hides it
+rather than destroying it.** This used to be a rule about data: `withMarked` ran
+the notes through the same filter as the marks, so dropping a mark dropped the
+sentence under it and no host had to remember to. That is a tidy invariant and
+it was the wrong trade. Unmarking is one tap, and on a phone it is the *same*
+tap that reads a word — the only way to see what a feeling means there is to
+pick it. One tap must not be able to delete a paragraph somebody wrote.
+
+So `notesInSourceOrder` now enforces only what is still true: the category's own
+order, and no blank notes (an emptied box is the delete, and the only one). The
+picked-word rule moved to the two places that need it:
+
+- `visibleNote` is what every screen reads. A note on an unmarked word returns
+  null, so nothing draws it and no pencil claims it exists.
+- `chosen` is the door everything leaves the picker by, and it filters each
+  category's notes down to its picked words. Nothing outside has any use for a
+  hidden note, and a host writing one into somebody's file would be writing down
+  a thought about a feeling they had said did not apply.
+
+`Visited.notes` deliberately keeps the hidden ones, because that is *how* the
+undo survives leaving a category and coming back: they are handed straight back
+to the sift as `alreadyNoted`. `noted`, which builds a card's word list, reads
+from `words` and so cannot pair one with a word that was not picked.
 
 **In a walk the note is part of the answer, not a substitute for it.** `Enter`
 keeps what is written and leaves the card exactly where it was — nothing on a
@@ -105,10 +152,16 @@ card is decided until it is answered. The first version answered the card and
 dealt the next one, on the grounds that writing about a word is a stronger yes
 than the arrow; the card then flew off on the last keystroke and the note was
 never once seen where it lives, and a typo could not be fixed. So a walk carries
-its own `notes`, `fold` merges them on exactly the rule it already merges marks
-by — what the walk asked about, the walk decides — and `withMarked` drops
-whatever is left over a word that ended up unmarked. That is why passing on a
-card takes its note with it and no extra rule says so.
+its own `notes` and `fold` merges them on exactly the rule it already merges
+marks by — what the walk asked about, the walk decides.
+
+**Passing on a card hides its note; it does not delete it**, which is the same
+rule unmarking follows on the grid and matters more here. A walk asks about
+every word in the category, so its `asked` set covers the lot — when `reject`
+deleted the note and `init` filtered its inbound ones down to what was already
+picked, a single walk through a category quietly destroyed every hidden note in
+it. Preservation that dies on the screen where an accidental rejection is
+likeliest is not preservation. Answering the other way brings it back.
 
 **The drawer parks what it covers.** The screen is pushed up, faded and
 dissolved into the top edge; the drawer comes in off the bottom and grows
@@ -124,23 +177,73 @@ the drawer while it is open: `close` checks `isNoting` first, which is the same
 `--nvc-ring`: the drawer covers what it parks, so it needs a surface, and the
 plugin points it at Obsidian's modal background.
 
-**The offer is a line of text, not a target.** On a marked word the reserved line
-under the definition reads *Press `N` to add a few words about livid*, and once
-something is written, *Press `N` to edit* followed by the note, ellipsized. It
-must not look clickable in a grid: to reach a target down there the pointer has
-to sweep across the words above, and every word it crosses changes which word
-the line is about — so a click aimed at one would land on whichever the mouse
-passed last. Naming a key costs the pointer nothing. It stays a real button
-underneath for the two cases with nothing to lose: a coarse pointer, which has
-no hover and no key and is drawn a target because on a phone this line is the
-only way in, and a card, which is one word. `NoteLine`'s `clickable` prop is
-that distinction and nothing else.
+**The offer is a control that names its word; the edit is not.** Under the
+definition, *Add note on livid* while there is nothing written, and simply
+*Edit* once there is, with the note itself shown beside it. The whole row is the target, so clicking what was written opens it for
+editing; only the label at the end is drawn as something to press, because a
+border round three lines of somebody's own words reads as a field they are
+sitting in rather than as a way to change them.
 
-The key is at the left in both states so the one thing shaped like a button does
-not move when a note appears beside it. The height is reserved whether or not
-there is a line to draw, for the reason the gloss strip holds its two: a line
-that came and went would move the modal's bottom edge every time the pointer
-crossed a marked word.
+This was a line of prose for a long time, and the reasoning held while it
+lasted: the definition strip followed the pointer, so to reach a target here the
+pointer had to sweep across the words above, and every word it crossed changed
+which word the line was about — a click aimed at one would land on whichever it
+passed last. Naming a key cost the pointer nothing. **The anchor retired that
+argument.** The word this names is chosen on purpose and holds still while the
+pointer travels to it. What was left for a while was worse than either: a button
+still wearing the costume of the prose it used to be, so it worked and looked
+inert. *Press N* also read as an instruction rather than as a control, which
+left a phone — with no key to press — nothing that looked like a way in.
+
+It names the **anchored** word, never the previewed one. While the pointer is
+dwelling somewhere else the strip describes word A above a control offering to
+write about word B, and that is correct rather than a compromise: both words are
+on screen, each is named, and this is the only thing in the strip that can act,
+so it is the only thing that must not move. A control that followed the pointer
+could not be reached by it.
+
+**The word is dropped from the edit label.** Nothing else on the line says which
+word an empty offer is about, so there it has to be named. Once something is
+written the note is sitting right beside the control, in the reader's own words
+— the most recognisable thing on the screen — and the pencil marks the pill it
+belongs to, so naming the word again bought nothing and cost the room the note
+needed.
+
+It cost more than nothing. The word sat at the *end* of the label, so it was the
+first thing the ellipsis took: a long note turned *Edit note on mortified* into
+*Edit note …*, which is longer than *Edit* and says less — it failed at the one
+job the word was there for, exactly when the note was long enough for it to
+matter. The label is now longest where there is most room and shortest where
+there is least.
+
+The word stays in the accessible name, as text that is there and not seen, since
+a screen reader has no equivalent of glancing at the note beside it. It cannot be
+an `aria-label` — Obsidian draws those as tooltips.
+
+**Nothing is drawn at all when the anchored word is not marked.** Not a disabled
+control explaining that you must pick something first — that spends a line
+teaching a rule nobody was going to break, and it would be the only text here
+that lectures rather than naming an action. Discovering that notes exist after
+picking a word is soon enough, since a note only ever belongs to a picked word.
+The strip's reserve holds its height either way, so saying nothing moves
+nothing. This is why `NoteLine` needs neither a `disabled` prop nor a word for
+what the inventory calls its entries: it is only ever drawn with a word to name.
+
+**Quiet on purpose, and quietest where it is largest.** It hugs its own words
+rather than stretching to the width it is given: full width it read as the
+screen's primary control, which is out of all proportion to something most
+people will never use. On a touch screen the thumb's worth of target is bought
+with padding rather than with ink, so how much room it takes and how much
+attention it draws are set separately — the same split the note badge uses on a
+pill.
+
+Only the words give way when the modal is narrow. The keycap is `flex: none` and
+the label ellipsises beside it, because what is worth losing is the end of a
+phrase repeating what the control does, never the one mark on the line that says
+a key will do it. The key is drawn the way the commit button draws its chord —
+a size down, part way into the background, no box of its own — because there is
+already one settled way to print a key in this modal and a second would read as
+a different kind of thing.
 
 **The note goes inside the card.** In a walk the card is thrown off the side when
 it is answered, and everything belonging to the word has to leave with it — a
@@ -149,12 +252,48 @@ offering a note about the card arriving behind it. `FeelingCard` and `NeedCard`
 take a `note` slot for this. It is also the only place unambiguous enough: a
 card is the one thing on that screen saying which word is being asked about.
 
-**A noted word says so with a pencil.** `NoteMark`, in the pill on the grid and
-beside the word listed in a category card. It is the one thing here that costs
-width — a pill grows by about a character — and that is the trade: a dot in the
-corner and a rule under the word are both free and both read as a rendering
-artefact until someone explains them. Nothing grows under the finger, because a
-noted word is always a marked one and the mark came first.
+**The pencil is both the sign and the way in, and it is the only control on a
+pill that does not toggle the mark.** That last part is what earns it. Clicking
+a word marks or unmarks it *and* anchors it, so without the badge there is no
+way to say more about a word picked a moment ago without first un-picking it —
+and un-picking it takes the note control away at the same time, so the gesture
+meaning "say more about this" would deselect the word and remove the way to say
+anything. Everything else about the badge follows from having to exist.
+
+`NoteMark` draws it, over a pill's corner on the grid and beside the word listed
+in a category card. `placement` is the whole of what the two callers disagree
+about, and it is a discriminated union rather than two flags because `noted` is
+not a question an inline mark has: a card only lists a pencil where there is a
+note.
+
+As a badge it is out of flow and costs the pill no width, which is what lets it
+appear on **any marked word** rather than only a noted one. In flow it cost
+about a character, so a badge that came and went with the mark would reflow the
+row under the very tap that marked it — the one thing **The pill** forbids
+outright. It overhangs upward only: `right: 0` keeps it inside the pill's own
+edge, because a pill at the end of a row with a glyph past it widens the grid.
+
+Three weights of one ink, never a colour: hidden, `0.55` when offered, full
+strength once there is a note. A colour would be the only one in any component
+besides `--nvc-ring` and would have to be picked twice over for a light ground
+and a dark one — the same argument `StepProgress` makes for drawing *kept* in
+weight rather than in red. It is never the only sign that a note exists; the
+note itself shows in the control below.
+
+**Touch is treated like a mouse here, which it did not used to be.** Visible at
+rest on every marked word is the default, because nothing on a touch screen can
+reveal it; where there *is* a hover it is hidden again until the word is pointed
+at or focused, so a desktop grid is not speckled with pencils. The reveal rule
+lives in `pill.module.css` on `[data-note-mark]` — the attribute that already
+existed so the pill could tell a click on the pencil from a click on the word —
+because `NoteMark` cannot name the pill's hashed class.
+
+It was inert on a coarse pointer for a reason that has since expired: *a thumb
+would miss a 0.72em glyph, and a miss unmarks the word, which takes the note with
+it*. Unmarking no longer takes the note, so the worst a fat finger does now is
+cost one more tap, and that is a much cheaper mistake than having no way at all
+to write about a word without un-picking it. The hit box grows for a thumb,
+upward and leftward and never rightward, for the reason `right: 0` gives.
 
 **Nothing of this reaches the note in the vault yet.** `Visited.notes` is carried
 through the machines and drawn on every screen, but `insert.ts` writes the same
@@ -162,6 +301,72 @@ fence it always did and `resolve.ts` reads a block back with `notes: []`. The
 format is the open question — an indented bullet under the category, keyed by
 the word, is the proposal in `docs/prototypes/feeling-notes.html` — and until it
 is settled a note lives as long as the modal does.
+
+## The anchor
+
+A sift holds two words, not one, and keeping them apart is the whole of what
+makes the grid usable with a mouse.
+
+**`anchor` is the word the screen is about.** Everything applies to it — the
+note button, `n`, the arrow keys, the definition strip when nothing else is
+happening. It is set only on purpose: a click, focus arriving, an arrow key, the
+pencil. It survives the pointer leaving the grid.
+
+**`preview` is a word the pointer is resting on.** It overrides what the strip
+*displays* and nothing else. It decides no action, takes no focus, and is
+cleared when the pointer leaves the grid.
+
+There used to be one field, `showing`, written by a click, by focus and by the
+pointer merely passing over. Because it was also what actions applied to, there
+was no mouse path from a word to a control about that word: the cursor crossed
+other words on the way and retargeted the thing it was travelling towards. Hover
+was doing a job only a persistent state can do. Two of this project's earlier
+decisions — a note line that refused the pointer, and a pencil put on the pill
+so the mouse had somewhere near to aim — were both workarounds for it.
+
+**Hover is an intention, so it is timed.** `useHoverIntent` waits 150ms before
+previewing, so fast travel across the grid never retargets the strip and
+deliberate dwelling does. Leaving the grid clears it immediately — leaving is
+unambiguous in a way that arriving is not. Between two words nothing is cleared,
+or a sweep would flicker back to the anchor between every pair.
+
+**It is a mouse's idea.** `onPointerEnter` bails unless `pointerType` is
+`'mouse'`. A tap fires a compatibility `pointerenter` too, and on a screen there
+is no pointer to move away and so no leave to undo it — the preview would latch
+onto whatever was last tapped and stay there. Asking the event what it is is not
+sniffing the user agent; it is the event saying so.
+
+**The grid is a listbox and one tab stop.** `role="listbox"` with
+`aria-multiselectable`, pills as `role="option"` with `aria-selected`, and a
+roving `tabIndex` so that a 28-word category is one stop rather than 28 sitting
+between the words and the button row. ← and → move one word in source order and
+wrap, because a wrapped row is one run of words the layout happened to break.
+↑ and ↓ do not wrap — they are the shape of the paragraph, and jumping from the
+last row to the first loses your place. Home and End go to the ends.
+
+Nothing else is handled. A pill is a real `<button>`, so Enter and Space press it
+natively and a handler here would fire the toggle twice; `n` is heard at the
+window because the two ways off a sift are in the modal's button row outside the
+grid; Escape is left to bubble; and Tab is what the roving stop exists to keep
+working. A modifier bails first, the rule the tabs already used.
+
+**Which pill is tabbable is not which pill is anchored.** They agree once
+something is chosen, and differ before it: `data-sift` stays on the grid wrapper
+while `anchor` is null, so entering a category shows the hint rather than
+silently anchoring the first word, while `tabIndex={0}` sits on the first pill so
+Tab can still get in. Two booleans, because no single one says both.
+
+**Focus follows the anchor through `screenKey`, not through `.focus()`.** The
+key is `sift:{category}:{anchor}`, so moving the anchor is a screen change and
+the host's existing `useFocusScreen` carries the focus ring from pill to pill —
+this component never touches the DOM to move focus. `preview` is deliberately
+absent from the key: the pointer resting on a word must not steal the ring from
+the keyboard. What is marked is absent for the reason it always was.
+
+This also retired the sift's `resume` field. Opening the drawer anchors the word
+it is about, so closing it flips the key from `note:` back to `sift:` with that
+same anchor still named, and focus lands on the pill it came from without
+anything saying so.
 
 ## The progress rule
 
@@ -363,17 +568,43 @@ straight from `src/` and adds nothing to it.
   and everything about it worth moving focus for; the element to focus marks
   itself with a matching `data-prompt`, `data-sift` or `data-browse`. Nothing on
   any of them may carry a `role` or an `aria-label`: either becomes the region's
-  accessible name and is announced on every card. A sift's key is the category
-  and nothing else — marking a word is not a new screen, and a count in the key
-  would take focus off whatever was just tapped, on every tap.
+  accessible name and is announced on every card. The sift's listbox role is not
+  an exception to that — it sits on the inner row of words, and the outer
+  `data-sift` wrapper stays bare.
+
+  A sift's key is the category **and the anchored word**. That is not the same
+  as the count this rule was written against: a count changes whenever any word
+  is marked and would move focus to the grid root, off whatever was just tapped,
+  where the anchor names the very thing that was touched and so moves focus onto
+  it. That is what a roving tabindex needs, and it is how the arrow keys carry
+  the focus ring without a component calling `.focus()` — see **The anchor**.
+  What is marked is still absent, and so is `preview`.
 - **Coming back lands on the category just left.** `resumeAt` names it, the
   card carries `resume`, and the card's heading button takes the focus — so
   returning from a category shows what you just did rather than nothing. Before
   anything is opened `FeelingPicker` falls back to the chosen tab and
-  `NeedPicker`, which has none, to the list itself. The tab is in
+  `NeedPicker`, which has none, to the list itself. This is the *browse* screen
+  only; the sift once had a `resume` of its own for coming back out of the note
+  drawer, and the anchor does that job now. The tab is in
   `feelingPicker`'s `screenKey` for this reason: switching tabs takes that card
   off screen, and focus would otherwise be left on nothing and the arrow keys
   dead.
+- **An `aria-label` is a tooltip in Obsidian.** The app draws one on hover for
+  any element carrying it — that is its tooltip mechanism, and the plugin uses
+  it on purpose for the block's corner button (`obsidian/block.tsx`). So a label
+  added for a screen reader is also a black box that appears over whatever is
+  below it. A label on the sift's listbox hung one over the definition strip
+  whenever the pointer was anywhere in the grid, and one on the note control put
+  a second box under the pointer every time it crossed the control.
+
+  Neither was reachable before: the listbox is new, and the note line refused
+  the pointer until it became a real control. Prefer `aria-labelledby` pointing
+  at something already on screen — the sift names its listbox with its own
+  heading — or let a control's own contents name it, which is what the note
+  button does. Reach for `aria-label` only where a tooltip is genuinely wanted.
+  `StepProgress` still carries one, on the progress rule a walk draws between
+  the card and the answers.
+
 - **Focus has to be drawn, not just held.** The regions are focused
   programmatically, and `:focus-visible` does not match a programmatic focus
   that followed a click — so a region styles plain `:focus`, and anything a
@@ -396,7 +627,13 @@ straight from `src/` and adds nothing to it.
   28 would scroll them out of reach — and a walk is drawn with no button row at
   all, because it is one question and answering it is the only way to move.
 - **The chord is drawn as a hint, not as a second label.** ⌘⏎ / Ctrl+⏎ presses
-  the primary button on the screen, and it is printed on that button — but a
+  the primary button on the screen — except while a note is open, where the
+  screen on top is the drawer and the chord landed on `leaveTop`, which for a
+  drawer means `dropNote`: the one chord that everywhere else keeps something
+  was the only one that threw a note away. The box ignores a modified `Enter`
+  for the other half of the same bug, where it kept the note and the window
+  listener then left the category on the same keystroke. It is printed on the
+  button — but a
   size down and part way into the background, the way a menu draws a shortcut
   beside its command, so the word is still what is read first. Written in `em`
   and `currentColor` in the gallery and in Obsidian's own tokens in the plugin

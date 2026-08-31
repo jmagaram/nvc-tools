@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import NeedPill from '../components/NeedPill.tsx'
 import { categories } from '../data/needs.ts'
 import styles from './NeedPillDemo.module.css'
@@ -31,6 +31,11 @@ const STATES = [
 
 export default function NeedPillDemo() {
   const [word, setWord] = useState('companionship')
+  /* Nothing here draws a definition strip, and no specimen is anchored, so the
+     pill never actually renders this — it is gated on `anchored`. It is still a
+     real id rather than a made-up string, because a description that pointed at
+     nothing would be the kind of thing a sheet like this exists to catch. */
+  const glossId = useId()
   const [clicks, setClicks] = useState(0)
   const [shows, setShows] = useState(0)
   const [notes, setNotes] = useState(0)
@@ -45,20 +50,34 @@ export default function NeedPillDemo() {
           flip one between them: the difference between them is the thing worth
           looking at, and a checkbox shows only one at a time.
 
-          Three, not four. A note cannot outlive the mark under it, so there is
-          no unmarked word with one — the missing fourth pill is the shape of
-          that rule, and worth the gap it leaves in the row. */}
-      <div className={styles.row}>
-        {STATES.map((state) => (
+          Three, not four. A note is kept when a word is unmarked, so that an
+          unmark is undoable — but it is never *drawn* on an unmarked word,
+          there being nothing on screen for it to belong to. So the fourth pill
+          would be identical to the first, and the gap where it is not is the
+          shape of that rule. */}
+      {/* A row of word pills is a listbox wherever it appears, so the specimens
+          say so too: `role="option"` outside one is not valid markup, and a
+          sheet that shows a component in invalid surroundings is not showing
+          the component. */}
+      <div
+        className={styles.row}
+        role="listbox"
+        aria-multiselectable="true"
+        aria-label="Every state of one word"
+      >
+        {STATES.map((state, index) => (
           <NeedPill
             key={state.label}
             word={word}
             marked={state.marked}
             noted={state.noted}
-            resume={false}
+            tabbable={index === 0}
+            anchored={false}
+            describedBy={glossId}
             onClick={() => setClicks(clicks + 1)}
             onNote={() => setNotes(notes + 1)}
-            onShow={() => setShows(shows + 1)}
+            onAnchor={() => setShows(shows + 1)}
+            onPreview={() => setShows(shows + 1)}
           />
         ))}
       </div>
@@ -68,9 +87,12 @@ export default function NeedPillDemo() {
       </p>
       <p>
         The pencil is its own target for a mouse: clicking it opens the note,
-        where clicking the word marks or unmarks. Only for a mouse — a thumb
-        would miss a glyph that small more often than it hit it, and a miss
-        unmarks the word, which takes the note with it.
+        where clicking the word marks or unmarks. It appears on any marked word,
+        quietly, while the pointer or the focus ring is on it — and stays at
+        full strength once there is something to read. It hangs off the corner
+        out of flow, so it costs the pill no width and a row cannot reflow under
+        the pointer crossing it. Only for a mouse: a thumb would miss a glyph
+        that small more often than it hit it, and a miss unmarks the word.
       </p>
       <hr />
 
@@ -82,17 +104,25 @@ export default function NeedPillDemo() {
         heavier border say so, and neither changes the pill's width, so marking
         a word cannot shuffle the row under the finger that tapped it.
       </p>
-      <div className={styles.row}>
-        {SAMPLE.needs.map((need) => (
+      <div
+        className={styles.row}
+        role="listbox"
+        aria-multiselectable="true"
+        aria-label={`${SAMPLE.name}, some of it marked`}
+      >
+        {SAMPLE.needs.map((need, index) => (
           <NeedPill
             key={need.word}
             word={need.word}
             marked={MARKED.has(need.word)}
             noted={NOTED.has(need.word)}
-            resume={false}
+            tabbable={index === 0}
+            anchored={false}
+            describedBy={glossId}
             onClick={() => {}}
             onNote={() => {}}
-            onShow={() => {}}
+            onAnchor={() => {}}
+            onPreview={() => {}}
           />
         ))}
       </div>

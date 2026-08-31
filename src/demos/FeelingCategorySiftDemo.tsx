@@ -28,7 +28,7 @@ export default function FeelingCategorySiftDemo() {
   /* This page is the host, so it owns the key — see `useNoteShortcut`. There is
      no button row here to lose focus to, but a host that skipped this would
      have a grid whose `n` worked only while the grid itself had focus. */
-  useNoteShortcut(true, () => dispatch({ type: 'noteShowing' }))
+  useNoteShortcut(true, () => dispatch({ type: 'noteAnchor' }))
 
   /** Open another category, keeping what the one on screen marked. */
   const open = (index: number) => {
@@ -89,10 +89,20 @@ export default function FeelingCategorySiftDemo() {
         asks again afterwards.
       </p>
       <p>
-        Touch, hover or Tab to a word to read its definition in the strip at the
-        bottom. The border is solid on a category of feelings that signals needs
-        met and dashed on one that signals needs unmet, the same split the cards
-        and pills draw.
+        Tab reaches the grid once, not once per word, and the arrow keys move
+        inside it — left and right through the words, up and down between the
+        rows. The word you land on is the one the strip describes and the one
+        the button under it will write about. Resting the pointer on another
+        word previews its definition without taking either away, which is what
+        lets the button be aimed at at all.
+      </p>
+      <p>
+        The border is solid on a category of feelings that signals needs met and
+        dashed on one that signals needs unmet, the same split the cards and
+        pills draw. Marking a word puts a pencil over its corner: faint until
+        you point at it, solid once something is written. Unmarking hides what
+        was written rather than deleting it — mark the word again and it is
+        back.
       </p>
     </>
   )

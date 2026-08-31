@@ -1,112 +1,189 @@
-/* Flat to the point of being invisible as a control: no border, no background,
-   no hover, no ring, and no pointer events unless the screen says it is safe
-   to have them — see the `clickable` prop. Everything a host's own button
-   chrome would put here is named, the way the pills and the tabs do it.
+/* The row is the target — clicking what was written opens it for editing — but
+   only the label at the end is drawn as something to press. A border round three
+   lines of somebody's own words would read as a field they were sitting in
+   rather than as a way to change them.
 
    The class is doubled for the same reason `.pill.pill` is: Obsidian's own
-   `button:not(.clickable-icon)` is 0,1,1 and beats a single class, so a line
-   meant to be invisible came out wearing the filled, rounded chrome of a
-   button — a whole sentence of quiet instruction drawn as something to press.
-   Undoubled it looked right in the gallery, where a bare button has no chrome
-   to lose, and wrong in the only surface that ships. */
+   `button:not(.clickable-icon)` is 0,1,1 and beats a single class, so a control
+   meant to be this quiet came out wearing the filled, rounded chrome of a
+   button. Undoubled it looked right in the gallery, where a bare button has no
+   chrome to lose, and wrong in the only surface that ships. */
 .line.line {
   display: flex;
   align-items: baseline;
   gap: 0.45rem;
   width: 100%;
   height: auto;
-  padding: 0;
+  padding: 0.1rem 0;
   border: none;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
   font: inherit;
   color: inherit;
   text-align: left;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* A card is one word, so a pointer may open it there. A coarse pointer may
-   open it anywhere, having no hover to lose and no key to press — and there it
-   is drawn as a target too, as an empty field is, since on a phone this line is
-   the only way to a note. */
-.line.line[data-clickable] {
-  pointer-events: auto;
   cursor: pointer;
 }
 
+/* The row itself is never drawn, in any state. It is the full width of the
+   strip, so any chrome it picks up — a focus ring, a press background, a host's
+   own border — comes out as a rounded rectangle the width of the modal with
+   almost nothing in it, which reads as a stray line under the definition rather
+   than as this control. Every state is named rather than left to a reset,
+   because Obsidian's `button` rules are 0,1,1 and a single class does not beat
+   them; the doubled class does. */
+.line.line,
+.line.line:hover,
+.line.line:focus,
+.line.line:focus-visible,
+.line.line:active {
+  border: none;
+  background: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* The ring goes on the part that is drawn as a control, so what is highlighted
+   is what looks pressable. `:focus-visible` on the row, because the row is what
+   actually takes focus. */
+.line.line:focus-visible .action {
+  outline: 2px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
+  outline-offset: 1px;
+}
+
+/* A thumb's worth of target, bought with padding rather than with ink. A note is
+   optional and most people will never write one, so the control stays quiet at
+   the size it needs to be pressable — how much room it takes and how much
+   attention it draws are set separately, which is the same trick the note badge
+   uses on a pill. */
 @media (pointer: coarse) {
   .line.line {
-    pointer-events: auto;
-    cursor: pointer;
     min-height: 44px;
-    border-bottom: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+    padding: 0.35rem 0;
   }
 }
 
-/* How to change it. Second on the line and last in the row, so what is written
-   holds the left edge; because the words here are the same length whichever
-   state the line is in, its left edge is the same too and reads as a column.
+/* What it would do, drawn as the one thing here to press. Upright, not italic:
+   the border already separates it from the definition above, and a slanted
+   button reads as prose that happens to have a box round it.
 
-   Italic, which is the whole of what separates it from the definition sitting
-   directly above: the two are the same size and the same ink, and upright they
-   read as one paragraph — a second sentence about the word rather than an offer
-   to write one. The keycap stays upright inside it, being a key and not
-   prose. */
+   It shares the width with whatever is already written and gives way first,
+   ellipsising rather than pushing the word it names off the end in a narrow
+   modal. */
 .action {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  /* Hugs its words and never stretches to the width it is given. Full width it
+     read as the screen's primary control, which is out of proportion to
+     something most people will never use — and it is drawn largest exactly
+     where that matters most, on a phone, where the row is 44px tall. The row
+     stays the target; only this is drawn as one.
+
+     `flex: none` because it must not give way to the note beside it. Shrinkable,
+     a long note took the whole row and squeezed this to nothing — leaving a box
+     containing the keycap and no word at all, which is worse than either thing
+     on its own. The note is what yields; it is already clamped and has more to
+     give. */
   flex: none;
-  white-space: nowrap;
-  font-style: italic;
-  opacity: 0.6;
+  align-self: flex-start;
+  padding: 0.05em 0.4em;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 0.25rem;
+  opacity: 0.8;
+  transition:
+    background-color 0.1s ease-out,
+    opacity 0.1s ease-out;
 }
 
-/* The whole line when there is nothing written on it, so it ellipsizes rather
-   than pushing the word it names off the end in a narrow modal. */
+/* Lit from anywhere on the row, so the note counts as part of the same target
+   rather than as text that happens to sit beside a button. */
+.line.line:hover .action,
+.line.line:focus-visible .action {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  opacity: 1;
+}
+
+.line.line:active .action {
+  background: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action {
+    transition: none;
+  }
+}
+
+/* Only the words give way, and only where there is nothing else on the line to
+   give instead. With a note beside it the label is just `Edit` and is never
+   shrunk at all — see `.action`. Alone, it is `Add note on <word>` and a narrow
+   modal ellipsises the end of it; the keycap keeps its size either way, so what
+   is lost is a phrase repeating what the control does and never the one mark
+   saying a key will do it. */
+.says {
+  white-space: nowrap;
+}
+
 .line:not(:has(.note)) .action {
-  flex: 1;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.line:not(:has(.note)) .says {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Drawn as a key rather than said as a word: it is the one thing here that
-   looks like something to press, which is the whole of what the line teaches. */
-.key {
-  font-style: normal;
-  border: 1px solid;
-  border-radius: 3px;
-  padding: 0 0.25em;
-  font-size: 0.9em;
-}
+/* The key, drawn the way the commit button draws its chord — a size down and
+   part way into the background, the way a menu prints a shortcut beside its
+   command — rather than as a keycap with a box of its own. There is already one
+   settled way to print a key in this modal (`.chord` in the gallery,
+   `.nvc-chord` in the plugin) and a second would read as a different kind of
+   thing.
 
-/* One of the two is showing at any time, and never both. */
-.tap {
-  display: none;
+   Taken off a coarse pointer, which has no key. The shortcut itself stays
+   registered: a phone with a keyboard attached still answers it, and simply says
+   nothing about itself. */
+.key {
+  flex: none;
+  font-size: 0.85em;
+  opacity: 0.65;
 }
 
 @media (pointer: coarse) {
-  .press {
+  .key {
     display: none;
   }
-  .tap {
-    display: inline;
-  }
+}
+
+/* Said out loud and not drawn. Off-screen rather than `display: none`, which
+   would take it out of the accessibility tree along with the pixels, and
+   absolutely positioned so it adds nothing to the width the label is measured
+   at — the whole point of dropping it from the visible label. */
+.unseen {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* What was said, and the count of what would not fit, kept together as one
    phrase.
 
-   It takes the room it needs and no more, so the instruction sits against its
-   right edge rather than out at the far side of the card: a two-word note left
-   the two ends of the line so far apart that they read as unrelated, and the
-   eye had to cross the card to find out that the words on the left could be
-   changed at all. */
+   It takes the room it needs and no more, so the label sits against its right
+   edge rather than out at the far side of the card: a two-word note left the
+   two ends of the line so far apart that they read as unrelated, and the eye had
+   to cross the card to find out that the words on the left could be changed at
+   all. */
 .said {
   display: flex;
   align-items: baseline;
   gap: 0.45rem;
-  flex: 0 1 auto;
+  /* Takes what is left and gives it back first, for the reason `.action` above
+     gives. */
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -114,13 +191,12 @@
    past that counted at the end — the whole of it is always a keystroke away.
 
    `pre-wrap` so the lines someone wrote are the lines they get back, and the
-   clamp so a single long one cannot run the card past the modal. `--note-lines`
-   is the count, handed down by whoever drew the line: a grid says one, a card
-   says three.
+   clamp so a single long one cannot run the card past the modal.
+   `--note-lines` is the count, handed down by whoever drew the line.
 
-   Italic for the same reason the offer is, and it matters more here: this is
-   the one text on the card that nobody but the reader wrote, sitting directly
-   under a sentence from the inventory in the same size and the same ink. */
+   Italic, and it matters: this is the one text on the screen that nobody but
+   the reader wrote, sitting directly under a sentence from the inventory in the
+   same size and the same ink. */
 .note {
   min-width: 0;
   overflow: hidden;

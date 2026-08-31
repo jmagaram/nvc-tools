@@ -21,6 +21,12 @@
   text-align: left;
   cursor: pointer;
   transition: transform 0.1s ease-out;
+  /* The containing block for the note badge, which hangs off the top-right
+     corner out of flow so that writing on a word cannot change its width. The
+     two category pills draw no badge and are unaffected: a containing block
+     with nothing absolutely positioned in it costs nothing, which is why this
+     stays in the one shared file rather than forking it. */
+  position: relative;
 }
 
 /* A press has to be felt before whatever it opens replaces it — a category
@@ -65,10 +71,11 @@
    the row under the finger that just tapped it. A heavier *word* would shuffle
    it too, which is why the weight is left alone.
 
-   Only the two that can be marked ever carry `aria-pressed`. A category pill
-   has no marked state: once something is picked in a category it is drawn as a
-   card instead. */
-.pill.pill[aria-pressed='true'] {
+   Only the two word pills are ever selected, and they say so as options in a
+   listbox. A category pill has no marked state at all: once something is picked
+   in a category it is drawn as a card instead, so an outline pill always means
+   nothing chosen here. */
+.pill.pill[aria-selected='true'] {
   background: color-mix(in srgb, currentColor 32%, transparent);
   border-width: 2px;
   padding: calc(0.1rem - 1px) calc(0.6rem - 1px);
@@ -82,6 +89,27 @@
    it at Obsidian's. Failing that, the text colour softened towards the
    background: undiluted `currentColor` is the strongest ink on the page and
    reads as a hard black box beside the quieter rings an app draws itself. */
+/* The note badge, revealed while the word is pointed at or focused. It lives in
+   `NoteMark.module.css`, which cannot name this file's hashed class — so the
+   reveal is written here instead, on `[data-note-mark]`, the attribute contract
+   that already exists so that neither module has to know the other's names. A
+   badge on a word that carries a note is drawn at full strength there and is
+   not affected by this.
+
+   Only where there is a hover to reveal it with. On a touch screen the badge
+   stays visible on every marked word instead — see the module — because nothing
+   there can uncover it, and it is the only way to write about a word without
+   first un-picking it.
+
+   `:focus-visible` and not `:focus`, so a mouse click does not leave a pencil
+   showing on a word the pointer has moved off. */
+@media (hover: hover) {
+  .pill.pill:hover [data-note-mark]:not([data-noted]),
+  .pill.pill:focus-visible [data-note-mark]:not([data-noted]) {
+    opacity: 0.55;
+  }
+}
+
 .pill.pill:focus-visible {
   outline: 3px solid var(--nvc-ring, color-mix(in srgb, currentColor 55%, transparent));
   outline-offset: 2px;

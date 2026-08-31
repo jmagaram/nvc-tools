@@ -56,7 +56,7 @@ export default function FeelingCategoryCard({
           {feelings.map((feeling) => (
             <li key={feeling.word}>
               {feeling.word}
-              {feeling.note !== undefined && <NoteMark />}
+              {feeling.note !== undefined && <NoteMark placement="inline" />}
             </li>
           ))}
         </ul>

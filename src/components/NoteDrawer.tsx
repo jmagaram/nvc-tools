@@ -70,7 +70,18 @@ export default function NoteDrawer({
   const boxId = useId()
 
   const boxKeys = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      // A modified Enter is somebody else's. ⌘/Ctrl+Enter is the host's commit
+      // chord, and without this it kept the note here *and* was heard at the
+      // window a moment later — against a state that was no longer noting, so
+      // it left the whole category. Two things on one keystroke, and the second
+      // one threw away the screen.
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey
+    ) {
       event.preventDefault()
       onKeep()
     } else if (event.key === 'Escape') {

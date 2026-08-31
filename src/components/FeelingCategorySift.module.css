@@ -24,32 +24,19 @@
   opacity: 0.7;
 }
 
+/* The row gap is the wider of the two, and pays for the note badge: it hangs
+   off the top of a marked pill, out of flow, and would otherwise land on the
+   border of the row above. The column gap is unchanged — the badge never
+   overhangs sideways, for the reason NoteMark.module.css gives. */
 .words {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.85rem 0.4rem;
 }
 
-/* Two lines' worth, held whether or not there is anything in it. A strip that
-   collapsed when nothing was showing would move the grid every time the pointer
-   left it — and every definition fits in two: measured across all 309 of them,
-   three lines happen twice, and only at the largest text size in the narrowest
-   modal.
-
-   `2lh` is two line boxes exactly, whichever line-height the host is using. The
-   `3em` says the same thing only where that is 1.5, which is why a theme with a
-   looser one could still make the strip grow under a definition that had
-   wrapped. It stays as the fallback for a webview too old for `lh` — a mobile
-   vault on an old system webview, since `minAppVersion` reaches back further
-   than the unit does. The two are an `@supports` pair rather than two
-   `min-height` lines in one block, which is the older way to write a fallback
-   and which the directory's CSS review reads as a duplicated property.
-
-   Content-box because the two lines are the text's and not the box's. Obsidian
-   sets `* { box-sizing: border-box }` and the gallery sets nothing, so without
-   this the padding and the rule above come out of the two lines instead of
-   sitting on top of them — 1.7 lines' worth in the plugin against 2 in the
-   preview, and a 9px jump under the pointer every time a definition wrapped. */
+/* Nothing about the height here: the reserve the definition and the note share
+   is on `.strip` below, which is what holds the modal's bottom edge still. This
+   only sets the size the sentence is read at. */
 .gloss {
   margin: 0;
   font-size: 0.9em;
@@ -96,6 +83,27 @@
   }
 }
 
+/* A coarse pointer's note button is 44px tall — a thumb's worth, not a line's —
+   while the reserve above is measured in line boxes. The two agree at a
+   comfortable text size and stop agreeing at a small one, where the line boxes
+   shrink and the 44px does not, and the button is clipped by the strip's own
+   `overflow: hidden`. The extra line is exactly that difference, spent only
+   where the 44px rule applies. Before the offer became a button this went
+   unnoticed, because the line it replaced was only drawn on a marked word. */
+@media (pointer: coarse) {
+  .strip {
+    height: 7.2em;
+  }
+}
+
+@supports (height: 1lh) {
+  @media (pointer: coarse) {
+    .strip {
+      height: 4.8lh;
+    }
+  }
+}
+
 .hint {
   opacity: 0.7;
 }
@@ -110,6 +118,11 @@
      would grow after all. */
   min-height: 0;
   overflow: hidden;
+  /* The button sits at the top of whatever the definition left over rather than
+     in the middle of it, so it stays put against the sentence above as that
+     sentence wraps to one line or two. */
+  display: grid;
+  align-items: start;
   /* A grid item is `min-width: auto` — it refuses to be narrower than its own
      contents, and the instruction on the note line is one unbroken run of
      `nowrap` text. Without this a long entry pushed the whole screen wider than
@@ -118,6 +131,5 @@
      sideways. Nothing on this line decides how wide the screen is; the screen
      decides, and the line ellipsises into what it gets. */
   min-width: 0;
-  min-height: 1.7lh;
   font-size: 0.85em;
 }

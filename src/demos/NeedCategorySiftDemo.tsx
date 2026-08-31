@@ -28,7 +28,7 @@ export default function NeedCategorySiftDemo() {
   /* This page is the host, so it owns the key — see `useNoteShortcut`. There is
      no button row here to lose focus to, but a host that skipped this would
      have a grid whose `n` worked only while the grid itself had focus. */
-  useNoteShortcut(true, () => dispatch({ type: 'noteShowing' }))
+  useNoteShortcut(true, () => dispatch({ type: 'noteAnchor' }))
 
   /** Open another category, keeping what the one on screen marked. */
   const open = (index: number) => {
@@ -89,10 +89,19 @@ export default function NeedCategorySiftDemo() {
         asks again afterwards.
       </p>
       <p>
-        Touch, hover or Tab to a word to read its definition in the strip at the
-        bottom. Reading one costs nothing, which is why the strip and not a
+        Tab reaches the grid once, not once per word, and the arrow keys move
+        inside it — left and right through the words, up and down between the
+        rows. The word you land on is the one the strip describes and the one
+        the button under it will write about. Resting the pointer on another
+        word previews its definition without taking either away, which is what
+        lets the button be aimed at at all.
+      </p>
+      <p>
+        Reading a definition costs nothing, which is why the strip and not a
         second tap. It holds its height whether or not anything is showing, so
-        the grid never shifts under the finger that just tapped it.
+        the grid never shifts under the finger that just tapped it. Unmarking a
+        word hides what was written about it rather than deleting it — mark it
+        again and the note is back.
       </p>
     </>
   )

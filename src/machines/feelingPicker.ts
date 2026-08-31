@@ -10,6 +10,14 @@ export type Visited = {
   /** May be empty: the category was opened but nothing in it applied. */
   words: readonly string[]
   /**
+   * What was written here, including about words that are no longer in
+   * `words`. That is deliberate: unmarking a word hides its note rather than
+   * deleting it, and this is how one survives leaving the category and coming
+   * back — it is handed straight back to the sift as `alreadyNoted`. Nothing
+   * draws from here without gating on `words` first; `noted` does it for a
+   * card, and `chosen` does it on the way out of the picker.
+   */
+  /**
    * A few words of someone's own about some of them. Only ever for a word in
    * `words` — feelingCategorySift's normalising is what keeps that true — so
    * anything reading `words` alone still sees the whole of what was picked.
@@ -307,8 +315,12 @@ function shownAsCard(state: FeelingPickerState): Set<string> {
 
 /**
  * A visited category's words with what is written about them, for a card to
- * draw. One list rather than two: `notes` is normalised against `words` on
- * every write, so this can only ever pair a note with a word that was picked.
+ * draw. One list rather than two: a note belongs to a word, and two lists could
+ * disagree about which.
+ *
+ * Reading from `words` is also what gates it. `notes` may hold a note about a
+ * word that was unmarked — it is kept so that unmarking is undoable — and this
+ * is one of the two places that decides such a note is not to be shown.
  */
 export function noted(visited: Visited): { word: string; note?: string }[] {
   const written = new Map(visited.notes.map((note) => [note.word, note.text]))
@@ -355,7 +367,18 @@ export function counts(state: FeelingPickerState): {
  * insert. Categories opened without picking anything are left out.
  */
 export function chosen(state: FeelingPickerState): Visited[] {
-  return state.visited.filter((v) => v.words.length > 0)
+  return state.visited
+    .filter((v) => v.words.length > 0)
+    .map((v) => ({
+      ...v,
+      // The second of the two gates on a hidden note, and the one that matters:
+      // this is the door everything leaves the picker by. `notes` deliberately
+      // keeps what was written about a word whose mark was later dropped, so
+      // that unmarking is undoable — but nothing outside has any use for one,
+      // and a host writing it into somebody's note would be writing down a
+      // thought about a feeling they had said did not apply.
+      notes: v.notes.filter((note) => v.words.includes(note.word)),
+    }))
 }
 
 /**

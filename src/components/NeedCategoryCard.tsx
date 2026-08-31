@@ -50,7 +50,7 @@ export default function NeedCategoryCard({
           {needs.map((need) => (
             <li key={need.word}>
               {need.word}
-              {need.note !== undefined && <NoteMark />}
+              {need.note !== undefined && <NoteMark placement="inline" />}
             </li>
           ))}
         </ul>

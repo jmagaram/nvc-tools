@@ -100,9 +100,12 @@ export function init(
     progress: current
       ? { status: 'asking', answered: [], current, upcoming }
       : { status: 'done', answered: [] },
-    // Whatever the grid was told about these words comes along, so a word
-    // walked after being written about arrives with its note on the card.
-    notes: alreadyNoted.filter((note) => wasPicked.has(note.word)),
+    // Everything the grid was told comes along, including notes on words that
+    // were not marked there — a walk asks about every word in the category, so
+    // one it is about to ask about may well be a word whose mark was dropped
+    // with the note kept. Filtering to what was picked would have made walking
+    // a category the way to destroy every hidden note in it.
+    notes: alreadyNoted,
     noting: null,
   }
 }
@@ -159,11 +162,11 @@ export function reduce(
         progress: head
           ? { status: 'asking', answered: next, current: head, upcoming: rest }
           : { status: 'done', answered: next },
-        // Passing on a word takes what was written about it: there is no such
-        // thing as a note on a need that does not apply.
-        notes: picked
-          ? state.notes
-          : state.notes.filter((note) => note.word !== current.word),
+        // Passing on a word hides what was written about it and does not
+        // delete it — the same rule unmarking follows on the grid, and for the
+        // same reason: this is one keypress, and one keypress must not be able
+        // to destroy a sentence. Answering again brings it back.
+        notes: state.notes,
         noting: null,
       }
     }
