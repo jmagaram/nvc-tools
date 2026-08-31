@@ -9,6 +9,7 @@ import type {
   FeelingPickerAction,
   FeelingPickerState,
 } from '../machines/feelingPicker.ts'
+import { rowNeighbor } from '../rowNeighbor.ts'
 import styles from './FeelingPicker.module.css'
 
 type Props = {
@@ -77,9 +78,11 @@ export default function FeelingPicker({ state, onAction }: Props) {
   // focused. Exactly one of the two carries `data-browse`.
   const resume = resumeAt(state)
 
-  // Sideways moves sideways, the same as it does on a card. A modifier means
-  // the keystroke belongs to whoever is hosting this — Obsidian's hotkeys run
-  // through ⌘ and Ctrl — so those are left alone.
+  /* Sideways moves sideways — but only from a tab. This used to sit on the
+     whole screen, which meant the arrows switched tabs wherever focus was, and
+     so they could never move between the categories underneath. On the tab
+     strip it is the natural reading of the key and leaves the arrows below free
+     for the list they are pointing at. */
   const tabOnArrow = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.ctrlKey || event.metaKey || event.altKey) return
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
@@ -89,12 +92,73 @@ export default function FeelingPicker({ state, onAction }: Props) {
     }
   }
 
+
+  /**
+   * The arrow keys move between the categories, the same way they move between
+   * the words inside one. Left and right go in the order the categories are
+   * drawn and wrap at the ends; up and down land on the nearest one in the row
+   * above or below and stop at the edges, since that is the shape of the block
+   * rather than a run.
+   *
+   * Focus is moved directly here, where a sift routes the same keys through its
+   * machine. The difference is that a sift's arrows move an *anchor* — the word
+   * its definition strip and its note button are about — and this screen has no
+   * such state: nothing here depends on which category is focused except the
+   * focus itself. Putting it in a machine would be state that only ever mirrors
+   * the DOM.
+   *
+   * Every category stays its own tab stop, so Tab walks them as it always has
+   * and the arrows are a faster way through the same list, not the only way.
+   */
+  const categoryOnArrow = (event: KeyboardEvent<HTMLDivElement>) => {
+    // A modifier means the keystroke belongs to whoever is hosting this —
+    // Obsidian's hotkeys run through ⌘ and Ctrl — so those are left alone.
+    if (event.ctrlKey || event.metaKey || event.altKey) return
+
+    /* Every category is a button and nothing else in here is one, so this is
+       the whole list in the order it is drawn — cards first, then pills. */
+    const items = [
+      ...event.currentTarget.querySelectorAll<HTMLElement>('button'),
+    ]
+    if (items.length === 0) return
+    const at = items.indexOf(document.activeElement as HTMLElement)
+
+    const go = (index: number) => {
+      event.preventDefault()
+      items[index]?.focus()
+    }
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowLeft': {
+        const step = event.key === 'ArrowRight' ? 1 : -1
+        return go(at < 0 ? 0 : (at + step + items.length) % items.length)
+      }
+      case 'ArrowDown':
+      case 'ArrowUp': {
+        if (at < 0) return go(0)
+        // The one place this reaches for the page: which category is above
+        // another is known only to the layout — see `rowNeighbor`.
+        const boxes = items.map((item) => item.getBoundingClientRect())
+        const next = rowNeighbor(boxes, at, event.key === 'ArrowDown' ? 1 : -1)
+        event.preventDefault()
+        return next === null ? undefined : go(next)
+      }
+      case 'Home':
+        return go(0)
+      case 'End':
+        return go(items.length - 1)
+      default:
+        return
+    }
+  }
+
   return (
-    <div className={styles.picker} onKeyDown={tabOnArrow}>
+    <div className={styles.picker}>
       {/* Two toggle buttons rather than role="tab": the ARIA tab pattern would
           promise ↑ and ↓ and Home and End alongside the arrows below, and
           these are plain buttons reached with Tab like everything else. */}
-      <div className={styles.tabs}>
+      <div className={styles.tabs} onKeyDown={tabOnArrow}>
         {TABS.map(({ kind, label }) => (
           <button
             key={kind}
@@ -109,7 +173,7 @@ export default function FeelingPicker({ state, onAction }: Props) {
         ))}
       </div>
 
-      <div className={styles.panel}>
+      <div className={styles.panel} onKeyDown={categoryOnArrow}>
         {/* Cards first, then pills: walked categories, then the rest. Together
             they are every category on this tab, which is why neither group
             needs a heading saying what it leaves out. An empty group is left

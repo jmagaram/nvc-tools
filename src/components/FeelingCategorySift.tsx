@@ -234,7 +234,6 @@ export default function FeelingCategorySift({ state, onAction }: Props) {
               <NoteLine
                 word={notable}
                 note={visibleNote(state, notable)}
-                maxLines={3}
                 onOpen={() => onAction({ type: 'noteAnchor' })}
               />
             )}

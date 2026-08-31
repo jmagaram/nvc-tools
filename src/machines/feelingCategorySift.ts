@@ -249,9 +249,10 @@ export function reduce(
     case 'keepNote': {
       if (!state.noting) return state
       const { word, draft } = state.noting
-      // A blank box is the delete. Trimmed here rather than in a host, so that
-      // a note of nothing but spaces cannot be written down.
-      const text = draft.trim()
+      // A blank box is the delete. Collapsed rather than only trimmed, and
+      // here rather than in a host: a note is one line wherever it is kept, and
+      // text pasted in from somewhere else is the way a line break gets in.
+      const text = draft.replace(/\s+/g, ' ').trim()
       const rest = state.notes.filter((note) => note.word !== word)
       // The anchor is left alone: opening the drawer anchored this word, so
       // closing it lands focus back on that pill without anything here saying

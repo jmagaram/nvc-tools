@@ -1,18 +1,152 @@
-/* All three layouts sit inside someone else's prose — a note, a demo page — so
-   they set spacing and structure only and take colour and type from around
-   them. */
+/* All five layouts sit inside someone else's prose — a note, a demo page — so
+   they set spacing and structure and take their type from around them.
 
-.list {
+   Colour is the one thing they do name, and only through Obsidian's own text
+   tokens: `--text-muted` for a note, `--text-faint` for a label about the
+   block rather than in it. A block is read inside a wall of the reader's own
+   writing, and a note that is the same weight as the words it hangs off makes
+   the whole thing one grey mass. Every token has a `color-mix` of the inherited
+   ink behind it, so the gallery — which has no Obsidian variables — draws the
+   same distinctions rather than flattening.
+
+   `opacity` would have been the obvious way to do that and is not used: it
+   multiplies against whatever is behind the text, so the same note comes out at
+   a different weight on a modal, on a callout, and on the page. */
+
+.block {
+  margin: 0.6rem 0;
+}
+
+/* --- shared: a run of words ------------------------------------------------
+   The commas are drawn rather than written, so selecting the words does not
+   pick them up. The exception is the inline layout, which uses real ones — see
+   the component. */
+.words {
+  display: inline;
   margin: 0;
-  padding-left: 1.5rem;
+  padding: 0;
+  list-style: none;
 }
 
+.words li {
+  display: inline;
+  /* Zeroed because Obsidian gives a list item its own spacing, and an inline
+     one spends it sideways: the words came out with three spaces between them,
+     as though the line had been justified. Resetting the `ul` is not enough —
+     a theme's indent lives on the item, and `text-indent` is inherited, so a
+     list that sets one hands it to every item as a gap before the word. */
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  list-style: none;
+}
+
+.words li:not(:last-child)::after {
+  content: ', ';
+  color: var(--text-muted, color-mix(in srgb, currentColor 65%, transparent));
+}
+
+/* --- gloss and column: a two-column grid ---------------------------------- */
+.rows {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 1.5rem;
+  row-gap: 0.3rem;
+  margin: 0;
+}
+
+/* The rows are grouping elements and draw no box of their own, so the grid
+   sees the labels and bodies directly and every column lines up across the
+   whole block. What it costs is that a row cannot take a margin — see the
+   sibling rule further down. */
+.categoryRow,
+.noteRow,
+.wordRow,
+.columnGroup {
+  display: contents;
+}
+
+.label {
+  grid-column: 1;
+  margin: 0;
+}
+
+.wordsCell {
+  grid-column: 2;
+  margin: 0;
+}
+
+/* A note is a second value under the same name, so it has to be told which
+   column it is in — left to itself it would land in the label column of the
+   row below and push everything out by one. */
+.note {
+  grid-column: 2;
+  margin: 0;
+  color: var(--text-muted, color-mix(in srgb, currentColor 70%, transparent));
+}
+
+/* Air above each category after the first. It goes on the children because the
+   row itself has no box to put it on. */
+.categoryRow + .categoryRow > .label,
+.categoryRow + .categoryRow > .wordsCell {
+  margin-top: 0.8rem;
+}
+
+/* --- column ---------------------------------------------------------------
+   The category spans both columns and reads as a break in the run rather than
+   as another label: in the label column it would leave the words below it out
+   of line with one another, which is the one thing this layout is for. */
 .category {
-  font-weight: bolder;
+  grid-column: 1 / -1;
+  margin: 0.7rem 0 0.1rem;
 }
 
+.columnGroup:first-child > .category {
+  margin-top: 0;
+}
+
+.word {
+  grid-column: 1;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+/* --- sentence ------------------------------------------------------------- */
+.sentence {
+  margin: 0.6rem 0;
+}
+
+/* The gap is the only thing saying there are two sides, so it has to be a gap
+   and not the margin two lines of prose would have. */
+.side + .side {
+  margin-top: 0.6rem;
+}
+
+.said:not(:last-child)::after,
+.said:last-of-type::after {
+  content: '. ';
+}
+
+.count {
+  margin-left: 0.35rem;
+  font-style: italic;
+  color: var(--text-faint, color-mix(in srgb, currentColor 50%, transparent));
+}
+
+/* --- inline --------------------------------------------------------------- */
+.inline {
+  margin: 0.4rem 0;
+}
+
+/* --- table ----------------------------------------------------------------
+   Fixed, because three columns of prose in a phone's width will not size
+   themselves: left to `auto` the note takes what it likes and the two narrow
+   columns are squeezed to one letter each. Over-wide it scrolls, which is a
+   fair trade for a layout somebody chose on purpose. */
 .table {
+  width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .table th,
@@ -20,8 +154,43 @@
   padding: 0.15rem 0.75rem 0.15rem 0;
   text-align: left;
   vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
-.inline {
-  margin: 0;
+.table th {
+  font-weight: normal;
+  color: var(--text-faint, color-mix(in srgb, currentColor 50%, transparent));
+  border-bottom: 1px solid
+    var(--background-modifier-border, color-mix(in srgb, currentColor 20%, transparent));
+}
+
+.table td.note {
+  /* The grid column above does not apply in a table, where the cell is already
+     in the right place. */
+  grid-column: auto;
+}
+
+/* --- narrow --------------------------------------------------------------
+   Under about a phone's width the two columns become one: the label keeps its
+   line and the body sits under it, indented enough to read as belonging to it. */
+@media (max-width: 420px) {
+  .rows {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.1rem;
+  }
+
+  .label,
+  .wordsCell,
+  .note,
+  .word {
+    grid-column: 1;
+  }
+
+  .note {
+    padding-left: 1.25rem;
+  }
+
+  .categoryRow + .categoryRow > .label {
+    margin-top: 0.8rem;
+  }
 }

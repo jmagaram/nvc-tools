@@ -169,48 +169,26 @@
   white-space: nowrap;
 }
 
-/* What was said, and the count of what would not fit, kept together as one
-   phrase.
+/* What was written. One line, wrapped and clamped to the room the screen gave
+   it — a note is stored as one line, so there is nothing here to count and no
+   `+2 lines` to draw.
 
    It takes the room it needs and no more, so the label sits against its right
    edge rather than out at the far side of the card: a two-word note left the
-   two ends of the line so far apart that they read as unrelated, and the eye had
-   to cross the card to find out that the words on the left could be changed at
-   all. */
-.said {
-  display: flex;
-  align-items: baseline;
-  gap: 0.45rem;
-  /* Takes what is left and gives it back first, for the reason `.action` above
-     gives. */
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* As many of its own lines as the screen said it had room for, with anything
-   past that counted at the end — the whole of it is always a keystroke away.
-
-   `pre-wrap` so the lines someone wrote are the lines they get back, and the
-   clamp so a single long one cannot run the card past the modal.
-   `--note-lines` is the count, handed down by whoever drew the line.
+   two ends of the line so far apart that they read as unrelated, and the eye
+   had to cross the card to find out that the words on the left could be changed
+   at all.
 
    Italic, and it matters: this is the one text on the screen that nobody but
    the reader wrote, sitting directly under a sentence from the inventory in the
    same size and the same ink. */
 .note {
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: var(--note-lines, 1);
+  -webkit-line-clamp: 3;
   font-style: italic;
-}
-
-.more {
-  flex: none;
-  font-size: 0.85em;
-  font-style: italic;
-  opacity: 0.55;
 }

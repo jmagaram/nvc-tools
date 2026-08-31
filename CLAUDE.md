@@ -295,12 +295,14 @@ cost one more tap, and that is a much cheaper mistake than having no way at all
 to write about a word without un-picking it. The hit box grows for a thumb,
 upward and leftward and never rightward, for the reason `right: 0` gives.
 
-**Nothing of this reaches the note in the vault yet.** `Visited.notes` is carried
-through the machines and drawn on every screen, but `insert.ts` writes the same
-fence it always did and `resolve.ts` reads a block back with `notes: []`. The
-format is the open question — an indented bullet under the category, keyed by
-the word, is the proposal in `docs/prototypes/feeling-notes.html` — and until it
-is settled a note lives as long as the modal does.
+**A note reaches the vault and comes back.** `insert.ts` writes an indented
+bullet under the category for each noted word and `resolve.ts` reads them, so a
+note now lives as long as the file does — see **The block is the note's copy**.
+What still does not exist is a way to write one *from* the note: the picker is
+the only author, and hand-editing the fence body is the supported path until a
+per-note editor lands. The format already holds a category-level note (`> text`
+under the category) and nothing reads or writes it yet; a block containing one
+is shown verbatim rather than half-read.
 
 ## The anchor
 
@@ -497,17 +499,51 @@ straight from `src/` and adds nothing to it.
   heading and the button row through portals, because that modifier only works
   when `.modal-button-container` is a *sibling* of `.modal-content`, not inside
   it.
-- **The block is the note's copy.** What goes in is a fence whose body is the
-  same bullets as before, so the note still reads with the plugin off. The
-  plugin redraws it as a list, a table, or one comma-separated line
-  (`PickedEntries`), switched from a right-click menu or the block's corner
-  button. `registerBlocks` in `obsidian/block.tsx` registers one processor per
-  language — `nvc`, `nvc-list`, `nvc-table`, `nvc-inline` — because a code block
-  processor is handed the body and never the info string, so a ```` ```nvc table
-  ```` argument could not be read without going back to the file. Switching
-  rewrites the fence line, so the choice lives in the note and each block keeps
-  its own. A block whose body does not parse is shown verbatim rather than
-  half-swallowed.
+- **The block is the note's copy.** What goes in is a fence whose body is
+  bullets, so the note still reads with the plugin off:
+
+  ```
+  - Angry: enraged, irate, livid
+    - livid: only about the meeting, not about him
+  ```
+
+  One bullet per category with its words inline, and an indented bullet under it
+  for each word carrying a note. A note is addressed by the pair *(category,
+  word)*, which the nesting already carries — a word appears at most once in a
+  category, where the word alone would not settle it: `surprised` is in both
+  Excited and Disquiet. So nothing is written into the text to say which is
+  meant, and there are no keys or ids anywhere.
+
+  **A note is one line**, collapsed on the way out of the drawer. That is what
+  lets it be a bullet: a line break would need a continuation rule in every
+  reader of the format. The parser is tolerant of one anyway — a note somebody
+  has hand-wrapped over several indented lines is read and joined with a space,
+  and the next save writes it back as one. Tolerant read, strict write.
+
+  The plugin redraws the body five ways (`PickedEntries`), switched from a
+  right-click menu or the block's corner button. `registerBlocks` in
+  `obsidian/block.tsx` registers one processor per language, because a code
+  block processor is handed the body and never the info string, so a
+  ```` ```nvc table ```` argument could not be read without going back to the
+  file. Switching rewrites the fence line, so the choice lives in the note and
+  each block keeps its own. A block whose body does not parse is shown verbatim
+  rather than half-swallowed — including one holding a `>` line, which is the
+  category-level note the grammar leaves room for and this plugin does not yet
+  write or read.
+
+- **`nvc-list` is kept forever and never written again.** The default layout was
+  called `list` before it was called `gloss`, and every block the plugin has
+  ever written carries that word. The bodies did not change — a note bullet is
+  an addition to the grammar, not a change to it — so an old block reads as a
+  new one, and dropping the registration would have left each of them drawn as a
+  grey code block. New blocks are written `nvc-gloss`.
+
+- **A layout is drawn from the resolved entries, not the parsed ones.** Which
+  side of the met/unmet split a category sits on is not in the note and should
+  not be: `resolve` works it out from the words, the same pass that validates
+  them. A block that parses but does not resolve is still drawn, without the
+  headings — the honest answer, rather than guessing a side for a word the
+  inventory does not know.
 - **Editing reopens the picker on the block.** **Edit…**, first in the same
   menu, seeds the picker with what the block already holds and writes the
   answer back over the body, leaving the fence line — and so the layout — alone.
@@ -541,7 +577,12 @@ straight from `src/` and adds nothing to it.
 - **There is a way out.** **Convert to Markdown**, in the same menu, replaces the
   whole fence with the layout on screen written as ordinary markdown — a real
   pipe table that Obsidian's own table editor can add columns to. One-way by
-  design: past there the plugin has no claim on the text. Both that and a layout
+  design: past there the plugin has no claim on the text. It is generated from
+  the parsed entries and never from what is on screen: the commas between words
+  are drawn by CSS and would not come across, and an empty note cell and a
+  missing one look identical in the DOM. Bold on a category is the only emphasis
+  that survives, so each converted form is written to read on its own rather
+  than to look like the view it came from. Both that and a layout
   switch go through `rewrite`, which uses the editor holding the note when there
   is one so the change is a single undo, and falls back to `vault.process` where
   none has it.
@@ -560,9 +601,25 @@ straight from `src/` and adds nothing to it.
   once and being able to find the one you saw a moment ago is worth more.
 - **The arrow keys need focus.** `FeelingPrompt` / `NeedPrompt` answer on ←
   and →, but only while focus is inside the region, and a walk opens from a
-  card that is gone by the time it does. Browsing, ← and → move between the
-  tabs, and the chrome that gets you there — Obsidian's own modal element, the
-  portalled way back — all sits outside the picker. Hosts — the two modals and
+  card that is gone by the time it does. Browsing, the arrows move between the
+  *categories* — ← and → in the order they are drawn, wrapping, and ↑ and ↓ to
+  the nearest one in the row above or below, which is the same pair of rules a
+  sift moves between words by. They used to switch tabs from anywhere on the
+  screen, which is why they could never do this: the handler sat on the whole
+  picker, so the categories underneath never saw a keystroke. It sits on the tab
+  strip now, where sideways is the obvious reading of the key and the list below
+  is left the arrows it is pointing at.
+
+  Focus is moved directly there rather than through the machine, which is the
+  one place this differs from a sift. A sift's arrows move an *anchor* — the
+  word its definition strip and its note button are about — and browsing has no
+  such state: nothing depends on which category has focus except the focus. A
+  machine field would only ever mirror the DOM. Every category also stays its
+  own tab stop, where a sift's grid is one: the arrows are a faster way through
+  the same list, not the only way.
+
+  The chrome that gets you there — Obsidian's own modal element, the portalled
+  way back — all sits outside the picker. Hosts — the two modals and
   the four demo pages alike — call
   `useFocusScreen(screenKey(state))`. A machine's `screenKey` names the screen
   and everything about it worth moving focus for; the element to focus marks

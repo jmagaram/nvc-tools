@@ -1,4 +1,4 @@
-import type { Picked } from '../src/components/PickedEntries.tsx'
+import type { Note, Picked } from '../src/components/PickedEntries.tsx'
 import { categories as feelingCategories } from '../src/data/feelings.ts'
 import { categories as needCategories } from '../src/data/needs.ts'
 import type { Visited as FeelingVisited } from '../src/machines/feelingPicker.ts'
@@ -86,10 +86,16 @@ const needs = index(
 function against<Kind>(
   inventory: Map<string, Indexed<Kind>>,
   entries: readonly Picked[],
-): { category: string; kind: Kind; words: string[]; notes: [] }[] | null {
+):
+  | { category: string; kind: Kind; words: string[]; notes: Note[] }[]
+  | null {
   const seen = new Set<string>()
-  const resolved: { category: string; kind: Kind; words: string[]; notes: [] }[] =
-    []
+  const resolved: {
+    category: string
+    kind: Kind
+    words: string[]
+    notes: Note[]
+  }[] = []
 
   for (const entry of entries) {
     const category = inventory.get(key(entry.category))
@@ -106,6 +112,28 @@ function against<Kind>(
       wanted.add(found)
     }
 
+    /* A note is addressed by the pair (category, word), which the nesting
+       already carries: a word appears at most once in a category, where the
+       word alone would not settle it — `surprised` is in both Excited and
+       Disquiet, and `frustrated` in both Tension and Disquiet. So nothing has
+       to be written into the note to say which one is meant. */
+    const written = new Map<string, string>()
+    for (const note of entry.notes ?? []) {
+      const found = category.byKey.get(key(note.word));
+      // The same answer an unknown word in the list gets, for the same reason.
+      if (!found) return null
+      // A note on a word that was not picked cannot have been written by the
+      // picker — `chosen` drops those on the way out — so it is a block someone
+      // has edited by hand, and guessing what they meant is worse than saying
+      // it cannot be read.
+      if (!wanted.has(found)) return null
+      // Two notes on one word leave no single answer to seed the drawer with.
+      if (written.has(found)) return null
+      const text = note.text.replace(/\s+/g, ' ').trim()
+      // A blank note is the delete, everywhere. Dropping it guesses nothing.
+      if (text) written.set(found, text)
+    }
+
     resolved.push({
       category: category.name,
       kind: category.kind,
@@ -113,10 +141,11 @@ function against<Kind>(
          a sift's `marked` goes through. Done here so a word written twice
          cannot inflate the count on the button. */
       words: category.words.filter((word) => wanted.has(word)),
-      /* Nothing in the note carries a note yet: the fence holds the words and
-         only the words, so a block read back is a block with none. What the
-         picker writes during a session lives as long as the modal does. */
-      notes: [],
+      /* In the category's own order too, so a block written back matches the
+         one that was read whatever order the notes were typed in. */
+      notes: category.words
+        .filter((word) => written.has(word))
+        .map((word) => ({ word, text: written.get(word)! })),
     })
   }
 

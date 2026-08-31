@@ -68,8 +68,9 @@
      the button row moved — the one thing the reserve exists to stop.
 
      Fixed, the leftover is always exactly what the definition did not use, and
-     a note longer than it is clipped rather than growing. `maxLines` caps it
-     at three besides, so a fourth line can never be half-drawn. */
+     a note longer than it is clipped rather than growing, and the clamp on the
+     note itself caps it at three besides, so a fourth line is never
+     half-drawn. */
   grid-template-rows: auto minmax(0, 1fr);
   gap: 0.35rem;
   padding-top: 0.5rem;

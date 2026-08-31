@@ -138,8 +138,9 @@ export function reduce(
       if (!state.noting) return state
       const { word, draft } = state.noting
       // A blank box is the delete, and the card stays where it was either way:
-      // what was written is part of the answer, not the answer itself.
-      const text = draft.trim()
+      // what was written is part of the answer, not the answer itself. Collapsed
+      // to one line, which is what a note is wherever it is kept.
+      const text = draft.replace(/\s+/g, ' ').trim()
       const rest = state.notes.filter((note) => note.word !== word)
       return {
         ...state,

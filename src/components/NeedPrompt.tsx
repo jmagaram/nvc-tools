@@ -154,7 +154,6 @@ export default function NeedPrompt({
                          with still legible on it. Nothing can reach it:
                          `.leaving` is `pointer-events: none` and the whole
                          ghost is `aria-hidden`. */
-                      maxLines={3}
                       onOpen={() => {}}
                     />
                   )
@@ -175,7 +174,6 @@ export default function NeedPrompt({
                 <NoteLine
                   word={word}
                   note={note}
-                  maxLines={3}
                   onOpen={onNote}
                 />
               }

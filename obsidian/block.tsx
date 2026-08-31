@@ -21,11 +21,19 @@ import {
 import { resolve } from "./resolve.ts";
 import type { Resolved } from "./resolve.ts";
 
-/** The layouts on offer, in the order the menu lists them. */
+/**
+ * The layouts on offer, in the order the menu lists them.
+ *
+ * The titles say what you get rather than what the layout is called: `Grouped`
+ * and `Sentence` mean something to somebody choosing between them where `Gloss`
+ * would not. The fence names underneath are permanent and are not these.
+ */
 const CHOICES: { format: Format; title: string; icon: string }[] = [
-  { format: "list", title: "List", icon: "list" },
+  { format: "gloss", title: "Grouped", icon: "list" },
+  { format: "column", title: "One word per line", icon: "list-ordered" },
+  { format: "sentence", title: "Sentence", icon: "text" },
+  { format: "inline", title: "Plain line", icon: "minus" },
   { format: "table", title: "Table", icon: "table" },
-  { format: "inline", title: "Comma separated", icon: "text" },
 ];
 
 /** A fence line for one of our languages, and nothing else. */
@@ -65,14 +73,21 @@ function render(
   ctx: MarkdownPostProcessorContext,
   format: Format,
 ) {
-  const entries = parseBlock(source);
-  if (!entries) {
+  const parsed = parseBlock(source);
+  if (!parsed) {
     /* Someone has typed something we cannot read back. Show it as the code
        block it looks like rather than drawing an empty one — whatever is in
        there is theirs, and losing it would be the worse failure. */
     el.createEl("pre").createEl("code", { text: source });
     return;
   }
+
+  /* Resolving is what tells a word which side of the met/unmet split it is on,
+     and nothing in the note says. A block that does not resolve is still drawn
+     — it parsed, so it is ours — just without the headings, which is the honest
+     answer rather than a guess at which side an unknown word belongs to. */
+  const opened = resolve(parsed);
+  const entries: Picked[] = opened ? opened.entries : parsed;
 
   el.addClass("nvc-block");
   const root = createRoot(el.createDiv());

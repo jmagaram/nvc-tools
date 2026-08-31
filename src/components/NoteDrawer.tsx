@@ -45,15 +45,15 @@ type Props = {
  * a character. Whether it names the word as well is the screen's to say — see
  * `namesWord`.
  *
- * The box is a textarea, because a note is allowed to be a sentence and then
- * another one. `Enter` keeps it, `Shift Enter` is a new line, `Escape` puts it
- * back the way it was found, and an emptied box is the delete — there is no
- * second control for that.
+ * The box is a textarea so that a long note wraps and stays visible, but what
+ * it holds is one line: `Enter` keeps it whatever is held down with it, so no
+ * line break can be typed, and text pasted in with newlines is flattened on the
+ * way out. A note is a few words caught as they come, not a paragraph being
+ * composed — and one line is what lets it live as a bullet in the note, where a
+ * line break would need a continuation rule in every reader of the format.
  *
- * None of the four is printed. A note is a few words caught as they come, not
- * a paragraph being composed, so the one rule anybody needed telling — that a
- * new line takes Shift — is one almost nobody here will reach for; the box
- * still answers it, and says nothing about itself.
+ * `Escape` puts it back the way it was found, and an emptied box is the delete
+ * — there is no second control for that. None of the three is printed.
  */
 export default function NoteDrawer({
   noting,
@@ -72,7 +72,6 @@ export default function NoteDrawer({
   const boxKeys = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (
       event.key === 'Enter' &&
-      !event.shiftKey &&
       // A modified Enter is somebody else's. ⌘/Ctrl+Enter is the host's commit
       // chord, and without this it kept the note here *and* was heard at the
       // window a moment later — against a state that was no longer noting, so
@@ -150,7 +149,6 @@ export default function NoteDrawer({
               data-note=""
               id={boxId}
               rows={1}
-              aria-keyshortcuts="Shift+Enter"
               value={noting?.draft ?? ''}
               onChange={(event) => onDraft(event.target.value)}
               onKeyDown={boxKeys}

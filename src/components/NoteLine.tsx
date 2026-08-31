@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react'
 import styles from './NoteLine.module.css'
 
 type Props = {
@@ -11,14 +10,6 @@ type Props = {
   word: string
   /** What is written about it, or null when nothing is yet. */
   note: string | null
-  /**
-   * How many of the note's own lines to show before the rest are counted.
-   *
-   * Required rather than defaulted, because the screens that draw this could
-   * genuinely differ and a silent default would quietly give one the other's
-   * answer. Both ask for three today.
-   */
-  maxLines: number
   /** Write a note about this word, or open the one already there. */
   onOpen: () => void
 }
@@ -48,13 +39,7 @@ type Props = {
  * screen the thumb's worth of target is bought with padding rather than with
  * ink, so the room it takes and the attention it draws are set separately.
  */
-export default function NoteLine({ word, note, maxLines, onOpen }: Props) {
-  const lines = note === null ? [] : note.split('\n')
-  /* Counted in the note's own lines, not in the lines it comes to once it has
-     wrapped: what is hidden is what was written and did not fit, and a line
-     that wrapped is still shown. */
-  const rest = lines.length - maxLines
-
+export default function NoteLine({ word, note, onOpen }: Props) {
 
   return (
     <button
@@ -76,21 +61,7 @@ export default function NoteLine({ word, note, maxLines, onOpen }: Props) {
           definition above it and the two read as one column of prose about the
           word. The count hugs it rather than the label, being part of the same
           sentence. */}
-      {note !== null && (
-        <span className={styles.said}>
-          <span
-            className={styles.note}
-            style={{ '--note-lines': maxLines } as CSSProperties}
-          >
-            {lines.slice(0, maxLines).join('\n')}
-          </span>
-          {rest > 0 && (
-            <span className={styles.more}>
-              +{rest} {rest === 1 ? 'line' : 'lines'}
-            </span>
-          )}
-        </span>
-      )}
+      {note !== null && <span className={styles.note}>{note}</span>}
 
       {/* The only part drawn as something to press. The row around it is the
           target too — so that what was written can be clicked to change it —
