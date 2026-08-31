@@ -1,0 +1,46 @@
+/* A sheet of specimens rather than a column of them: the whole point is that
+   two states are in the eye at once, so the comparison is made by looking
+   rather than by remembering what the last one did. */
+.sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  align-items: start;
+  gap: 1.5rem 1rem;
+  margin-top: 1rem;
+}
+
+.specimen {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.label {
+  display: grid;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+/* What the label had no room for. Quiet, because it is an aside about the
+   specimen and not part of the specimen. */
+.why {
+  font-weight: normal;
+  font-style: italic;
+  opacity: 0.6;
+}
+
+/* Near a modal's width, and no wider. Everything the note line does under
+   pressure — ellipsising, hugging its instruction, wrapping a caption — needs
+   the width to run out before it happens. */
+.frame {
+  max-width: 26rem;
+  padding: 0.75rem;
+  border: 1px solid;
+  border-radius: 0.25rem;
+}
+
+.how {
+  max-width: 40rem;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
