@@ -73,6 +73,7 @@ export default function NeedCategorySift({ state, onAction }: Props) {
               noted={noteFor(state, need.word) !== null}
               resume={state.resume === need.word}
               onClick={() => onAction({ type: 'toggle', word: need.word })}
+              onNote={() => onAction({ type: 'note', word: need.word })}
               onShow={() => onAction({ type: 'show', word: need.word })}
             />
           ))}

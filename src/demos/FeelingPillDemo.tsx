@@ -18,11 +18,20 @@ const MARKED = new Set(['agitated', 'discombobulated', 'startled', 'unnerved'])
    on the one word a screen is about. */
 const NOTED = new Set(['agitated', 'startled'])
 
+/* The three a pill can be. There is no fourth: a note cannot sit on a word
+   that is not picked. */
+const STATES = [
+  { label: 'unmarked', marked: false, noted: false },
+  { label: 'marked', marked: true, noted: false },
+  { label: 'marked with a note', marked: true, noted: true },
+]
+
 export default function FeelingPillDemo() {
   const [word, setWord] = useState('fascinated')
   const [kind, setKind] = useState<'met' | 'unmet'>('met')
   const [clicks, setClicks] = useState(0)
   const [shows, setShows] = useState(0)
+  const [notes, setNotes] = useState(0)
 
   return (
     <>
@@ -43,25 +52,37 @@ export default function FeelingPillDemo() {
         </select>
       </label>
       <hr />
-      {/* Both states of the same word, side by side, rather than a control to
+      {/* Every state of the same word, side by side, rather than a control to
           flip one between them: the difference between them is the thing worth
-          looking at, and a checkbox shows only one at a time. */}
+          looking at, and a checkbox shows only one at a time.
+
+          Three, not four. A note cannot outlive the mark under it, so there is
+          no unmarked word with one — the missing fourth pill is the shape of
+          that rule, and worth the gap it leaves in the row. */}
       <div className={styles.row}>
-        {[false, true].map((marked) => (
+        {STATES.map((state) => (
           <FeelingPill
-            key={String(marked)}
+            key={state.label}
             word={word}
             kind={kind}
-            marked={marked}
-            noted={false}
+            marked={state.marked}
+            noted={state.noted}
             resume={false}
             onClick={() => setClicks(clicks + 1)}
+            onNote={() => setNotes(notes + 1)}
             onShow={() => setShows(shows + 1)}
           />
         ))}
       </div>
       <p>
-        Unmarked and marked. Clicked {clicks} times, shown {shows} times.
+        {STATES.map((state) => state.label).join(', ')}. Clicked {clicks} times,
+        shown {shows} times, pencil clicked {notes} times.
+      </p>
+      <p>
+        The pencil is its own target for a mouse: clicking it opens the note,
+        where clicking the word marks or unmarks. Only for a mouse — a thumb
+        would miss a glyph that small more often than it hit it, and a miss
+        unmarks the word, which takes the note with it.
       </p>
       <hr />
 
@@ -85,6 +106,7 @@ export default function FeelingPillDemo() {
             noted={NOTED.has(feeling.word)}
             resume={false}
             onClick={() => {}}
+            onNote={() => {}}
             onShow={() => {}}
           />
         ))}

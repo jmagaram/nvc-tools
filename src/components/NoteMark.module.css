@@ -1,13 +1,51 @@
 /* Sits after the word, at a beat's distance, and rides the text's own colour
-   like everything else here. */
+   like everything else here.
+
+   Inert to the pointer by default, so the pill it sits in is one target: a
+   thumb aiming at a 0.72em glyph inside a pill that is already the right size
+   for a thumb would miss it more often than not, and a miss unmarks the word —
+   which takes the note with it. A phone has a way to the note already, the
+   note line below the grid going tappable on a coarse pointer.
+
+   A mouse can hit it, so a mouse is given it. This is the only way to a note
+   on the grid without the keyboard: the note line down there cannot be the
+   target, because reaching it means crossing the words above and each one
+   crossed changes which word the line is about. */
 .mark {
+  position: relative;
   display: inline-flex;
   align-items: center;
   margin-left: 0.3em;
+  pointer-events: none;
 }
 
+@media (pointer: fine) {
+  .mark {
+    pointer-events: auto;
+  }
+
+  /* A target the size of a fingertip's worth of slack around a glyph that is
+     barely there. Drawn as a pseudo-element so the pill's width is untouched —
+     nothing about a note may reflow the row it is in. It overlaps the end of
+     the word on purpose: a click that falls between the two means the pencil,
+     because opening a note you did not mean to open is a cancel, and unmarking
+     a word you did not mean to unmark is a deletion. */
+  .mark::after {
+    content: '';
+    position: absolute;
+    inset: -0.35rem -0.3rem;
+  }
+
+  .mark:hover .pencil {
+    opacity: 1;
+  }
+}
+
+/* Quieted until it is pointed at, which is the only hint that it is a target
+   — it cannot say so in words without becoming part of the pill's name. */
 .pencil {
   display: block;
+  opacity: 0.75;
 }
 
 /* What the pencil says out loud. Off-screen rather than `display: none`, which

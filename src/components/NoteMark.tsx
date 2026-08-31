@@ -53,7 +53,11 @@ function NotePencil() {
  */
 export default function NoteMark() {
   return (
-    <span className={styles.mark}>
+    /* `data-note-mark` is how the pill tells a click on the pencil from a click
+       on the word — see `FeelingPill`. An attribute rather than the module's
+       own class, because the pill imports a different stylesheet and should not
+       have to know this one's hashed names. */
+    <span className={styles.mark} data-note-mark="">
       <NotePencil />
       <span className={styles.said}> — has a note</span>
     </span>

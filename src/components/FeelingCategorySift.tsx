@@ -75,6 +75,7 @@ export default function FeelingCategorySift({ state, onAction }: Props) {
               noted={noteFor(state, feeling.word) !== null}
               resume={state.resume === feeling.word}
               onClick={() => onAction({ type: 'toggle', word: feeling.word })}
+              onNote={() => onAction({ type: 'note', word: feeling.word })}
               onShow={() => onAction({ type: 'show', word: feeling.word })}
             />
           ))}

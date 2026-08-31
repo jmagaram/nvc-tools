@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react'
 import NoteMark from './NoteMark.tsx'
 import styles from './pill.module.css'
 
@@ -25,6 +26,16 @@ type Props = {
   /** Called to turn the mark on or off. */
   onClick: () => void
   /**
+   * Called to open the note already written here, when the pencil itself is
+   * clicked rather than the word.
+   *
+   * Only reachable while there is one — the pencil is what is being clicked —
+   * so a host may treat it as 'edit', never as 'write a new one'. It is a
+   * mouse's way in and nothing else's: the keyboard has `n`, and a coarse
+   * pointer has the note line under the grid.
+   */
+  onNote: () => void
+  /**
    * Called when the word comes under attention — pointed at, or tabbed to. One
    * prop rather than two named for the events, because to a host they mean the
    * same thing: show what this word means. Reading a definition must not cost a
@@ -47,15 +58,26 @@ export default function FeelingPill({
   noted,
   resume,
   onClick,
+  onNote,
   onShow,
 }: Props) {
+  /* The pencil is a region of this button that means something else. It can be
+     a region and not a button of its own because a button inside a button is
+     not markup a browser or a screen reader is obliged to make sense of, and a
+     pill split into two controls would put fifty-six tab stops in a category of
+     twenty-eight words. Which was hit is a question the event answers. */
+  const click = (event: MouseEvent<HTMLButtonElement>) => {
+    const target = event.target as HTMLElement
+    if (target.closest('[data-note-mark]')) onNote()
+    else onClick()
+  }
   return (
     <button
       type="button"
       className={`${styles.pill} ${styles[kind]}`}
       aria-pressed={marked}
       data-sift={resume ? '' : undefined}
-      onClick={onClick}
+      onClick={click}
       onPointerEnter={onShow}
       onFocus={onShow}
     >
