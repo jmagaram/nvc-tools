@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import NeedPicker from '../components/NeedPicker.tsx'
 import { useFocusScreen } from '../focusScreen.ts'
-import { useNoteShortcut, useSubmitShortcut } from '../keyboard.ts'
-import { submitShortcut } from './shortcut.ts'
+import {
+  submitShortcutFor,
+  useNoteShortcut,
+  useSubmitShortcut,
+} from '../keyboard.ts'
 import ModalFrame from '../components/ModalFrame.tsx'
 import type { ModalHeading } from '../components/ModalFrame.tsx'
 import DeviceSelect from './DeviceSelect.tsx'
@@ -44,6 +47,16 @@ export default function NeedPickerDemo() {
      so nothing here wants width. */
   const [dialogWidth, setDialogWidth] = useState(420)
   const [lastClose, setLastClose] = useState<LastClose>({ kind: 'open' })
+  /* Which keyboard the chord is spelled for. The plugin asks Obsidian's own
+     `Platform.isMacOS`; the gallery has no such API and does not guess, because
+     a browser's answer would be OS detection sitting in `src/` — which the
+     community directory's scanner reads as plugin source and rejects. So it is
+     a control like every other prop here, and this is its starting position
+     rather than a detection. */
+  const [isMac, setIsMac] = useState(true)
+  /* Memoised because `useSubmitShortcut` takes it as a dependency: a fresh
+     object every render would tear the window listener down and put it back. */
+  const submitShortcut = useMemo(() => submitShortcutFor(isMac), [isMac])
 
   const dispatch = (action: NeedPickerAction) =>
     setState((current) => reduce(current, action))
@@ -209,6 +222,14 @@ export default function NeedPickerDemo() {
           />
         </label>
       )}
+      <label>
+        <input
+          type="checkbox"
+          checked={isMac}
+          onChange={(e) => setIsMac(e.target.checked)}
+        />{' '}
+        Mac keyboard (⌘⏎ rather than Ctrl+⏎)
+      </label>
       <hr />
 
       {inModal ? (

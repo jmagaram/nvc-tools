@@ -9,6 +9,12 @@
 // reads it as plugin source, but most of it is never imported by `obsidian/`,
 // and its demo pages would raise findings about code that never ships. Read
 // anything it says about `src/` as advisory.
+//
+// The ignore below is ours alone — the directory's scanner has no such list and
+// lints the demo pages too. So a finding it raises there is real even though
+// this config cannot see it, which is how a `navigator.userAgent` in
+// `src/demos/` came to fail a submission. Anything the demos do that a plugin
+// may not do has to go, ignored here or not.
 
 import obsidianmd from 'eslint-plugin-obsidianmd'
 

@@ -707,13 +707,21 @@ straight from `src/` and adds nothing to it.
   label, `aria-keyshortcuts`, and what counts as a press — from one `isMac` it
   is handed, and asks nobody itself. The plugin answers with Obsidian's
   `Platform.isMacOS` in `obsidian/shortcut.ts`, which is the app's own answer to
-  this exact question and true on iPhone and iPad too; the gallery, a web page
-  with no such API, asks the user agent in `src/demos/shortcut.ts`. Detecting it
-  in `src/keyboard.ts` put a browser's guess in code the plugin ships, which is
-  what `obsidianmd/platform` flags — and the plugin's rules cannot be disabled
-  in a comment, `eslint-comments/no-restricted-disable` being on. The gallery's
-  copy is the one finding `lint:obsidian` still has, in the demo folder it
-  already ignores.
+  this exact question and true on iPhone and iPad too. Detecting it in
+  `src/keyboard.ts` would put a browser's guess in code the plugin ships, which
+  is what `obsidianmd/platform` flags — and the plugin's rules cannot be
+  disabled in a comment, `eslint-comments/no-restricted-disable` being on.
+
+  **The gallery does not guess; it asks.** It is a web page with no `Platform`
+  to consult, and the obvious stand-in — a regex over `navigator.userAgent` —
+  is the very thing that rule forbids. It lived in `src/demos/shortcut.ts` on
+  the grounds that the demo folder never ships and `lint:obsidian` ignores it;
+  the community directory's scanner does not, reads all of `src/` as plugin
+  source, and failed the submission on it. So the two picker demos carry a
+  **Mac keyboard** checkbox instead, which is what the gallery is for — one
+  control per prop — and the platform is now a prop like any other. Its initial
+  value is a starting position, not a detection. The plugin is untouched: it
+  had the right answer all along.
 - **The title bar carries a control only where one is needed.** On a walk that is
   **‹ Angry** — the category it started in, since that is where its answers land,
   rather than *Back*, which left open what became of the answers already given —

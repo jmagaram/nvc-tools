@@ -33,9 +33,10 @@ export type SubmitShortcut = {
  * Which platform that is belongs to the host, not to this module. The plugin
  * knows from Obsidian's own `Platform.isMacOS` — the answer the app itself uses
  * to choose between command- and ctrl-based hotkeys, and the one the community
- * scanner asks a plugin to use. The gallery is a web page with no such API and
- * asks the user agent. Deciding it here would put one surface's answer in code
- * the other one ships.
+ * scanner asks a plugin to use. The gallery has no such API, and the browser's
+ * own answer is what that scanner rejects, so its demo pages make the platform
+ * a control and let you say. Deciding it here would put one surface's answer in
+ * code the other one ships.
  */
 export function submitShortcutFor(isMac: boolean): SubmitShortcut {
   return {
